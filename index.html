@@ -1,184 +1,456 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Name - Portfolio</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <style>
-        .hero-bg {
-            background: linear-gradient(90deg, #2563eb 0%, #7c3aed 100%);
-        }
-        .project-card:hover {
-            transform: translateY(-5px);
-            transition: all 0.3s ease;
-        }
-    </style>
-</head>
-<body class="bg-gray-50">
-    <!-- Navigation -->
-    <nav class="fixed w-full bg-white shadow-sm z-50">
-        <div class="container mx-auto px-6 py-4">
-            <div class="flex items-center justify-between">
-                <a href="#" class="text-2xl font-bold text-gray-800">Your Name</a>
-                <div class="hidden md:flex space-x-8">
-                    <a href="#about" class="text-gray-600 hover:text-blue-600">About</a>
-                    <a href="#projects" class="text-gray-600 hover:text-blue-600">Projects</a>
-                    <a href="#skills" class="text-gray-600 hover:text-blue-600">Skills</a>
-                    <a href="#contact" class="text-gray-600 hover:text-blue-600">Contact</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section class="hero-bg min-h-screen flex items-center pt-16">
-        <div class="container mx-auto px-6">
-            <div class="flex flex-col md:flex-row items-center">
-                <div class="md:w-1/2 text-center md:text-left">
-                    <h1 class="text-4xl md:text-6xl font-bold text-white mb-6">
-                        Hi, I'm Your Name
-                    </h1>
-                    <p class="text-xl text-gray-100 mb-8">
-                        A passionate developer crafting digital experiences
-                    </p>
-                    <a href="#contact" class="bg-white text-blue-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition duration-300">
-                        Get in Touch
-                    </a>
-                </div>
-                <div class="md:w-1/2 mt-12 md:mt-0">
-                    <img src="/api/placeholder/500/500" alt="Profile" class="rounded-full mx-auto w-64 h-64 object-cover shadow-xl">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- About Section -->
-    <section id="about" class="py-20">
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-bold text-center mb-12">About Me</h2>
-            <div class="max-w-3xl mx-auto text-gray-600 text-lg leading-relaxed">
-                <p>
-                    Hello! I'm a developer passionate about creating beautiful and functional web applications. 
-                    With experience in modern web technologies, I focus on delivering high-quality solutions 
-                    that solve real-world problems.
+<!-- About Section -->
+<section id="about" class="py-20 relative overflow-hidden">
+    <div class="absolute inset-0 binary-bg opacity-5"></div>
+    <div class="container mx-auto px-6 relative">
+        <h2 class="text-3xl font-bold text-center mb-12">About Me</h2>
+        <div class="max-w-3xl mx-auto">
+            <div class="bg-white/80 backdrop-blur-md rounded-2xl p-8 shadow-xl border border-blue-100">
+                <p class="text-gray-600 text-lg leading-relaxed mb-6">
+                    As a data scientist with a growing passion for robotics, I blend statistical insights with 
+                    mechanical innovation. My journey involves transforming raw data into actionable intelligence 
+                    that powers autonomous systems. I specialize in developing AI solutions that enable robots 
+                    to perceive, learn, and adapt to their environment.
                 </p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+                    <div class="text-center p-4 bg-blue-50 rounded-lg relative overflow-hidden">
+                        <div class="relative z-10">
+                            <div class="text-3xl font-bold text-blue-600 mb-2">4+</div>
+                            <div class="text-sm text-gray-600">Years in Data Science</div>
+                        </div>
+                        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMjAgMmMyLjIgMCA0IDEuOCA0IDRzLTEuOCA0LTQgNC00LTEuOC00LTQgMS44LTQgNC00em0wIDE2YzIuMiAwIDQgMS44IDQgNHMtMS44IDQtNCA0LTQtMS44LTQtNCAxLjgtNCA0LTR6IiBmaWxsPSIjOTNDNUZEIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=')] opacity-10"></div>
+                    </div>
+                    <div class="text-center p-4 bg-purple-50 rounded-lg relative overflow-hidden">
+                        <div class="relative z-10">
+                            <div class="text-3xl font-bold text-purple-600 mb-2">20+</div>
+                            <div class="text-sm text-gray-600">ML Projects</div>
+                        </div>
+                        <div class="absolute inset-0 circuit-pattern opacity-10"></div>
+                    </div>
+                    <div class="text-center p-4 bg-green-50 rounded-lg relative overflow-hidden">
+                        <div class="relative z-10">
+                            <div class="text-3xl font-bold text-green-600 mb-2">10+</div>
+                            <div class="text-sm text-gray-600">Research Papers</div>
+                        </div>
+                        <div class="absolute inset-0 bg-[radial-gradient(circle,_#22C55E_1px,_transparent_1px)] bg-[length:10px_10px] opacity-10"></div>
+                    </div>
+                    <div class="text-center p-4 bg-yellow-50 rounded-lg relative overflow-hidden">
+                        <div class="relative z-10">
+                            <div class="text-3xl font-bold text-yellow-600 mb-2">5+</div>
+                            <div class="text-sm text-gray-600">Robotics Projects</div>
+                        </div>
+                        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMjAgMmMyLjIgMCA0IDEuOCA0IDRzLTEuOCA0LTQgNC00LTEuOC00LTQgMS44LTQgNC00em0wIDE2YzIuMiAwIDQgMS44IDQgNHMtMS44IDQtNCA0LTQtMS44LTQtNCAxLjgtNCA0LTR6IiBmaWxsPSIjRkJEMzREIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=')] opacity-10"></div>
+                    </div>
+                </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Projects Section -->
-    <section id="projects" class="py-20 bg-gray-100">
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-bold text-center mb-12">Projects</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Project Card 1 -->
-                <div class="bg-white rounded-lg shadow-md overflow-hidden project-card">
-                    <img src="/api/placeholder/400/300" alt="Project 1" class="w-full h-48 object-cover">
-                    <div class="p-6">
-                        <h3 class="text-xl font-semibold mb-2">Project Name</h3>
-                        <p class="text-gray-600 mb-4">Description of your amazing project goes here.</p>
-                        <div class="flex space-x-2">
-                            <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">React</span>
-                            <span class="px-3 py-1 bg-purple-100 text-purple-600 rounded-full text-sm">Node.js</span>
+<!-- Projects Section -->
+<section id="projects" class="py-20 bg-gray-100/50 relative overflow-hidden">
+    <div class="absolute inset-0 circuit-pattern opacity-5"></div>
+    <div class="container mx-auto px-6 relative">
+        <h2 class="text-3xl font-bold text-center mb-12">Featured Projects</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Project Card 1 -->
+            <div class="project-card rounded-xl overflow-hidden">
+                <div class="relative">
+                    <img src="/api/placeholder/400/300" alt="Computer Vision Project" class="w-full h-48 object-cover">
+                    <div class="absolute top-4 right-4 bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
+                        Computer Vision
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-2">Neural Vision System</h3>
+                    <p class="text-gray-600 mb-4">Advanced computer vision system enabling robots to recognize and manipulate objects with high precision.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">PyTorch</span>
+                        <span class="px-3 py-1 bg-green-100 text-green-600 rounded-full text-sm">OpenCV</span>
+                        <span class="px-3 py-1 bg-purple-100 text-purple-600 rounded-full text-sm">ROS</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project Card 2 -->
+            <div class="project-card rounded-xl overflow-hidden">
+                <div class="relative">
+                    <img src="/api/placeholder/400/300" alt="Data Analysis Project" class="w-full h-48 object-cover">
+                    <div class="absolute top-4 right-4 bg-green-600 text-white text-xs px-2 py-1 rounded-full">
+                        Machine Learning
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-2">Predictive Maintenance AI</h3>
+                    <p class="text-gray-600 mb-4">Real-time anomaly detection system for robotic systems using sensor fusion and deep learning.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">TensorFlow</span>
+                        <span class="px-3 py-1 bg-yellow-100 text-yellow-600 rounded-full text-sm">Scikit-learn</span>
+                        <span class="px-3 py-1 bg-red-100 text-red-600 rounded-full text-sm">Pandas</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project Card 3 -->
+            <div class="project-card rounded-xl overflow-hidden">
+                <div class="relative">
+                    <img src="/api/placeholder/400/300" alt="Robotics Project" class="w-full h-48 object-cover">
+                    <div class="absolute top-4 right-4 bg-purple-600 text-white text-xs px-2 py-1 rounded-full">
+                        Robotics
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-2">Autonomous Navigation</h3>
+                    <p class="text-gray-600 mb-4">SLAM-based navigation system with reinforcement learning for adaptive path planning.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">C++</span>
+                        <span class="px-3 py-1 bg-purple-100 text-purple-600 rounded-full text-sm">ROS</span>
+                        <span class="px-3 py-1 bg-green-100 text-green-600 rounded-full text-sm">Gazebo</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Skills Section -->
+<section id="skills" class="py-20 relative overflow-hidden">
+    <div class="absolute inset-0 matrix-bg"></div>
+    <div class="container mx-auto px-6 relative">
+        <h2 class="text-3xl font-bold text-center mb-12">Technical Skills</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <!-- Data Science Skills -->
+            <div class="bg-white/90 backdrop-blur-md rounded-xl p-6 shadow-lg border border-blue-100">
+                <h3 class="text-xl font-semibold mb-4 text-blue-600">Data Science</h3>
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-gray-600">Python & Data Analysis</span>
+                            <span class="text-blue-600">95%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-600 h-2 rounded-full" style="width: 95%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-gray-600">Machine Learning</span>
+                            <span class="text-blue-600">90%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-600 h-2 rounded-full" style="width: 90%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-gray-600">Deep Learning</span>
+                            <span class="text-blue-600">85%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-600 h-2 rounded-full" style="width: 85%"></div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Project Card 2 -->
-                <div class="bg-white rounded-lg shadow-md overflow-hidden project-card">
-                    <img src="/api/placeholder/400/300" alt="Project 2" class="w-full h-48 object-cover">
-                    <div class="p-6">
-                        <h3 class="text-xl font-semibold mb-2">Project Name</h3>
-                        <p class="text-gray-600 mb-4">Description of your amazing project goes here.</p>
-                        <div class="flex space-x-2">
-                            <span class="px-3 py-1 bg-green-100 text-green-600 rounded-full text-sm">Vue</span>
-                            <span class="px-3 py-1 bg-yellow-100 text-yellow-600 rounded-full text-sm">Python</span>
+            <!-- Robotics Skills -->
+            <div class="bg-white/90 backdrop-blur-md rounded-xl p-6 shadow-lg border border-purple-100">
+                <h3 class="text-xl font-semibold mb-4 text-purple-600">Robotics</h3>
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-gray-600">ROS & Navigation</span>
+                            <span class="text-purple-600">80%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-purple-600 h-2 rounded-full" style="width: 80%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-gray-600">Computer Vision</span>
+                            <span class="text-purple-600">85%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-purple-600 h-2 rounded-full" style="width: 85%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-gray-600">Control Systems</span>
+                            <span class="text-purple-600">75%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-purple-600 h-2 rounded-full" style="width: 75%"></div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-                <!-- Project Card 3 -->
-                <div class="bg-white rounded-lg shadow-md overflow-hidden project-card">
-                    <img src="/api/placeholder/400/300" alt="Project 3" class="w-full h-48 object-cover">
-                    <div class="p-6">
-                        <h3 class="text-xl font-semibold mb-2">Project Name</h3>
-                        <p class="text-gray-600 mb-4">Description of your amazing project goes here.</p>
-                        <div class="flex space-x-2">
-                            <span class="px-3 py-1 bg-red-100 text-red-600 rounded-full text-sm">Angular</span>
-                            <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">TypeScript</span>
+<!-- Contact Section -->
+<section id="contact" class="py-20 bg-gray-100/50 relative overflow-hidden">
+    <div class="absolute inset-0 circuit-pattern opacity-5"></div>
+    <div class="container mx-auto px-6 relative">
+        <h2 class="text-3xl font-bold text-center mb-12">Get in Touch</h2>
+        <div class="max-w-lg mx-auto">
+            <div class="flex flex-col space-y-4">
+                <a href="mailto:your.email@example.com" class="group flex items-center justify-center space-x-3 bg-white rounded-xl shadow-md px-6 py-4 hover:shadow-lg transition duration-300 border border-blue-100">
+                    <span class="text-2xl group-hover:scale-110 transition-transform">📧</span>
+                    <span class="text-gray-600 font-mono">your.email@example.com</span>
+
+<!-- About Section -->
+<section id="about" class="py-20 relative overflow-hidden">
+    <div class="absolute inset-0 binary-bg opacity-5"></div>
+    <div class="container mx-auto px-6 relative">
+        <h2 class="text-3xl font-bold text-center mb-12">About Me</h2>
+        <div class="max-w-3xl mx-auto">
+            <div class="bg-white/80 backdrop-blur-md rounded-2xl p-8 shadow-xl border border-blue-100">
+                <p class="text-gray-600 text-lg leading-relaxed mb-6">
+                    As a data scientist with a growing passion for robotics, I blend statistical insights with 
+                    mechanical innovation. My journey involves transforming raw data into actionable intelligence 
+                    that powers autonomous systems. I specialize in developing AI solutions that enable robots 
+                    to perceive, learn, and adapt to their environment.
+                </p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+                    <div class="text-center p-4 bg-blue-50 rounded-lg relative overflow-hidden">
+                        <div class="relative z-10">
+                            <div class="text-3xl font-bold text-blue-600 mb-2">4+</div>
+                            <div class="text-sm text-gray-600">Years in Data Science</div>
+                        </div>
+                        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMjAgMmMyLjIgMCA0IDEuOCA0IDRzLTEuOCA0LTQgNC00LTEuOC00LTQgMS44LTQgNC00em0wIDE2YzIuMiAwIDQgMS44IDQgNHMtMS44IDQtNCA0LTQtMS44LTQtNCAxLjgtNCA0LTR6IiBmaWxsPSIjOTNDNUZEIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=')] opacity-10"></div>
+                    </div>
+                    <div class="text-center p-4 bg-purple-50 rounded-lg relative overflow-hidden">
+                        <div class="relative z-10">
+                            <div class="text-3xl font-bold text-purple-600 mb-2">20+</div>
+                            <div class="text-sm text-gray-600">ML Projects</div>
+                        </div>
+                        <div class="absolute inset-0 circuit-pattern opacity-10"></div>
+                    </div>
+                    <div class="text-center p-4 bg-green-50 rounded-lg relative overflow-hidden">
+                        <div class="relative z-10">
+                            <div class="text-3xl font-bold text-green-600 mb-2">10+</div>
+                            <div class="text-sm text-gray-600">Research Papers</div>
+                        </div>
+                        <div class="absolute inset-0 bg-[radial-gradient(circle,_#22C55E_1px,_transparent_1px)] bg-[length:10px_10px] opacity-10"></div>
+                    </div>
+                    <div class="text-center p-4 bg-yellow-50 rounded-lg relative overflow-hidden">
+                        <div class="relative z-10">
+                            <div class="text-3xl font-bold text-yellow-600 mb-2">5+</div>
+                            <div class="text-sm text-gray-600">Robotics Projects</div>
+                        </div>
+                        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMjAgMmMyLjIgMCA0IDEuOCA0IDRzLTEuOCA0LTQgNC00LTEuOC00LTQgMS44LTQgNC00em0wIDE2YzIuMiAwIDQgMS44IDQgNHMtMS44IDQtNCA0LTQtMS44LTQtNCAxLjgtNCA0LTR6IiBmaWxsPSIjRkJEMzREIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=')] opacity-10"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Projects Section -->
+<section id="projects" class="py-20 bg-gray-100/50 relative overflow-hidden">
+    <div class="absolute inset-0 circuit-pattern opacity-5"></div>
+    <div class="container mx-auto px-6 relative">
+        <h2 class="text-3xl font-bold text-center mb-12">Featured Projects</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Project Card 1 -->
+            <div class="project-card rounded-xl overflow-hidden">
+                <div class="relative">
+                    <img src="/api/placeholder/400/300" alt="Computer Vision Project" class="w-full h-48 object-cover">
+                    <div class="absolute top-4 right-4 bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
+                        Computer Vision
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-2">Neural Vision System</h3>
+                    <p class="text-gray-600 mb-4">Advanced computer vision system enabling robots to recognize and manipulate objects with high precision.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">PyTorch</span>
+                        <span class="px-3 py-1 bg-green-100 text-green-600 rounded-full text-sm">OpenCV</span>
+                        <span class="px-3 py-1 bg-purple-100 text-purple-600 rounded-full text-sm">ROS</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project Card 2 -->
+            <div class="project-card rounded-xl overflow-hidden">
+                <div class="relative">
+                    <img src="/api/placeholder/400/300" alt="Data Analysis Project" class="w-full h-48 object-cover">
+                    <div class="absolute top-4 right-4 bg-green-600 text-white text-xs px-2 py-1 rounded-full">
+                        Machine Learning
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-2">Predictive Maintenance AI</h3>
+                    <p class="text-gray-600 mb-4">Real-time anomaly detection system for robotic systems using sensor fusion and deep learning.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">TensorFlow</span>
+                        <span class="px-3 py-1 bg-yellow-100 text-yellow-600 rounded-full text-sm">Scikit-learn</span>
+                        <span class="px-3 py-1 bg-red-100 text-red-600 rounded-full text-sm">Pandas</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project Card 3 -->
+            <div class="project-card rounded-xl overflow-hidden">
+                <div class="relative">
+                    <img src="/api/placeholder/400/300" alt="Robotics Project" class="w-full h-48 object-cover">
+                    <div class="absolute top-4 right-4 bg-purple-600 text-white text-xs px-2 py-1 rounded-full">
+                        Robotics
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-2">Autonomous Navigation</h3>
+                    <p class="text-gray-600 mb-4">SLAM-based navigation system with reinforcement learning for adaptive path planning.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">C++</span>
+                        <span class="px-3 py-1 bg-purple-100 text-purple-600 rounded-full text-sm">ROS</span>
+                        <span class="px-3 py-1 bg-green-100 text-green-600 rounded-full text-sm">Gazebo</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Skills Section -->
+<section id="skills" class="py-20 relative overflow-hidden">
+    <div class="absolute inset-0 matrix-bg"></div>
+    <div class="container mx-auto px-6 relative">
+        <h2 class="text-3xl font-bold text-center mb-12">Technical Skills</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <!-- Data Science Skills -->
+            <div class="bg-white/90 backdrop-blur-md rounded-xl p-6 shadow-lg border border-blue-100 relative overflow-hidden group">
+                <div class="absolute inset-0 bg-gradient-to-r from-blue-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <h3 class="text-xl font-semibold mb-4 text-blue-600 flex items-center">
+                    <span class="text-2xl mr-2">📊</span> Data Science
+                </h3>
+                <div class="space-y-4">
+                    <div class="relative">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-gray-600 font-mono">Python & Data Analysis</span>
+                            <span class="text-blue-600">95%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-600 h-2 rounded-full transition-all duration-500" style="width: 95%"></div>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-gray-600 font-mono">Machine Learning</span>
+                            <span class="text-blue-600">90%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-600 h-2 rounded-full transition-all duration-500" style="width: 90%"></div>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-gray-600 font-mono">Statistical Analysis</span>
+                            <span class="text-blue-600">85%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-600 h-2 rounded-full transition-all duration-500" style="width: 85%"></div>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-gray-600 font-mono">Deep Learning</span>
+                            <span class="text-blue-600">80%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-600 h-2 rounded-full transition-all duration-500" style="width: 80%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Robotics Skills -->
+            <div class="bg-white/90 backdrop-blur-md rounded-xl p-6 shadow-lg border border-purple-100 relative overflow-hidden group">
+                <div class="absolute inset-0 bg-gradient-to-r from-purple-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <h3 class="text-xl font-semibold mb-4 text-purple-600 flex items-center">
+                    <span class="text-2xl mr-2">🤖</span> Robotics
+                </h3>
+                <div class="space-y-4">
+                    <div class="relative">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-gray-600 font-mono">ROS & Navigation</span>
+                            <span class="text-purple-600">80%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-purple-600 h-2 rounded-full transition-all duration-500" style="width: 80%"></div>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-gray-600 font-mono">Computer Vision</span>
+                            <span class="text-purple-600">85%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-purple-600 h-2 rounded-full transition-all duration-500" style="width: 85%"></div>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-gray-600 font-mono">Control Systems</span>
+                            <span class="text-purple-600">75%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-purple-600 h-2 rounded-full transition-all duration-500" style="width: 75%"></div>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-gray-600 font-mono">Sensor Integration</span>
+                            <span class="text-purple-600">70%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-purple-600 h-2 rounded-full transition-all duration-500" style="width: 70%"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Skills Section -->
-    <section id="skills" class="py-20">
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-bold text-center mb-12">Skills</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-                <div class="text-center">
-                    <div class="w-20 h-20 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                        <span class="text-blue-600 text-2xl">💻</span>
-                    </div>
-                    <h3 class="font-semibold">Frontend</h3>
-                    <p class="text-gray-600">HTML, CSS, JavaScript</p>
-                </div>
-                <div class="text-center">
-                    <div class="w-20 h-20 mx-auto bg-purple-100 rounded-full flex items-center justify-center mb-4">
-                        <span class="text-purple-600 text-2xl">⚙️</span>
-                    </div>
-                    <h3 class="font-semibold">Backend</h3>
-                    <p class="text-gray-600">Node.js, Python</p>
-                </div>
-                <div class="text-center">
-                    <div class="w-20 h-20 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-4">
-                        <span class="text-green-600 text-2xl">🎨</span>
-                    </div>
-                    <h3 class="font-semibold">Design</h3>
-                    <p class="text-gray-600">UI/UX, Figma</p>
-                </div>
-                <div class="text-center">
-                    <div class="w-20 h-20 mx-auto bg-yellow-100 rounded-full flex items-center justify-center mb-4">
-                        <span class="text-yellow-600 text-2xl">📱</span>
-                    </div>
-                    <h3 class="font-semibold">Mobile</h3>
-                    <p class="text-gray-600">React Native</p>
-                </div>
+<!-- Contact Section -->
+<section id="contact" class="py-20 bg-gray-100/50 relative overflow-hidden">
+    <div class="absolute inset-0 circuit-pattern opacity-5"></div>
+    <div class="container mx-auto px-6 relative">
+        <h2 class="text-3xl font-bold text-center mb-12">Get in Touch</h2>
+        <div class="max-w-lg mx-auto">
+            <div class="flex flex-col space-y-4">
+                <a href="mailto:your.email@example.com" class="group flex items-center justify-center space-x-3 bg-white rounded-xl shadow-md px-6 py-4 hover:shadow-lg transition duration-300 border border-blue-100 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <span class="text-2xl group-hover:scale-110 transition-transform">📧</span>
+                    <span class="text-gray-600 font-mono relative z-10">your.email@example.com</span>
+                </a>
+                <a href="https://github.com/yourusername" target="_blank" class="group flex items-center justify-center space-x-3 bg-white rounded-xl shadow-md px-6 py-4 hover:shadow-lg transition duration-300 border border-purple-100 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-r from-purple-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <span class="text-2xl group-hover:scale-110 transition-transform">💻</span>
+                    <span class="text-gray-600 font-mono relative z-10">GitHub</span>
+                </a>
+                <a href="https://linkedin.com/in/yourusername" target="_blank" class="group flex items-center justify-center space-x-3 bg-white rounded-xl shadow-md px-6 py-4 hover:shadow-lg transition duration-300 border border-blue-100 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <span class="text-2xl group-hover:scale-110 transition-transform">💼</span>
+                    <span class="text-gray-600 font-mono relative z-10">LinkedIn</span>
+                </a>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Contact Section -->
-    <section id="contact" class="py-20 bg-gray-100">
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-bold text-center mb-12">Get in Touch</h2>
-            <div class="max-w-lg mx-auto">
-                <div class="flex flex-col space-y-4">
-                    <a href="mailto:your.email@example.com" class="flex items-center justify-center space-x-3 bg-white rounded-lg shadow-md px-6 py-4 hover:shadow-lg transition duration-300">
-                        <span class="text-2xl">📧</span>
-                        <span class="text-gray-600">your.email@example.com</span>
-                    </a>
-                    <a href="https://github.com/yourusername" target="_blank" class="flex items-center justify-center space-x-3 bg-white rounded-lg shadow-md px-6 py-4 hover:shadow-lg transition duration-300">
-                        <span class="text-2xl">💻</span>
-                        <span class="text-gray-600">GitHub</span>
-                    </a>
-                    <a href="https://linkedin.com/in/yourusername" target="_blank" class="flex items-center justify-center space-x-3 bg-white rounded-lg shadow-md px-6 py-4 hover:shadow-lg transition duration-300">
-                        <span class="text-2xl">💼</span>
-                        <span class="text-gray-600">LinkedIn</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-8">
-        <div class="container mx-auto px-6 text-center">
-            <p>&copy; 2024 Your Name. All rights reserved.</p>
-        </div>
-    </footer>
+<!-- Footer -->
+<footer class="bg-gray-900 text-white py-8">
+    <div class="container mx-auto px-6 text-center">
+        <p class="font-mono">
+            <span class="text-blue-400">{</span> 
+            &copy; 2024 Your Name | Data Scientist & Robotics Engineer 
+            <span class="text-blue-400">}</span>
+        </p>
+    </div>
+</footer>
 </body>
 </html>
