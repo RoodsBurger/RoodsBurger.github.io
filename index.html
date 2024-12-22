@@ -10,32 +10,67 @@
 </head>
 <body class="bg-white">
     <!-- Navigation -->
-    <nav class="fixed w-full z-50 transition-colors duration-300 nav-dark">
-        <div class="container mx-auto px-6 py-4">
-            <div class="flex items-center justify-between">
-                <a href="#" class="text-xl font-mono font-medium flex items-center logo-text">
-                    <span class="text-blue-600">{</span>
-                    Rodolfo Raimundo
-                    <span class="text-blue-600">}</span>
-                </a>
-                <div class="hidden md:flex space-x-8">
-                    <a href="#about" class="transition-colors">About</a>
-                    <a href="#projects" class="transition-colors">Projects</a>
-                    <a href="#skills" class="transition-colors">Skills</a>
-                    <a href="#contact" class="transition-colors">Contact</a>
-                </div>
+    <nav class="fixed w-full z-50 transition-colors duration-300 nav-dark h-16" id="mainNav">
+        <div class="container mx-auto px-6 h-full">
+        <!-- This flex container is exactly 64px tall (h-full -> h-16 from nav) -->
+        <div class="flex items-center justify-between h-full">
+            <!-- Logo -->
+            <a href="#" class="text-xl font-mono font-medium flex items-center logo-text">
+            <span class="text-blue-600">{</span>
+            Rodolfo Raimundo
+            <span class="text-blue-600">}</span>
+            </a>
+
+            <!-- Desktop Nav (hidden on mobile) -->
+            <div class="hidden md:flex space-x-8" id="navMenu">
+            <a href="#about" class="transition-colors">About</a>
+            <a href="#projects" class="transition-colors">Projects</a>
+            <a href="#skills" class="transition-colors">Skills</a>
+            <a href="#contact" class="transition-colors">Contact</a>
             </div>
+
+            <!-- Hamburger Button (mobile only) -->
+            <button
+            class="md:hidden text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-600 p-2 rounded"
+            id="menuButton"
+            >
+            <!-- 3-line (hamburger) icon -->
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16"
+                />
+            </svg>
+            </button>
+        </div>
+        </div>
+
+        <!-- Mobile Menu: absolutely positioned below the navbar -->
+        <div
+            id="mobileMenu"
+            class="md:hidden flex flex-col space-y-4 p-4 rounded 
+                    menu-animation menu-closed 
+                    absolute top-16 left-0 w-full"
+            >
+            <a href="#about">About</a>
+            <a href="#projects">Projects</a>
+            <a href="#skills">Skills</a>
+            <a href="#contact">Contact</a>
         </div>
     </nav>
+
+
 
     <!-- Hero Section -->
     <section class="hero-section relative">
         <div class="absolute inset-0 circuit-pattern opacity-10"></div>
         <div class="container mx-auto px-6 relative h-full flex items-center justify-between mt-16">
             <div class="w-full md:w-1/2">
-                <div class="inline-block mb-6 font-mono text-sm">
-                    <span class="bg-blue-600/10 text-blue-400 px-4 py-2 rounded-full">
-                        while(true) { learn(); innovate(); }
+                <div class="mb-6">
+                    <span class="bg-blue-600/10 text-blue-400 px-3 py-1 rounded-full text-sm font-mono">
+                        ML • CV • Robotics
                     </span>
                 </div>
                 <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">

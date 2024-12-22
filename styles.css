@@ -90,3 +90,66 @@
 .nav-light .logo-text {
     color: #1a1a2e;
 }
+
+/* Add a transition to max-height and opacity, and ensure hidden overflow to avoid popping */
+.menu-animation {
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    overflow: hidden;
+  }
+  
+  /* Closed state: zero height, invisible */
+  .menu-closed {
+    max-height: 0;
+    opacity: 0;
+  }
+  
+  /* Open state: large enough max-height for all links, fully visible */
+  .menu-open {
+    max-height: 300px; /* Adjust as needed */
+    opacity: 1;
+  }
+
+  /* Navbar color states (assuming you already have nav-dark/nav-light) */
+.nav-dark {
+    background-color: #1a1a2e;
+    border-bottom: 1px solid rgba(79, 70, 229, 0.1);
+  }
+  .nav-light {
+    background-color: #fff;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  /* Menu animation classes */
+  .menu-animation {
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    overflow: hidden;
+  }
+  .menu-closed {
+    max-height: 0;
+    opacity: 0;
+  }
+  .menu-open {
+    max-height: 300px; /* or whatever height fits your links */
+    opacity: 1;
+  }
+  
+  /* For a dark mobile menu, matching nav-dark */
+.mobile-menu-dark {
+    background-color: #1a1a2e;   /* same as nav-dark background */
+    color: #cbd5e1;             /* same as nav-dark text color */
+  }
+  
+  .mobile-menu-dark a:hover {
+    color: white;
+  }
+  
+  /* For a light mobile menu, matching nav-light */
+  .mobile-menu-light {
+    background-color: #fff;     /* same as nav-light background */
+    color: #4b5563;             /* same as nav-light text color */
+  }
+  
+  .mobile-menu-light a:hover {
+    color: #1a1a2e;
+  }
+  
