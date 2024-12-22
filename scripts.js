@@ -22,6 +22,15 @@ document.addEventListener('DOMContentLoaded', function() {
           mobileMenu.classList.add('menu-closed');
         }
       });
+  
+      // 1) Close mobile menu on link click (main page)
+      const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+      mobileMenuLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          mobileMenu.classList.remove('menu-open');
+          mobileMenu.classList.add('menu-closed');
+        });
+      });
     }
   
     // Toggle mobile menu (project page)
@@ -34,6 +43,15 @@ document.addEventListener('DOMContentLoaded', function() {
           mobileMenuProject.classList.remove('menu-open');
           mobileMenuProject.classList.add('menu-closed');
         }
+      });
+  
+      // 2) Close mobile menu on link click (project page)
+      const mobileMenuProjectLinks = mobileMenuProject.querySelectorAll('a');
+      mobileMenuProjectLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          mobileMenuProject.classList.remove('menu-open');
+          mobileMenuProject.classList.add('menu-closed');
+        });
       });
     }
   
@@ -54,7 +72,6 @@ document.addEventListener('DOMContentLoaded', function() {
             menuButton.classList.add('text-gray-700', 'hover:text-gray-900');
           }
   
-          // ------ Add this: set the mobile menu to light ------
           if (mobileMenu) {
             mobileMenu.classList.remove('mobile-menu-dark');
             mobileMenu.classList.add('mobile-menu-light');
@@ -65,13 +82,11 @@ document.addEventListener('DOMContentLoaded', function() {
           nav.classList.remove('nav-light');
           nav.classList.add('nav-dark');
   
-          // Change the hamburger to match dark nav
           if (menuButton) {
             menuButton.classList.remove('text-gray-700', 'hover:text-gray-900');
             menuButton.classList.add('text-gray-300', 'hover:text-white');
           }
   
-          // ------ Add this: set the mobile menu to dark ------
           if (mobileMenu) {
             mobileMenu.classList.remove('mobile-menu-light');
             mobileMenu.classList.add('mobile-menu-dark');
@@ -82,13 +97,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // For pages without hero (project pages)
         nav.classList.add('nav-light'); // Usually always light
   
-        // If on the project page, keep hamburger dark
         if (menuButtonProject) {
           menuButtonProject.classList.remove('text-gray-300');
           menuButtonProject.classList.add('text-gray-700');
         }
   
-        // ------ Add this: set the project page mobile menu to light ------
         if (mobileMenuProject) {
           mobileMenuProject.classList.remove('mobile-menu-dark');
           mobileMenuProject.classList.add('mobile-menu-light');
