@@ -6,7 +6,7 @@
     <title>Neural Vision System - Rodolfo Raimundo</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../styles.css">
-    <script src="scripts.js" defer></script>
+    <script src="../scripts.js" defer></script>
 </head>
 <body class="bg-white">
     <!-- Navigation (same as main page) -->
@@ -47,15 +47,17 @@
 
         <!-- Mobile Menu: absolutely positioned below the 64px nav -->
         <div
-            id="mobileMenuProject"
-            class="md:hidden flex flex-col space-y-4 p-4 rounded
-                    menu-animation menu-closed
-                    absolute top-16 left-0 w-full"
-            >
+        id="mobileMenuProject"
+        class="md:hidden menu-animation menu-closed 
+                absolute top-16 left-0 w-full bg-white z-50"
+        >
+        <!-- Here’s the important part: wrap the links in a container -->
+        <div class="container mx-auto px-6 py-4 flex flex-col space-y-4">
             <a href="../index.html#about">About</a>
             <a href="../index.html#projects">Projects</a>
             <a href="../index.html#skills">Skills</a>
             <a href="../index.html#contact">Contact</a>
+        </div>
         </div>
     </nav>
 
