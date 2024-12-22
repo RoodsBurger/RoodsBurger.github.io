@@ -5,111 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rodolfo Raimundo - Data Science & Robotics</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <style>
-        .gradient-text {
-            background: linear-gradient(90deg, #4F46E5, #2563EB);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .circuit-pattern {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                linear-gradient(90deg, rgba(52, 211, 153, 0.1) 1px, transparent 1px),
-                linear-gradient(rgba(52, 211, 153, 0.1) 1px, transparent 1px);
-            background-size: 30px 30px;
-            opacity: 0.5;
-        }
-
-        .technical-grid {
-            background-image: 
-                linear-gradient(to right, rgb(226 232 240 / 0.15) 1.5px, transparent 1.5px),
-                linear-gradient(to bottom, rgb(226 232 240 / 0.15) 1.5px, transparent 1.5px);
-            background-size: 8px 8px;
-        }
-
-        .project-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-            border: 1px solid rgba(79, 70, 229, 0.1);
-        }
-
-        .project-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(79, 70, 229, 0.3);
-            box-shadow: 0 10px 30px rgba(79, 70, 229, 0.1);
-        }
-
-        .hero-section {
-            min-height: 100vh;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            background-color: #1a1a2e;
-            color: white;
-        }
-
-        .floating {
-            animation: float 6s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
+    <script src="scripts.js"></script>
 </head>
 <body class="bg-white">
     <!-- Navigation -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const nav = document.querySelector('nav');
-            const heroSection = document.querySelector('.hero-section');
-            
-            const updateNav = () => {
-                const heroBottom = heroSection.offsetTop + heroSection.offsetHeight;
-                if (window.scrollY >= heroBottom - nav.offsetHeight) {
-                    nav.classList.remove('nav-dark');
-                    nav.classList.add('nav-light');
-                } else {
-                    nav.classList.remove('nav-light');
-                    nav.classList.add('nav-dark');
-                }
-            };
-
-            window.addEventListener('scroll', updateNav);
-            updateNav();
-        });
-    </script>
-    <style>
-        .nav-dark {
-            background-color: #1a1a2e;
-            border-bottom: 1px solid rgba(79, 70, 229, 0.1);
-        }
-        .nav-dark a {
-            color: #cbd5e1;
-        }
-        .nav-dark a:hover {
-            color: white;
-        }
-        .nav-light {
-            background-color: white;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        .nav-light a {
-            color: #4b5563;
-        }
-        .nav-light a:hover {
-            color: #1a1a2e;
-        }
-        .nav-light .logo-text {
-            color: #1a1a2e;
-        }
-    </style>
     <nav class="fixed w-full z-50 transition-colors duration-300 nav-dark">
         <div class="container mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
@@ -129,7 +29,7 @@
     </nav>
 
     <!-- Hero Section -->
-    <section class="hero-section bg-white relative">
+    <section class="hero-section relative">
         <div class="absolute inset-0 circuit-pattern opacity-10"></div>
         <div class="container mx-auto px-6 relative h-full flex items-center justify-between mt-16">
             <div class="w-full md:w-1/2">
@@ -212,7 +112,7 @@
             <h2 class="text-2xl font-bold text-gray-900 mb-12">Featured Projects</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- Project 1 -->
-                <div class="project-card rounded-xl overflow-hidden">
+                <a href="projects/neural-vision.html" class="project-card rounded-xl overflow-hidden">
                     <div class="relative">
                         <img src="/api/placeholder/400/300" alt="Neural Vision System" class="w-full h-48 object-cover">
                         <div class="absolute top-4 right-4 bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
@@ -229,7 +129,7 @@
                             <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full">ROS</span>
                         </div>
                     </div>
-                </div>
+                </a>
 
                 <!-- Project 2 -->
                 <div class="project-card rounded-xl overflow-hidden">
