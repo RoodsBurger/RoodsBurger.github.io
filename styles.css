@@ -14,15 +14,19 @@
     background-image: 
         linear-gradient(90deg, rgba(52, 211, 153, 0.1) 1px, transparent 1px),
         linear-gradient(rgba(52, 211, 153, 0.1) 1px, transparent 1px);
-    background-size: 30px 30px;
+    background-size: 80px 80px;
     opacity: 0.5;
 }
 
-.technical-grid {
+.circuit-pattern-inner {
+    position: absolute;
+    width: 100%;
+    height: 100%;
     background-image: 
-        linear-gradient(to right, rgb(226 232 240 / 0.15) 1.5px, transparent 1.5px),
-        linear-gradient(to bottom, rgb(226 232 240 / 0.15) 1.5px, transparent 1.5px);
-    background-size: 8px 8px;
+        linear-gradient(90deg, rgba(52, 211, 153, 0.1) 1px, transparent 1px),
+        linear-gradient(rgba(52, 211, 153, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+    opacity: 0.5;
 }
 
 /* Project cards */
@@ -30,13 +34,13 @@
     background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(10px);
     transition: all 0.3s ease;
-    border: 1px solid rgba(79, 70, 229, 0.1);
+    border: 1px solid rgba(39, 99, 235, 0.1);
 }
 
 .project-card:hover {
-    transform: translateY(-5px);
-    border-color: rgba(79, 70, 229, 0.3);
-    box-shadow: 0 10px 30px rgba(79, 70, 229, 0.1);
+    transform: translateY(-3px);
+    border-color: rgba(39, 99, 235, 0.3);
+    box-shadow: 0 5px 15px rgba(39, 99, 235, 0.1);
 }
 
 /* Hero section */
@@ -110,27 +114,13 @@
   }
 
   /* Navbar color states (assuming you already have nav-dark/nav-light) */
-.nav-dark {
+  .nav-dark {
     background-color: #1a1a2e;
     border-bottom: 1px solid rgba(79, 70, 229, 0.1);
   }
   .nav-light {
     background-color: #fff;
     border-bottom: 1px solid #e5e7eb;
-  }
-  
-  /* Menu animation classes */
-  .menu-animation {
-    transition: max-height 0.3s ease, opacity 0.3s ease;
-    overflow: hidden;
-  }
-  .menu-closed {
-    max-height: 0;
-    opacity: 0;
-  }
-  .menu-open {
-    max-height: 300px; /* or whatever height fits your links */
-    opacity: 1;
   }
   
   /* For a dark mobile menu, matching nav-dark */
