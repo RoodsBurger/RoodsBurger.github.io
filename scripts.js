@@ -2,8 +2,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Common elements
     const nav = document.querySelector('nav');
     const heroSection = document.querySelector('.hero-section');
-    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+    const themeColorMeta = document.querySelector('meta[name="theme-color"]:not([media])');
   
+    // Immediately set the theme color for the hero section
+    if (heroSection && themeColorMeta) {
+        themeColorMeta.setAttribute('content', '#1a1a2e');
+    }
+
     // Main page selectors
     const menuButton = document.getElementById('menuButton');
     const mobileMenu = document.getElementById('mobileMenu');
@@ -63,15 +68,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const heroBottom = heroSection.offsetTop + heroSection.offsetHeight;
             const isScrolledPastHero = window.scrollY >= heroBottom - nav.offsetHeight;
             
-            // Always set the Android nav bar color to match the hero background when at the top
+            // Update theme color based on scroll position
             if (themeColorMeta) {
-                if (!isScrolledPastHero) {
-                    // Use the same dark color as the hero section background
-                    themeColorMeta.setAttribute('content', '#1a1a2e');
-                } else {
-                    // Switch to light theme after scrolling past hero
-                    themeColorMeta.setAttribute('content', '#ffffff');
-                }
+                const color = !isScrolledPastHero ? '#1a1a2e' : '#ffffff';
+                themeColorMeta.setAttribute('content', color);
+                
+                // Also update other theme-color meta tags
+                document.querySelectorAll('meta[name="theme-color"][media]').forEach(meta => {
+                    meta.setAttribute('content', color);
+                });
             }
     
             if (isScrolledPastHero) {
