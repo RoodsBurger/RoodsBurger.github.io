@@ -62,18 +62,23 @@ document.addEventListener('DOMContentLoaded', function() {
         if (heroSection) {
             const heroBottom = heroSection.offsetTop + heroSection.offsetHeight;
             const isScrolledPastHero = window.scrollY >= heroBottom - nav.offsetHeight;
+            
+            // Always set the Android nav bar color to match the hero background when at the top
+            if (themeColorMeta) {
+                if (!isScrolledPastHero) {
+                    // Use the same dark color as the hero section background
+                    themeColorMeta.setAttribute('content', '#1a1a2e');
+                } else {
+                    // Switch to light theme after scrolling past hero
+                    themeColorMeta.setAttribute('content', '#ffffff');
+                }
+            }
     
             if (isScrolledPastHero) {
                 // Switch to light nav
                 nav.classList.remove('nav-dark');
                 nav.classList.add('nav-light');
     
-                // Update Android nav bar color to white
-                if (themeColorMeta) {
-                    themeColorMeta.setAttribute('content', '#ffffff');
-                }
-    
-                // Change the hamburger to match light nav
                 if (menuButton) {
                     menuButton.classList.remove('text-gray-300', 'hover:text-white');
                     menuButton.classList.add('text-gray-700', 'hover:text-gray-900');
@@ -88,11 +93,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Switch to dark nav
                 nav.classList.remove('nav-light');
                 nav.classList.add('nav-dark');
-    
-                // Update Android nav bar color to match hero background
-                if (themeColorMeta) {
-                    themeColorMeta.setAttribute('content', '#1a1a2e');
-                }
     
                 if (menuButton) {
                     menuButton.classList.remove('text-gray-700', 'hover:text-gray-900');
