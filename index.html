@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="theme-color" content="#1a1a2e">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rodolfo Raimundo - Data Science & Robotics</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
@@ -69,8 +70,8 @@
     <section class="hero-section relative">
         <div class="absolute inset-0 circuit-pattern opacity-10"></div>
         <div class="absolute inset-0 circuit-pattern-inner opacity-10"></div>
-        <div class="container mx-auto px-6 relative h-full flex items-center justify-between mt-16">
-            <div class="w-full md:w-1/2">
+        <div class="container mx-auto px-6 relative h-full flex items-center mt-16">
+            <div class="w-full max-w-3xl">
                 <div class="mb-6">
                     <span class="bg-blue-600/10 text-blue-400 px-3 py-1 rounded-full text-sm font-mono">
                         ML • CV • Robotics
@@ -93,49 +94,49 @@
                     </a>
                 </div>
             </div>
-            <div class="hidden md:block md:w-1/2 relative">
-                <div class="relative floating">
-                    <div class="absolute inset-0 bg-blue-600 rounded-full opacity-20 blur-2xl"></div>
-                    <img src="/api/placeholder/400/400" alt="Profile" class="relative rounded-full w-64 h-64 object-cover mx-auto border-4 border-blue-600/30">
-                    <div class="absolute -top-4 -right-4 w-24 h-24 bg-green-400/10 rounded-full blur-xl"></div>
-                    <div class="absolute -bottom-4 -left-4 w-32 h-32 bg-purple-400/10 rounded-full blur-xl"></div>
-                </div>
-            </div>
         </div>
     </section>
+    
 
     <!-- About Section -->
-    <section id="about" class="py-20">
+    <section id="about" class="py-10">
         <div class="container mx-auto px-6">
-            <h2 class="text-2xl font-bold text-gray-900 mb-12">About</h2>
-            <div class="w-full">
-                <p class="text-gray-600 text-lg leading-relaxed mb-8 w-full">
-                    I specialize in developing AI solutions that enable robots to perceive, learn, and adapt to their environment. 
-                    My work focuses on bridging the gap between theoretical machine learning and practical robotics applications.
-                </p>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-                    <div class="p-4 bg-blue-50 rounded-lg relative overflow-hidden">
-                        <div class="relative z-10">
-                            <div class="text-3xl font-bold text-blue-600 mb-1">4+</div>
-                            <div class="text-sm text-gray-600">Years Experience</div>
-                        </div>
+            <h2 class="text-3xl font-bold text-gray-900 mb-12">About</h2>
+            <div class="flex flex-col md:flex-row gap-12 items-center">
+                <div class="w-full md:w-1/3">
+                    <div class="relative">
+                        <img src="/artifacts/profile.png" alt="Profile" class="rounded-full w-64 h-64 object-cover mx-auto border-2 border-gray-200">
                     </div>
-                    <div class="p-4 bg-purple-50 rounded-lg relative overflow-hidden">
-                        <div class="relative z-10">
-                            <div class="text-3xl font-bold text-purple-600 mb-1">20+</div>
-                            <div class="text-sm text-gray-600">ML Projects</div>
+                </div>
+                <div class="w-full md:w-2/3">
+                    <p class="text-gray-600 text-lg leading-relaxed mb-8">
+                        I specialize in developing AI solutions that enable robots to perceive, learn, and adapt to their environment. 
+                        My work focuses on bridging the gap between theoretical machine learning and practical robotics applications.
+                    </p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                        <div class="p-4 bg-blue-50 rounded-lg relative overflow-hidden">
+                            <div class="relative z-10">
+                                <div class="text-3xl font-bold text-blue-600 mb-1">4+</div>
+                                <div class="text-sm text-gray-600">Years Experience</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="p-4 bg-green-50 rounded-lg relative overflow-hidden">
-                        <div class="relative z-10">
-                            <div class="text-3xl font-bold text-green-600 mb-1">10+</div>
-                            <div class="text-sm text-gray-600">Publications</div>
+                        <div class="p-4 bg-purple-50 rounded-lg relative overflow-hidden">
+                            <div class="relative z-10">
+                                <div class="text-3xl font-bold text-purple-600 mb-1">20+</div>
+                                <div class="text-sm text-gray-600">ML Projects</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="p-4 bg-yellow-50 rounded-lg relative overflow-hidden">
-                        <div class="relative z-10">
-                            <div class="text-3xl font-bold text-yellow-600 mb-1">5+</div>
-                            <div class="text-sm text-gray-600">Robotics Systems</div>
+                        <div class="p-4 bg-green-50 rounded-lg relative overflow-hidden">
+                            <div class="relative z-10">
+                                <div class="text-3xl font-bold text-green-600 mb-1">10+</div>
+                                <div class="text-sm text-gray-600">Publications</div>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-yellow-50 rounded-lg relative overflow-hidden">
+                            <div class="relative z-10">
+                                <div class="text-3xl font-bold text-yellow-600 mb-1">5+</div>
+                                <div class="text-sm text-gray-600">Robotics Systems</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -144,10 +145,9 @@
     </section>
 
     <!-- Projects Section -->
-    <section id="projects" class="py-20 bg-gray-50 relative">
-        <div class="absolute inset-0 circuit-pattern opacity-5"></div>
+    <section id="projects" class="py-10 bg-gray-50 relative">
         <div class="container mx-auto px-6">
-            <h2 class="text-2xl font-bold text-gray-900 mb-12">Featured Projects</h2>
+            <h2 class="text-3xl font-bold text-gray-900 mb-12">Recent Projects</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- Project 1 -->
                 <a href="projects/neural-vision.html" class="project-card rounded-xl overflow-hidden">
@@ -212,12 +212,11 @@
         </div>
     </section>
 
-    <!-- Skills Section -->
+    <!-- Skills Section
     <section id="skills" class="py-20">
         <div class="container mx-auto px-6">
             <h2 class="text-2xl font-bold text-gray-900 mb-8">Skills & Technologies</h2>
             <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Data Science & ML -->
                 <div class="bg-white rounded-xl border border-gray-100 overflow-hidden group hover:border-blue-100 transition-colors">
                     <div class="px-6 py-4 bg-gray-50 border-b border-gray-100">
                         <h3 class="text-sm font-semibold text-gray-900">Data Science & ML</h3>
@@ -233,8 +232,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Robotics & Systems -->
                 <div class="bg-white rounded-xl border border-gray-100 overflow-hidden group hover:border-purple-100 transition-colors">
                     <div class="px-6 py-4 bg-gray-50 border-b border-gray-100">
                         <h3 class="text-sm font-semibold text-gray-900">Robotics & Systems</h3>
@@ -252,12 +249,12 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> -->
 
     <!-- Hobbies Section -->
-    <section id="hobbies" class="py-20 bg-gray-50 relative">
+    <section id="hobbies" class="py-10">
         <div class="container mx-auto px-6">
-            <h2 class="text-2xl font-bold text-gray-900 mb-12">Beyond Tech</h2>
+            <h2 class="text-3xl font-bold text-gray-900 mb-12">Beyond Tech</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <!-- Climbing Card -->
                 <div class="group relative">
@@ -305,27 +302,37 @@
                     <span class="inline-block mt-4 text-sm font-medium text-blue-600">Wheel Throwing</span>
                 </div>
             </div>
+            
+            <!-- View More Link -->
+            <div class="flex justify-center mt-12">
+                <a href="hobbies.html" class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold transition-colors">
+                    View More Hobbies
+                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </a>
+            </div>
         </div>
     </section>
 
     <!-- Contact Section -->
-    <section id="contact" class="py-20">
+    <section id="contact" class="py-10 bg-gray-50 relative">
         <div class="container mx-auto px-6">
-            <h2 class="text-2xl font-bold text-gray-900 mb-8">Contact</h2>
+            <h2 class="text-3xl font-bold text-gray-900 mb-8">Contact</h2>
             <div class="w-full max-w-5xl mx-auto">
                 <div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
                     <div class="grid md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-100">
                         <a href="mailto:r.raimundo@columbia.edu" class="flex items-center p-4 hover:bg-gray-50 transition">
-                            <span class="text-gray-400 text-sm mr-3">Email</span>
-                            <span class="text-gray-600 text-sm truncate">r.raimundo@columbia.edu</span>
+                            <span class="text-gray-400 text-sm w-16">Email</span>
+                            <span class="text-gray-600 text-sm ml-4">r.raimundo@columbia.edu</span>
                         </a>
                         <a href="https://github.com/RoodsBurger" target="_blank" class="flex items-center p-4 hover:bg-gray-50 transition">
-                            <span class="text-gray-400 text-sm mr-3">GitHub</span>
-                            <span class="text-gray-600 text-sm truncate">github.com/RoodsBurger</span>
+                            <span class="text-gray-400 text-sm w-16">GitHub</span>
+                            <span class="text-gray-600 text-sm ml-4">github.com/RoodsBurger</span>
                         </a>
                         <a href="https://www.linkedin.com/in/rodolfo-raimundo" target="_blank" class="flex items-center p-4 hover:bg-gray-50 transition">
-                            <span class="text-gray-400 text-sm mr-3">LinkedIn</span>
-                            <span class="text-gray-600 text-sm truncate">linkedin.com/in/rodolfo-raimundo</span>
+                            <span class="text-gray-400 text-sm w-16">LinkedIn</span>
+                            <span class="text-gray-600 text-sm ml-4">linkedin.com/in/rodolfo-raimundo</span>
                         </a>
                     </div>
                 </div>
@@ -334,7 +341,7 @@
     </section>
 
     <!-- Footer -->
-    <footer class="py-8 text-center text-gray-500 text-sm">
+    <footer class="py-8 text-center text-gray-500 text-sm bg-gray-50 relative">
         <div class="container mx-auto px-6">
             © 2024 Rodolfo Raimundo
         </div>
