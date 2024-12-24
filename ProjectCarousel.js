@@ -1,5 +1,6 @@
 const { useState, useRef } = React;
 
+// SVG components remain the same
 const ChevronLeft = () => React.createElement('svg', {
   xmlns: "http://www.w3.org/2000/svg",
   width: "24",
@@ -31,6 +32,17 @@ const ProjectCarousel = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState(0);
   const containerRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  // Update isMobile state on window resize
+  React.useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Category colors mapping
   const categoryColors = {
@@ -73,8 +85,9 @@ const ProjectCarousel = () => {
     }
   ];
 
+  const itemsPerPage = isMobile ? 1 : 3;
   const canScrollLeft = currentIndex > 0;
-  const canScrollRight = currentIndex < projects.length - 3;
+  const canScrollRight = currentIndex < projects.length - itemsPerPage;
 
   const handleMouseDown = (e) => {
     setIsDragging(true);
@@ -86,7 +99,7 @@ const ProjectCarousel = () => {
 
     const dragDistance = e.pageX - dragStart;
     const containerWidth = containerRef.current.offsetWidth;
-    const threshold = containerWidth * 0.1; // 10% threshold for slide change
+    const threshold = containerWidth * 0.1;
 
     if (Math.abs(dragDistance) > threshold) {
       if (dragDistance > 0 && canScrollLeft) {
@@ -121,7 +134,7 @@ const ProjectCarousel = () => {
   const renderProject = (project, index) => {
     return React.createElement('div', { 
       key: index, 
-      className: 'w-1/3 flex-shrink-0 px-4 py-2' 
+      className: `w-full md:w-1/3 flex-shrink-0 px-4 py-2` 
     }, 
       React.createElement('a', {
         href: project.link,
@@ -170,7 +183,7 @@ const ProjectCarousel = () => {
   };
 
   // Create progress indicators
-  const progressDots = Array.from({ length: projects.length - 2 }).map((_, i) => 
+  const progressDots = Array.from({ length: projects.length - (itemsPerPage - 1) }).map((_, i) => 
     React.createElement('div', {
       key: `dot-${i}`,
       className: `h-1 rounded-full transition-all duration-300 ${
@@ -197,7 +210,7 @@ const ProjectCarousel = () => {
       }, 
         React.createElement('div', {
           className: `flex transition-transform duration-300 ease-in-out ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`,
-          style: { transform: `translateX(-${currentIndex * (100 / 3)}%)` }
+          style: { transform: `translateX(-${currentIndex * 100}%)` }
         }, projects.map(renderProject))
       )
     ]),
