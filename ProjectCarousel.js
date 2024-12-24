@@ -79,7 +79,7 @@ const ProjectCarousel = () => {
     {
       title: "Magnetic Wallet",
       description: "Advanced vision processing pipeline for industrial automation applications.",
-      image: "/artifacts/wallet_render_q.png",
+      image: "/artifacts/wallet_render.png",
       category: "Industrial Design",
       tags: ["Fusion", "3D Printing"]
     }
