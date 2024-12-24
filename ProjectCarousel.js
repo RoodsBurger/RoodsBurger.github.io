@@ -60,7 +60,7 @@ const ProjectCarousel = () => {
       image: "/artifacts/tobias_render_2.png",
       link: "projects/tobias.html",
       category: "Reinforcement Learning",
-      tags: ["PyTorch", "ROS"]
+      tags: ["PyTorch", "Fusion"]
     },
     {
       title: "Knolling Bot",
@@ -85,10 +85,12 @@ const ProjectCarousel = () => {
     }
   ];
 
+  // Items per page for desktop vs mobile
   const itemsPerPage = isMobile ? 1 : 3;
   const canScrollLeft = currentIndex > 0;
   const canScrollRight = currentIndex < projects.length - itemsPerPage;
 
+  // MOUSE events
   const handleMouseDown = (e) => {
     setIsDragging(true);
     setDragStart(e.pageX);
@@ -96,7 +98,6 @@ const ProjectCarousel = () => {
 
   const handleMouseMove = (e) => {
     if (!isDragging) return;
-
     const dragDistance = e.pageX - dragStart;
     const containerWidth = containerRef.current.offsetWidth;
     const threshold = containerWidth * 0.1;
@@ -119,6 +120,33 @@ const ProjectCarousel = () => {
     setIsDragging(false);
   };
 
+  // TOUCH events (mirroring mouse)
+  const handleTouchStart = (e) => {
+    setIsDragging(true);
+    setDragStart(e.touches[0].clientX);
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isDragging) return;
+    const dragDistance = e.touches[0].clientX - dragStart;
+    const containerWidth = containerRef.current.offsetWidth;
+    const threshold = containerWidth * 0.1;
+
+    if (Math.abs(dragDistance) > threshold) {
+      if (dragDistance > 0 && canScrollLeft) {
+        scrollLeft();
+      } else if (dragDistance < 0 && canScrollRight) {
+        scrollRight();
+      }
+      setIsDragging(false);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+  };
+
+  // Arrow click logic
   const scrollLeft = () => {
     if (canScrollLeft) {
       setCurrentIndex(currentIndex - 1);
@@ -131,6 +159,7 @@ const ProjectCarousel = () => {
     }
   };
 
+  // Renders each project
   const renderProject = (project, index) => {
     return React.createElement('div', { 
       key: index, 
@@ -203,20 +232,27 @@ const ProjectCarousel = () => {
         key: 'carousel-content',
         className: 'overflow-hidden select-none',
         ref: containerRef,
+        // MOUSE events
         onMouseDown: handleMouseDown,
         onMouseMove: handleMouseMove,
         onMouseUp: handleMouseUp,
-        onMouseLeave: handleMouseLeave
+        onMouseLeave: handleMouseLeave,
+        // TOUCH events
+        onTouchStart: handleTouchStart,
+        onTouchMove: handleTouchMove,
+        onTouchEnd: handleTouchEnd
       }, 
         React.createElement('div', {
           className: `flex transition-transform duration-300 ease-in-out ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`,
-          style: { transform: `translateX(-${currentIndex * 100}%)` }
+          style: { transform: `translateX(-${currentIndex * (100 / itemsPerPage)}%)` }
         }, projects.map(renderProject))
       )
     ]),
+    // Progress / arrows container
     React.createElement('div', {
       key: 'progress',
-      className: 'absolute -bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-6 py-4'
+      // Minimal change to ensure everything is horizontally centered
+      className: 'absolute bottom-3 inset-x-0 flex justify-center items-center gap-6'
     }, [
       React.createElement('button', {
         key: 'left-button-bottom',
