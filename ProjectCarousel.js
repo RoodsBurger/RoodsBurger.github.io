@@ -56,7 +56,7 @@ const ProjectCarousel = () => {
   const projects = [
     {
       title: "Tobias",
-      description: "Computer vision system enabling robots to recognize and manipulate objects with high precision.",
+      description: "4-legged robot project that integrates CAD Design, Physics Simulation, and Reinforcement Learning to achieve stable walking gaits and straight-line locomotion.",
       image: "/artifacts/tobias_render_2.png",
       link: "projects/tobias.html",
       category: "Reinforcement Learning",
@@ -64,21 +64,21 @@ const ProjectCarousel = () => {
     },
     {
       title: "Knolling Bot",
-      description: "Real-time anomaly detection system using sensor fusion and deep learning for automated organization.",
+      description: "End-to-end Computer Vision model that combines ControlNet architecture and YOLO object detection to transform cluttered object arrangements into organized setups.",
       image: "/artifacts/knolling_main.jpg",
       category: "Deep Learning",
       tags: ["YOLO", "Diffusion", "ControlNet"]
     },
     {
       title: "Artificial Synaptic Pruning",
-      description: "Novel neural network architecture inspired by biological pruning mechanisms for efficient learning.",
-      image: "/artifacts/synaptic.png",
+      description: "Novel neural network optimization approach that applies biological pruning principles to improve model performance while significantly reducing computational requirements.",
+      image: "/artifacts/cnn_diagram.png",
       category: "Computational Neuroscience",
       tags: ["Keras", "TensorFlow"]
     },
     {
       title: "Magnetic Wallet",
-      description: "Advanced vision processing pipeline for industrial automation applications.",
+      description: "Minimalist wallet design that uses magnets for smooth opening/closing and an innovative card presentation system.",
       image: "/artifacts/wallet_render.png",
       category: "Industrial Design",
       tags: ["Fusion", "3D Printing"]
@@ -167,7 +167,7 @@ const ProjectCarousel = () => {
     }, 
       React.createElement('a', {
         href: project.link,
-        className: "project-card rounded-xl overflow-hidden block h-full transform transition duration-200 hover:-translate-y-2 hover:shadow-lg"
+        className: "project-card rounded-xl overflow-hidden block h-full transform transition duration-200 hover:-translate-y-2 hover:shadow-lg flex flex-col"
       }, [
         React.createElement('div', { 
           key: 'image-container',
@@ -187,7 +187,7 @@ const ProjectCarousel = () => {
         ]),
         React.createElement('div', {
           key: 'content',
-          className: 'p-6'
+          className: 'p-6 flex flex-col flex-grow'
         }, [
           React.createElement('h3', {
             key: 'title',
@@ -195,7 +195,7 @@ const ProjectCarousel = () => {
           }, project.title),
           React.createElement('p', {
             key: 'description',
-            className: 'text-gray-600 text-sm mb-4 line-clamp-3'
+            className: 'text-gray-600 text-sm mb-4 line-clamp-3 flex-grow'
           }, project.description),
           React.createElement('div', {
             key: 'tags',
