@@ -49,7 +49,7 @@ const ProjectCarousel = () => {
     'Reinforcement Learning': 'bg-blue-600',
     'Deep Learning': 'bg-green-600',
     'Computational Neuroscience': 'bg-purple-600',
-    'Computer Vision': 'bg-yellow-600',
+    'Industrial Design': 'bg-yellow-600',
     'Robotics': 'bg-red-600'
   };
 
@@ -60,28 +60,28 @@ const ProjectCarousel = () => {
       image: "/artifacts/tobias_render_2.png",
       link: "projects/tobias.html",
       category: "Reinforcement Learning",
-      tags: ["PyTorch", "Fusion"]
+      tags: ["PyTorch", "Fusion", "PyBullet"]
     },
     {
       title: "Knolling Bot",
       description: "Real-time anomaly detection system using sensor fusion and deep learning for automated organization.",
       image: "/artifacts/knolling_main.jpg",
       category: "Deep Learning",
-      tags: ["YOLO", "Diffusion"]
+      tags: ["YOLO", "Diffusion", "ControlNet"]
     },
     {
       title: "Artificial Synaptic Pruning",
       description: "Novel neural network architecture inspired by biological pruning mechanisms for efficient learning.",
-      image: "/artifacts/cnn_diagram.png",
+      image: "/artifacts/synaptic.png",
       category: "Computational Neuroscience",
       tags: ["Keras", "TensorFlow"]
     },
     {
-      title: "Computer Vision Pipeline",
+      title: "Magnetic Wallet",
       description: "Advanced vision processing pipeline for industrial automation applications.",
-      image: "/artifacts/tobias_render_2.png",
-      category: "Computer Vision",
-      tags: ["OpenCV", "TensorFlow"]
+      image: "/artifacts/wallet_render_q.png",
+      category: "Industrial Design",
+      tags: ["Fusion", "3D Printing"]
     }
   ];
 
