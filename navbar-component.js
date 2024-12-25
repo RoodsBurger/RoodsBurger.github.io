@@ -18,8 +18,12 @@ class NavBar extends HTMLElement {
     }
   
     render() {
+      const navClasses = this.isDark ? 'nav-dark' : 'nav-light';
+      const mobileMenuClasses = this.isDark ? 'mobile-menu-dark' : 'bg-white';
+      const buttonClasses = this.isDark ? 'text-gray-300 hover:text-white' : 'text-gray-700 hover:text-gray-900';
+  
       this.innerHTML = `
-        <nav class="fixed w-full z-50 transition-colors duration-300 ${this.isDark ? 'nav-dark' : 'nav-light'} h-16" id="mainNav">
+        <nav class="fixed w-full z-50 transition-colors duration-300 ${navClasses} h-16" id="mainNav">
           <div class="container mx-auto px-6 h-full">
             <div class="flex items-center justify-between h-full">
               <!-- Logo -->
@@ -30,17 +34,15 @@ class NavBar extends HTMLElement {
               </a>
   
               <!-- Desktop Nav -->
-              <div class="hidden md:flex space-x-8" id="navMenu">
-                <a href="${this.getPath('index.html')}#about">About</a>
-                <a href="${this.getPath('index.html')}#projects">Projects</a>
-                <a href="${this.getPath('index.html')}#hobbies">Beyond Tech</a>
-                <a href="${this.getPath('index.html')}#contact">Contact</a>
+              <div class="hidden md:flex space-x-8">
+                <a href="${this.basePath}#about">About</a>
+                <a href="${this.basePath}#projects">Projects</a>
+                <a href="${this.basePath}#hobbies">Hobbies</a>
+                <a href="${this.basePath}#contact">Contact</a>
               </div>
   
               <!-- Hamburger Button -->
-              <button 
-                class="md:hidden ${this.isDark ? 'text-gray-300 hover:text-white' : 'text-gray-700 hover:text-gray-900'} focus:outline-none focus:ring-2 focus:ring-blue-600 p-2 rounded"
-                id="menuButton">
+              <button class="md:hidden ${buttonClasses} focus:outline-none focus:ring-2 focus:ring-blue-600 p-2 rounded">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                 </svg>
@@ -49,43 +51,68 @@ class NavBar extends HTMLElement {
           </div>
   
           <!-- Mobile Menu -->
-          <div id="mobileMenu" 
-               class="md:hidden menu-animation menu-closed absolute top-16 left-0 w-full bg-white z-50">
+          <div class="md:hidden menu-animation menu-closed absolute top-16 left-0 w-full ${mobileMenuClasses} z-50">
             <div class="container mx-auto px-6 py-4 flex flex-col space-y-4">
-              <a href="${this.getPath('index.html')}#about">About</a>
-              <a href="${this.getPath('index.html')}#projects">Projects</a>
-              <a href="${this.getPath('index.html')}#hobbies">Beyond Tech</a>
-              <a href="${this.getPath('index.html')}#contact">Contact</a>
+              <a href="${this.basePath}#about">About</a>
+              <a href="${this.basePath}#projects">Projects</a>
+              <a href="${this.basePath}#hobbies">Hobbies</a>
+              <a href="${this.basePath}#contact">Contact</a>
             </div>
           </div>
         </nav>
       `;
+  
+      if (this.isDark) {
+        this.setupScrollListener();
+      }
     }
   
     setupEventListeners() {
-      const menuButton = this.querySelector('#menuButton');
-      const mobileMenu = this.querySelector('#mobileMenu');
+      const button = this.querySelector('button');
+      const mobileMenu = this.querySelector('.menu-animation');
   
-      if (menuButton && mobileMenu) {
-        menuButton.addEventListener('click', () => {
-          if (mobileMenu.classList.contains('menu-closed')) {
-            mobileMenu.classList.remove('menu-closed');
-            mobileMenu.classList.add('menu-open');
-          } else {
-            mobileMenu.classList.remove('menu-open');
-            mobileMenu.classList.add('menu-closed');
-          }
-        });
+      button?.addEventListener('click', () => {
+        mobileMenu.classList.toggle('menu-closed');
+        mobileMenu.classList.toggle('menu-open');
+      });
   
-        // Close mobile menu on link click
-        const mobileMenuLinks = mobileMenu.querySelectorAll('a');
-        mobileMenuLinks.forEach(link => {
-          link.addEventListener('click', () => {
-            mobileMenu.classList.remove('menu-open');
-            mobileMenu.classList.add('menu-closed');
-          });
+      mobileMenu?.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          mobileMenu.classList.add('menu-closed');
+          mobileMenu.classList.remove('menu-open');
         });
-      }
+      });
+    }
+  
+    setupScrollListener() {
+      const heroSection = document.querySelector('.hero-section');
+      const nav = this.querySelector('nav');
+      const mobileMenu = this.querySelector('.menu-animation');
+      const button = this.querySelector('button');
+  
+      const updateNav = () => {
+        if (!heroSection || !nav) return;
+        
+        const heroBottom = heroSection.offsetTop + heroSection.offsetHeight;
+        const isScrolledPastHero = window.scrollY >= heroBottom - nav.offsetHeight;
+  
+        nav.className = `fixed w-full z-50 transition-colors duration-300 ${isScrolledPastHero ? 'nav-light' : 'nav-dark'} h-16`;
+        
+        if (isScrolledPastHero) {
+          mobileMenu?.classList.remove('mobile-menu-dark');
+          mobileMenu?.classList.add('bg-white');
+          button?.classList.remove('text-gray-300', 'hover:text-white');
+          button?.classList.add('text-gray-700', 'hover:text-gray-900');
+        } else {
+          mobileMenu?.classList.add('mobile-menu-dark');
+          mobileMenu?.classList.remove('bg-white');
+          button?.classList.add('text-gray-300', 'hover:text-white');
+          button?.classList.remove('text-gray-700', 'hover:text-gray-900');
+        }
+      };
+  
+      window.addEventListener('scroll', updateNav);
+      updateNav();
     }
   }
   
