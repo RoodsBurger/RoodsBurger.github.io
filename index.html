@@ -8,68 +8,16 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" href="/artifacts/logo.png" type="image/png">
-    <script src="scripts.js" defer></script>
-    <script src="navbar.js" defer></script>
+    <script src="./scripts.js" defer></script>
+    <script src="./navbar.js" defer></script>
     <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
     <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <script type="module" src="./ProjectCarousel.js"></script>
+    <script src="./navbar-component.js" defer></script>
 </head>
 <body class="bg-white">
     <!-- Navigation -->
-    <nav class="fixed w-full z-50 transition-colors duration-300 nav-dark h-16" id="mainNav">
-        <div class="container mx-auto px-6 h-full">
-        <!-- This flex container is exactly 64px tall (h-full -> h-16 from nav) -->
-        <div class="flex items-center justify-between h-full">
-            <!-- Logo -->
-            <a href="#" class="text-xl font-mono font-medium flex items-center logo-text">
-            <span class="text-blue-600">{</span>
-            Rodolfo Raimundo
-            <span class="text-blue-600">}</span>
-            </a>
-
-            <!-- Desktop Nav (hidden on mobile) -->
-            <div class="hidden md:flex space-x-8" id="navMenu">
-            <a href="#about" class="transition-colors">About</a>
-            <a href="#projects" class="transition-colors">Projects</a>
-            <a href="#hobbies" class="transition-colors">Hobbies</a>
-            <a href="#contact" class="transition-colors">Contact</a>
-            </div>
-
-            <!-- Hamburger Button (mobile only) -->
-            <button
-            class="md:hidden text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-600 p-2 rounded"
-            id="menuButton"
-            >
-            <!-- 3-line (hamburger) icon -->
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M4 6h16M4 12h16M4 18h16"
-                />
-            </svg>
-            </button>
-        </div>
-        </div>
-
-        <!-- Mobile Menu: absolutely positioned below the navbar -->
-        <div
-            id="mobileMenu"
-            class="md:hidden menu-animation menu-closed 
-                absolute top-16 left-0 w-full bg-white z-50"
-        >
-            <!-- Here’s the important part: wrap the links in a container -->
-            <div class="container mx-auto px-6 py-4 flex flex-col space-y-4">
-                <a href="#about">About</a>
-                <a href="#projects">Projects</a>
-                <a href="#hobbies">Hobbies</a>
-                <a href="#contact">Contact</a>
-            </div>
-        </div>
-    </nav>
-
-
+    <nav-bar theme="dark"></nav-bar>
 
     <!-- Hero Section -->
     <section class="hero-section relative">
@@ -134,13 +82,13 @@
                         <div class="p-4 bg-green-50 rounded-lg relative overflow-hidden">
                             <div class="relative z-10">
                                 <div class="text-3xl font-bold text-green-600 mb-1">10+</div>
-                                <div class="text-sm text-gray-600">Publications</div>
+                                <div class="text-sm text-gray-600">Machine Learning Projects</div>
                             </div>
                         </div>
                         <div class="p-4 bg-yellow-50 rounded-lg relative overflow-hidden">
                             <div class="relative z-10">
-                                <div class="text-3xl font-bold text-yellow-600 mb-1">5+</div>
-                                <div class="text-sm text-gray-600">Robotics Systems</div>
+                                <div class="text-3xl font-bold text-yellow-600 mb-1">1k+</div>
+                                <div class="text-sm text-gray-600">K-12 Students Mentored</div>
                             </div>
                         </div>
                     </div>
