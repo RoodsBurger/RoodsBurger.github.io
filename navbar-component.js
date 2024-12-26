@@ -37,7 +37,7 @@ class NavBar extends HTMLElement {
               <div class="hidden md:flex space-x-8">
                 <a href="${this.basePath}#about">About</a>
                 <a href="${this.basePath}#projects">Projects</a>
-                <a href="${this.basePath}#hobbies">Hobbies</a>
+                <a href="${this.basePath}#hobbies">Beyond Tech</a>
                 <a href="${this.basePath}#contact">Contact</a>
               </div>
   
@@ -55,7 +55,7 @@ class NavBar extends HTMLElement {
             <div class="container mx-auto px-6 py-4 flex flex-col space-y-4">
               <a href="${this.basePath}#about">About</a>
               <a href="${this.basePath}#projects">Projects</a>
-              <a href="${this.basePath}#hobbies">Hobbies</a>
+              <a href="${this.basePath}#hobbies">Beyond Tech</a>
               <a href="${this.basePath}#contact">Contact</a>
             </div>
           </div>
