@@ -66,6 +66,7 @@ const ProjectCarousel = () => {
       title: "Knolling Bot",
       description: "End-to-end Computer Vision model that combines ControlNet architecture and YOLO object detection to transform cluttered object arrangements into organized setups.",
       image: "/artifacts/knolling_main.jpg",
+      link: "projects/knolling.html",
       category: "Deep Learning",
       tags: ["YOLO", "Diffusion", "ControlNet"]
     },

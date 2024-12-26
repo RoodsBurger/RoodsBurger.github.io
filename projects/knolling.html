@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="theme-color" content="#1a1a2e"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knolling Bot - Rodolfo Raimundo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .gif-video {
+            pointer-events: none;
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+        }
+        .gif-video::-webkit-media-controls {
+            display: none !important;
+        }
+        .gif-video::-webkit-media-controls-enclosure {
+            display: none !important;
+        }
+        .mobile-grid {
+            display: none;
+        }
+        @media (max-width: 768px) {
+            .desktop-grid {
+                display: none;
+            }
+            .mobile-grid {
+                display: block;
+            }
+        }
+    </style>
+    <script src="../scripts.js" defer></script>
+    <script src="../navbar.js" defer></script>
+    <script src="../navbar-component.js" defer></script>
+</head>
+<body class="bg-white">
+    <!-- Navigation -->
+    <nav-bar base-path=".."></nav-bar>
+
+    <!-- Project Header -->
+    <section class="pt-24 pb-6 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto">
+                <div class="mb-6">
+                    <a 
+                      href="../index.html#projects" 
+                      class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold transition-colors"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="w-5 h-5"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                            <polyline points="9 5 2 12 9 19"></polyline>
+                        </svg>
+                        <span>Back to Projects</span>
+                    </a>
+                </div>
+                <h1 class="text-4xl font-bold text-gray-900 mb-4">Knolling Bot</h1>
+                <div class="flex flex-wrap items-center gap-3 mb-8">
+                    <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm">Deep Learning</span>
+                    <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm">YOLO</span>
+                    <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm">ControlNet</span>
+                    <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm">Computer Vision</span>
+                </div>
+
+                <div class="hidden md:grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 desktop-grid">
+                    <div class="relative rounded-xl overflow-hidden bg-gray-100">
+                        <img src="/artifacts/knolling1.jpg" alt="Tidy Image" class="w-full h-64 object-cover">
+                    </div>
+                    <div class="relative rounded-xl overflow-hidden bg-gray-100">
+                        <img src="/artifacts/knolling2.jpg" alt="Tidy Image" class="w-full h-64 object-cover">
+                    </div>
+                    <div class="relative rounded-xl overflow-hidden bg-gray-100">
+                        <img src="/artifacts/knolling3.jpg" alt="Messy Image 2" class="w-full h-64 object-cover">
+                    </div>
+                </div>
+                
+                <div class="block md:hidden grid grid-cols-1 gap-4 mb-4 mobile-grid">
+                    <div class="relative rounded-xl overflow-hidden bg-[#efefef] h-64">
+                        <img src="/artifacts/knolling1.jpg" alt="Tidy Image" class="w-full h-full object-contain">
+                    </div>
+                </div>
+                
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Project Content -->
+    <section class="py-12">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto">
+                <div class="prose prose-lg">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Overview</h2>
+                    <p class="text-gray-600 mb-8">
+                        The Knolling Bot project, conducted under Professor Hod Lipson at the Creative Machines Lab (Columbia University), 
+                        aims to develop an end-to-end computer vision system that can transform cluttered object arrangements into organized, 
+                        aesthetically pleasing setups. Building upon previous work in this area, our current iteration focuses on creating a 
+                        robust pipeline that combines object detection, spatial understanding, and controlled image transformation.
+                    </p>
+
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Key Features</h2>
+                    <ul class="space-y-4 text-gray-600 mb-8">
+                        <li class="flex items-start gap-3">
+                            <span class="text-blue-600">•</span>
+                            <span>Advanced YOLO-based object detection system with 86% mAP50 accuracy for precise object identification and matching</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-blue-600">•</span>
+                            <span>ControlNet architecture implementation for image transformation with maintained object integrity</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-blue-600">•</span>
+                            <span>Sophisticated position-matching algorithm for accurate object correspondence between messy and organized states</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-blue-600">•</span>
+                            <span>Real-time processing capabilities with efficient overlap filtering and spatial analysis</span>
+                        </li>
+                    </ul>
+
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Technical Details</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                        <div class="bg-gray-50 rounded-xl p-6">
+                            <h3 class="font-semibold text-gray-900 mb-4">Object Detection System</h3>
+                            <ul class="space-y-3 text-gray-600">
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-600 font-bold">•</span>
+                                    <span>YOLOv11 nano architecture with pre-trained initialization</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-600 font-bold">•</span>
+                                    <span>Comprehensive data augmentation including rotation, shear, and flips</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-600 font-bold">•</span>
+                                    <span>One-to-one object mapping with position-based validation</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-6">
+                            <h3 class="font-semibold text-gray-900 mb-4">ControlNet Implementation</h3>
+                            <ul class="space-y-3 text-gray-600">
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-600 font-bold">•</span>
+                                    <span>VAE and CLIP text conditioning for precise arrangement control</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-600 font-bold">•</span>
+                                    <span>Perceptual and content loss integration for object preservation</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-600 font-bold">•</span>
+                                    <span>KL divergence term for generation stability</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Results & Performance</h2>
+                    <p class="text-gray-600 mb-8">
+                        The system demonstrates robust performance across various metrics. The YOLO-based detection system achieved 
+                        an mAP50 of 0.86 (±0.02) and mAP50-95 of 0.76 (±0.02), with both precision and recall at 0.84. The 
+                        ControlNet implementation successfully maintains object integrity during transformation while achieving 
+                        precise spatial arrangement according to knolling principles.
+                    </p>
+
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Previous Work</h2>
+                    <p class="text-gray-600 mb-8">
+                        This project builds upon significant previous work in automated knolling, including two published papers 
+                        that established the foundational approaches to this problem. While the current implementation represents 
+                        a new direction in creating an end-to-end solution, it benefits from the insights and methodologies 
+                        developed in these earlier works.
+                    </p>
+
+                    <div class="bg-blue-50 rounded-xl p-6 mb-8">
+                        <h3 class="font-semibold text-blue-900 mb-4">Want to learn more?</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-none md:flex md:flex-row gap-4">
+                            <div class="text-center md:text-left">
+                                <a href="https://github.com/H-Y-H-Y-H/knolling_bot" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700">
+                                    <span>Project GitHub</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                    </svg>
+                                </a>
+                            </div>
+                            <div class="text-center md:text-left">
+                                <a href="https://arxiv.org/abs/2310.04566" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700">
+                                    <span>Previous Paper</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                    </svg>
+                                </a>
+                            </div>
+                            <div class="text-center md:text-left">
+                                <a href="https://github.com/RoodsBurger/knolling_fall_2024" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700">
+                                    <span>Fall 2024 GitHub</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                    </svg>
+                                </a>
+                            </div>
+                            <div class="text-center md:text-left">
+                                <a href="https://drive.google.com/file/d/18J81bxjiqtAkiqBEoIBJIuk4JiBuKLgA/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700">
+                                    <span>Fall 2024 Report</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-8 text-center text-gray-500 text-sm bg-gray-50 relative">
+        <div class="container mx-auto px-6">
+            © 2024 Rodolfo Raimundo
+        </div>
+    </footer>
+</body>
+</html>
