@@ -4,28 +4,40 @@
     <meta charset="UTF-8">
     <meta name="theme-color" content="#1a1a2e"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neural Vision System - Rodolfo Raimundo</title>
+    <title>Tobias - Rodolfo Raimundo</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../styles.css">
+    <style>
+        .gif-video {
+            pointer-events: none;
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+        }
+        .gif-video::-webkit-media-controls {
+            display: none !important;
+        }
+        .gif-video::-webkit-media-controls-enclosure {
+            display: none !important;
+        }
+    </style>
     <script src="../scripts.js" defer></script>
     <script src="../navbar.js" defer></script>
     <script src="../navbar-component.js" defer></script>
 </head>
 <body class="bg-white">
-    <!-- Navigation (same as main page) -->
+    <!-- Navigation -->
     <nav-bar base-path=".."></nav-bar>
 
     <!-- Project Header -->
     <section class="pt-24 pb-6 bg-gray-50">
         <div class="container mx-auto px-6">
             <div class="max-w-4xl mx-auto">
-                <!-- Updated: Arrow icon with horizontal line, original link colors -->
                 <div class="mb-6">
                     <a 
                       href="../index.html#projects" 
                       class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold transition-colors"
                     >
-                        <!-- This SVG draws a line (x1=2 to x2=22 at y=12) plus a left-pointing arrow -->
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             class="w-5 h-5"
@@ -36,21 +48,74 @@
                             stroke-linecap="round"
                             stroke-linejoin="round"
                         >
-                            <!-- Horizontal line -->
                             <line x1="2" y1="12" x2="22" y2="12"></line>
-                            <!-- Arrow pointing left -->
                             <polyline points="9 5 2 12 9 19"></polyline>
                         </svg>
                         <span>Back to Projects</span>
                     </a>
                 </div>
-                <h1 class="text-4xl font-bold text-gray-900 mb-4">Neural Vision System</h1>
-                <div class="flex items-center gap-3 mb-8">
-                    <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm">Computer Vision</span>
+                <h1 class="text-4xl font-bold text-gray-900 mb-4">Tobias</h1>
+                <div class="flex flex-wrap items-center gap-3 mb-8">
+                    <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm">Reinforcement Learning</span>
                     <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm">PyTorch</span>
-                    <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm">ROS</span>
+                    <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm">PyBullet</span>
+                    <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm">Fusion 360</span>
                 </div>
-                <img src="/api/placeholder/1200/600" alt="Neural Vision System Demo" class="w-full rounded-xl mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div class="relative rounded-xl overflow-hidden bg-gray-100">
+                        <div class="aspect-w-16 aspect-h-9">
+                            <video 
+                                class="gif-video"
+                                autoplay
+                                loop
+                                muted
+                                playsinline
+                                webkit-playsinline
+                            >
+                                <source src="/artifacts/sac_videos/sac_20000.mov">
+                            </video>
+                        </div>
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                            <p class="text-white text-sm font-medium">10k Training Steps</p>
+                        </div>
+                    </div>
+                    
+                    <div class="relative rounded-xl overflow-hidden bg-gray-100">
+                        <div class="aspect-w-16 aspect-h-9">
+                            <video 
+                                class="gif-video"
+                                autoplay
+                                loop
+                                muted
+                                playsinline
+                                webkit-playsinline
+                            >
+                                <source src="/artifacts/sac_videos/sac_100000.mov">
+                            </video>
+                        </div>
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                            <p class="text-white text-sm font-medium">200k Training Steps</p>
+                        </div>
+                    </div>
+                    
+                    <div class="relative rounded-xl overflow-hidden bg-gray-100">
+                        <div class="aspect-w-16 aspect-h-9">
+                            <video 
+                                class="gif-video"
+                                autoplay
+                                loop
+                                muted
+                                playsinline
+                                webkit-playsinline
+                            >
+                                <source src="/artifacts/sac_videos/sac_final.mov">
+                            </video>
+                        </div>
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                            <p class="text-white text-sm font-medium">1M Training Steps</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -62,74 +127,99 @@
                 <div class="prose prose-lg">
                     <h2 class="text-2xl font-bold text-gray-900 mb-4">Overview</h2>
                     <p class="text-gray-600 mb-8">
-                        The Neural Vision System is an advanced computer vision solution that enables robots to recognize 
-                        and manipulate objects with high precision. By combining deep learning techniques with traditional 
-                        computer vision algorithms, the system achieves robust performance in varying lighting conditions 
-                        and complex environments.
+                        Tobias is a quadrupedal robot project that integrates CAD design, physics simulation, and reinforcement 
+                        learning to achieve stable walking gaits and straight-line locomotion. By combining advanced RL techniques 
+                        with detailed physical modeling, we've created a robust platform for exploring autonomous robot movement 
+                        and control.
                     </p>
 
                     <h2 class="text-2xl font-bold text-gray-900 mb-4">Key Features</h2>
                     <ul class="space-y-4 text-gray-600 mb-8">
                         <li class="flex items-start gap-3">
                             <span class="text-blue-600">•</span>
-                            <span>Real-time object detection and tracking with 99.2% accuracy</span>
+                            <span>End-to-end integration pipeline from CAD design to physical deployment using Fusion 360 and PyBullet</span>
                         </li>
                         <li class="flex items-start gap-3">
                             <span class="text-blue-600">•</span>
-                            <span>6D pose estimation for precise robotic manipulation</span>
+                            <span>Advanced reinforcement learning implementation comparing DQN and SAC algorithms for optimal gait learning</span>
                         </li>
                         <li class="flex items-start gap-3">
                             <span class="text-blue-600">•</span>
-                            <span>Seamless ROS integration for robotic control</span>
+                            <span>Custom Controller Class for precise joint movement control and physical constraints management</span>
                         </li>
                         <li class="flex items-start gap-3">
                             <span class="text-blue-600">•</span>
-                            <span>Custom-trained neural networks for specific use cases</span>
+                            <span>Successful sim-to-real transfer through both closed-loop control and action replay methods</span>
                         </li>
                     </ul>
 
                     <h2 class="text-2xl font-bold text-gray-900 mb-4">Technical Details</h2>
-                    <div class="bg-gray-50 rounded-xl p-6 mb-8">
-                        <div class="grid grid-cols-2 gap-6">
-                            <div>
-                                <h3 class="font-semibold text-gray-900 mb-2">Architecture</h3>
-                                <ul class="space-y-2 text-gray-600">
-                                    <li>• PyTorch backend</li>
-                                    <li>• ResNet50 backbone</li>
-                                    <li>• Custom FPN implementation</li>
-                                    <li>• ROS middleware</li>
-                                </ul>
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-gray-900 mb-2">Performance</h3>
-                                <ul class="space-y-2 text-gray-600">
-                                    <li>• 30 FPS on GPU</li>
-                                    <li>• 99.2% detection accuracy</li>
-                                    <li>• 2mm position accuracy</li>
-                                    <li>• 0.5° rotation accuracy</li>
-                                </ul>
-                            </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                        <div class="bg-gray-50 rounded-xl p-6">
+                            <h3 class="font-semibold text-gray-900 mb-4">Learning System</h3>
+                            <ul class="space-y-3 text-gray-600">
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-600 font-bold">•</span>
+                                    <span>SAC with entropy-based exploration and automatic temperature tuning</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-600 font-bold">•</span>
+                                    <span>28D state space capturing position, orientation, velocities, and joint angles</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-600 font-bold">•</span>
+                                    <span>Continuous 8D action space controlling joint angles (2 per leg)</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-600 font-bold">•</span>
+                                    <span>Multi-component reward system with stability and efficiency terms</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-600 font-bold">•</span>
+                                    <span>1M step training with 512 batch size and 1M buffer capacity</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-6">
+                            <h3 class="font-semibold text-gray-900 mb-4">Architecture & Implementation</h3>
+                            <ul class="space-y-3 text-gray-600">
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-600 font-bold">•</span>
+                                    <span>Dual Actor-Critic networks with 256-neuron hidden layers and ReLU activation</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-600 font-bold">•</span>
+                                    <span>Custom Controller Class handling joint constraints and gear ratios</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-600 font-bold">•</span>
+                                    <span>PyBullet physics engine with real-time simulation capabilities</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-600 font-bold">•</span>
+                                    <span>URDF robot model generated from Fusion 360 CAD design</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-600 font-bold">•</span>
+                                    <span>Learning rates: 1e-4 (actor) and 3e-4 (critic) with soft updates</span>
+                                </li>
+                            </ul>
                         </div>
                     </div>
 
                     <h2 class="text-2xl font-bold text-gray-900 mb-4">Results & Impact</h2>
                     <p class="text-gray-600 mb-8">
-                        The system has been successfully deployed in multiple industrial settings, reducing error rates 
-                        by 85% and increasing processing speed by 3x compared to traditional methods. The project has 
-                        been featured in robotics conferences and has led to two published papers.
+                        The project demonstrated the effectiveness of entropy-based RL in robotics, with the SAC implementation 
+                        significantly outperforming both DQN and traditional approaches. Our Action Replay method proved particularly 
+                        effective for sim-to-real transfer, achieving stable walking gaits in real-world conditions. The framework 
+                        provides a foundation for future work in quadrupedal robotics and reinforcement learning applications.
                     </p>
 
                     <div class="bg-blue-50 rounded-xl p-6 mb-8">
                         <h3 class="font-semibold text-blue-900 mb-4">Want to learn more?</h3>
                         <div class="flex gap-4">
-                            <a href="#" class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700">
+                            <a href="https://github.com/RoodsBurger/tobias" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700">
                                 <span>View on GitHub</span>
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                </svg>
-                            </a>
-                            <a href="#" class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700">
-                                <span>Read the Paper</span>
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                 </svg>
