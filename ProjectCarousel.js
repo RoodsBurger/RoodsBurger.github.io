@@ -74,6 +74,7 @@ const ProjectCarousel = () => {
       title: "Artificial Synaptic Pruning",
       description: "Novel neural network optimization approach that applies biological pruning principles to improve model performance while significantly reducing computational requirements.",
       image: "/artifacts/cnn_diagram.png",
+      link: "projects/pruning.html",
       category: "Computational Neuroscience",
       tags: ["Keras", "TensorFlow"]
     },
