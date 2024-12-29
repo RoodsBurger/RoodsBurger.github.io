@@ -82,6 +82,7 @@ const ProjectCarousel = () => {
       title: "Magnetic Wallet",
       description: "Minimalist wallet design that uses magnets for smooth opening/closing and an innovative card presentation system.",
       image: "/artifacts/wallet_render.png",
+      link: "projects/wallet.html",
       category: "Industrial Design",
       tags: ["Fusion", "3D Printing"]
     }
