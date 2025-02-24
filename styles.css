@@ -134,3 +134,107 @@ section[id] {
 .mobile-menu-light a:hover {
     color: #1a1a2e;
 }
+
+/* Chat-specific styles */
+
+/* Bubble styles */
+.message-bubble {
+    position: relative;
+    max-width: 85%;
+    word-wrap: break-word;
+  }
+  
+  /* Animation for typing indicator */
+  @keyframes thinking {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
+  }
+  
+  .thinking-dots {
+    animation: thinking 1.5s infinite;
+  }
+  
+  /* Custom scrollbar for chat */
+  #chat-messages::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  #chat-messages::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+  
+  #chat-messages::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 10px;
+  }
+  
+  #chat-messages::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
+  
+  /* Message bubbles and indicators */
+  .user-bubble {
+    background-color: #ECFDF5;
+    color: #065F46;
+    border-radius: 18px 18px 0 18px;
+  }
+  
+  .assistant-bubble {
+    background-color: #EFF6FF;
+    color: #1E40AF;
+    border-radius: 18px 18px 18px 0;
+  }
+  
+  /* AI avatar styling */
+  #chat-messages .bg-blue-100 {
+    background-color: #DBEAFE;
+    border: 1px solid #BFDBFE;
+  }
+  
+  /* Typography within chat bubbles */
+  .message-text {
+    line-height: 1.5;
+  }
+  
+  .message-text p {
+    margin-bottom: 0.5rem;
+  }
+  
+  .message-text p:last-child {
+    margin-bottom: 0;
+  }
+  
+  /* Button and input styling */
+  #user-input:focus {
+    border-color: #3B82F6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+  
+  #chat-form button {
+    transition: all 0.2s ease;
+  }
+  
+  #chat-form button:hover {
+    transform: translateY(-1px);
+  }
+  
+  #chat-form button:active {
+    transform: translateY(1px);
+  }
+  
+  /* Cursor animation for typing effect */
+  .typing-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 14px;
+    background-color: currentColor;
+    margin-left: 2px;
+    animation: cursor-blink 1s infinite;
+  }
+  
+  @keyframes cursor-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
