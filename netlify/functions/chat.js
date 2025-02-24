@@ -48,9 +48,9 @@ export const handler = async (event, context) => {
             token: process.env.COHERE_API_KEY
         });
 
-        // Get embedding from Cohere v2
-        console.log('Getting embedding from Cohere v2...');
-        const embedResponse = await cohere.v2.embed({
+        // Get embedding from Cohere
+        console.log('Getting embedding from Cohere...');
+        const embedResponse = await cohere.embed({
             texts: [message],
             model: 'embed-english-v3.0',
             inputType: 'search_query',
@@ -60,7 +60,7 @@ export const handler = async (event, context) => {
         // Log the full response structure for debugging
         console.log('Full embed response structure:', JSON.stringify(embedResponse, null, 2).substring(0, 500));
 
-        // Check if embeddings exist before accessing - the structure is embedResponse.embeddings.float[0]
+        // Check if embeddings exist before accessing - the structure might be different for V2
         if (!embedResponse.embeddings || !embedResponse.embeddings.float || !embedResponse.embeddings.float[0]) {
             console.error('No embeddings returned from Cohere');
             return {
@@ -128,14 +128,13 @@ export const handler = async (event, context) => {
         
         // Log the parameters for debugging
         console.log('Chat params:', JSON.stringify({
-            model: "command",
+            model: "command-r-plus-08-2024",
             messages: [
                 {
                     role: "user",
                     content: message
                 }
             ],
-            // Optional preamble for context
             preamble: `You are an AI assistant for Rodolfo's portfolio website.`
         }, null, 2));
         
@@ -145,28 +144,32 @@ export const handler = async (event, context) => {
                 messages: [
                     {
                         role: "user",
-                        content: message
+                        content: `${message}\n\nUse this context to answer my question about Rodolfo: ${context}`
                     }
-                ],
-                // Adding context as a separate field if preamble doesn't work
-                context: `Use this context to answer questions about Rodolfo: ${context}
-                        Be friendly and concise. If you're not sure about something, 
-                        say so rather than making assumptions.`
+                ]
             });
             
-            if (chatResponse && chatResponse.text) {
-                console.log('Cohere chat response preview:', chatResponse.text.substring(0, 200) + '...');
+            if (chatResponse && chatResponse.response && chatResponse.response.text) {
+                console.log('Cohere chat response preview:', chatResponse.response.text.substring(0, 200) + '...');
+                
+                return {
+                    statusCode: 200,
+                    headers,
+                    body: JSON.stringify({
+                        response: chatResponse.response.text
+                    })
+                };
             } else {
                 console.log('Full response from Cohere:', JSON.stringify(chatResponse, null, 2).substring(0, 500));
+                
+                return {
+                    statusCode: 200,
+                    headers,
+                    body: JSON.stringify({
+                        response: "I'm sorry, I couldn't generate a response at the moment."
+                    })
+                };
             }
-            
-            return {
-                statusCode: 200,
-                headers,
-                body: JSON.stringify({
-                    response: chatResponse.text || chatResponse.response?.text || "I'm sorry, I couldn't generate a response at the moment."
-                })
-            };
         } catch (error) {
             console.error('Cohere API error:', error);
             throw error; // Rethrow to be caught by the outer try/catch
