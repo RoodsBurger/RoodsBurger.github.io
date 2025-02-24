@@ -72,10 +72,9 @@ class ChatInterface {
     }
 
     async queryPinecone(embedding) {
-        const response = await fetch(`https://${INDEX_NAME}.${PINECONE_ENVIRONMENT}.pinecone.io/query`, {
+        const response = await fetch(`/.netlify/functions/pinecone-proxy`, {
             method: 'POST',
             headers: {
-                'Api-Key': 'pcsk_3Vgh69_Rk26rABeZR6wZaPzDfUi8K7mGVX1jG2ADR2XsmgCpbJNtivid8hB73pHcZdPqRe',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
