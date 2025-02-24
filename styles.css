@@ -284,29 +284,29 @@ section[id] {
   }
   
   /* Mobile chat panel */
-  @media (max-width: 768px) {
-    #chat-panel.mobile-chat-open {
-      position: absolute;
-      top: 0;
-      right: 0;
-      left: 0;
-      bottom: 0;
-      height: 100%;
-      width: 100%;
-      border-radius: 0;
-      z-index: 100;
-      overflow-y: auto;
-    }
-  
-    
-    body.overflow-hidden {
-      overflow: hidden;
-    }
-    
-    #chat-bubble {
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
+@media (max-width: 768px) {
+  #chat-panel.mobile-chat-open {
+    position: fixed; /* was absolute */
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    height: 100%;
+    width: 100%;
+    border-radius: 0;
+    z-index: 100;
+    overflow-y: auto;
   }
+
+  body.overflow-hidden {
+    overflow: hidden;
+  }
+
+  #chat-bubble {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+
   
   /* Message formatting */
   .message-text p:last-child {
