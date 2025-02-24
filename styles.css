@@ -220,13 +220,12 @@ section[id] {
 
 /* Button animation */
 #chat-bubble {
-    transition: transform 0.3s ease;
-    transform-origin: bottom right;
-  }
-  
-  #chat-bubble:hover {
-    transform: scale(1.05);
-  }
+    transition: background-color 0.3s ease;
+}
+#chat-bubble:hover {
+    background-color: #2563eb; /* Similar to your index button hover */
+}
+
   
   /* Chat panel transitions */
   #chat-panel {
@@ -240,12 +239,13 @@ section[id] {
     50% { opacity: 1; }
     100% { opacity: 0.5; }
   }
-  
   .thinking-dots {
     animation: thinking 1.5s infinite;
     min-width: 60px;
     display: inline-block;
+    padding-left: 0.5rem;
   }
+  
   
   /* Message bubbles */
   .user-bubble {
@@ -286,15 +286,18 @@ section[id] {
   /* Mobile chat panel */
   @media (max-width: 768px) {
     #chat-panel.mobile-chat-open {
-      bottom: 0;
+      position: absolute;
+      top: 0;
       right: 0;
       left: 0;
-      top: 0;
+      bottom: 0;
       height: 100%;
       width: 100%;
       border-radius: 0;
       z-index: 100;
+      overflow-y: auto;
     }
+  
     
     body.overflow-hidden {
       overflow: hidden;
