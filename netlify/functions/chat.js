@@ -27,7 +27,19 @@ export const handler = async (event, context) => {
 
     try {
         console.log('Starting chat function...');
-        const { message } = JSON.parse(event.body);
+        const requestBody = JSON.parse(event.body);
+        const message = requestBody.message;
+        console.log('Received message:', message);
+
+        // Validate message
+        if (!message || typeof message !== 'string' || !message.trim()) {
+            console.warn('Warning: Empty or invalid message received');
+            return {
+                statusCode: 400,
+                headers,
+                body: JSON.stringify({ error: 'Message is required and must be non-empty' })
+            };
+        }
 
         // Get embedding from Cohere
         console.log('Getting embedding from Cohere...');
@@ -72,8 +84,12 @@ export const handler = async (event, context) => {
             .map(match => match.metadata.text)
             .join('\n');
 
+        console.log('Retrieved context:', context.substring(0, 200) + '...'); // Log a preview of context
+
         // Generate chat response with Cohere v2 API
         console.log('Generating chat response with Cohere v2...');
+        console.log('Message to send:', message);
+
         const chatResponse = await fetch('https://api.cohere.ai/v2/chat', {
             method: 'POST',
             headers: {
@@ -83,7 +99,7 @@ export const handler = async (event, context) => {
             body: JSON.stringify({
                 message: message,
                 model: 'command-r-plus-08-2024',
-                chat_history: [], // Empty for now, but you could track history if needed
+                chat_history: [],
                 prompt: `You are an AI assistant for Rodolfo's portfolio website. 
                         Use this context to answer questions about Rodolfo: ${context}
                         Be friendly and concise. If you're not sure about something, 
@@ -93,11 +109,13 @@ export const handler = async (event, context) => {
         });
 
         if (!chatResponse.ok) {
-            throw new Error(`Cohere chat error: ${await chatResponse.text()}`);
+            const errorText = await chatResponse.text();
+            console.error('Cohere API error response:', errorText);
+            throw new Error(`Cohere chat error: ${errorText}`);
         }
 
         const chatData = await chatResponse.json();
-        console.log('Cohere chat response structure:', JSON.stringify(chatData).substring(0, 500)); // For debugging
+        console.log('Cohere chat response structure:', JSON.stringify(chatData).substring(0, 500));
 
         // Extract text according to the v2 API structure
         let responseText = chatData.text || "I couldn't generate a response at this time.";
@@ -109,8 +127,6 @@ export const handler = async (event, context) => {
                 response: responseText
             })
         };
-
-        
     } catch (error) {
         console.error('Error in chat function:', error);
         return {
