@@ -140,7 +140,7 @@ export const handler = async (event, context) => {
         
         try {
             const chatResponse = await cohere.chat({
-                model: "command-r-plus-08-2024",
+                model: "command-r",
                 messages: [
                     {
                         role: "user",
