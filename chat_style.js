@@ -233,12 +233,11 @@ document.addEventListener("DOMContentLoaded", () => {
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
   
-  // Function to simulate typing
+  // Function to simulate typing with more random variations
   function typeMessage(text, element, baseSpeed = 30) {
-    // Create a cursor element
-    const cursor = document.createElement('span');
-    cursor.className = 'typing-cursor';
-    element.appendChild(cursor);
+    // Calculate an approximate total animation time - about 30ms per character
+    const totalCharCount = text.replace(/<[^>]*>/g, '').length;
+    const targetTotalTime = totalCharCount * 30; // target milliseconds for the whole text
     
     // Convert HTML to array of characters and HTML tags
     const htmlChunks = [];
@@ -269,43 +268,80 @@ document.addEventListener("DOMContentLoaded", () => {
       htmlChunks.push({ type: inTag ? 'tag' : 'text', content: currentChunk });
     }
     
-    // Type out each chunk with variable speed
+    // Type out each chunk with more varied speeds
     let i = 0;
+    let outputSoFar = '';
+    let animationStartTime = Date.now();
+    
     function typeNextChunk() {
       if (i < htmlChunks.length) {
         const chunk = htmlChunks[i];
         
         if (chunk.type === 'tag') {
           // Add HTML tags instantly
-          element.innerHTML = element.innerHTML.replace('<span class="typing-cursor"></span>', '');
-          element.innerHTML += chunk.content + '<span class="typing-cursor"></span>';
+          outputSoFar += chunk.content;
+          element.innerHTML = outputSoFar;
           i++;
           typeNextChunk();
         } else {
-          // Type text character by character with variable speed
+          // Type text character by character with highly variable speed
           let charIndex = 0;
+          
           function typeNextChar() {
             if (charIndex < chunk.content.length) {
-              // Remove cursor first
-              element.innerHTML = element.innerHTML.replace('<span class="typing-cursor"></span>', '');
-              
-              // Add next character
-              element.innerHTML += chunk.content[charIndex] + '<span class="typing-cursor"></span>';
+              // Add next character to output
+              outputSoFar += chunk.content[charIndex];
+              element.innerHTML = outputSoFar;
               charIndex++;
               
-              // Variable typing speed based on several factors
+              // Create more dramatic speed variations
               let speed = baseSpeed;
+              const char = chunk.content[charIndex - 1];
               
-              // Slow down at punctuation
-              if ('.!?,;:'.includes(chunk.content[charIndex - 1])) {
-                speed = baseSpeed * 3; // Pause longer at punctuation
-              } 
-              // Speed up for common words or patterns
-              else if (charIndex > 2 && ' the a and to of in is '.includes(' ' + chunk.content.slice(Math.max(0, charIndex - 4), charIndex) + ' ')) {
-                speed = baseSpeed * 0.7;
+              // Occasional pauses for "thinking"
+              const randomPause = Math.random() < 0.05; // 5% chance of a pause
+              
+              if (randomPause) {
+                // Add a random pause between 300-800ms
+                speed = baseSpeed + Math.floor(Math.random() * 500) + 300;
               }
-              // Random variations to make it feel organic
-              speed *= (0.8 + Math.random() * 0.4); // Random factor between 0.8 and 1.2
+              // Even longer pause at paragraph breaks
+              else if (char === '.' && charIndex < chunk.content.length && chunk.content[charIndex] === '\n') {
+                speed = baseSpeed * 5;
+              }
+              // Longer pause at end of sentences
+              else if ('.!?'.includes(char)) {
+                speed = baseSpeed * (2 + Math.random() * 2); // 2-4x pause at sentence end
+              }
+              // Medium pause at commas and other punctuation
+              else if (',;:'.includes(char)) {
+                speed = baseSpeed * (1.5 + Math.random());
+              }
+              // Slight speed up for common words
+              else if (charIndex > 2 && ' the a and to of in is '.includes(' ' + chunk.content.slice(Math.max(0, charIndex - 4), charIndex) + ' ')) {
+                speed = baseSpeed * 0.6;
+              }
+              // Random burst of fast typing
+              else if (Math.random() < 0.1) { // 10% chance of a speed burst
+                speed = baseSpeed * 0.3;
+              }
+              // Regular random variation for natural feel
+              else {
+                speed = baseSpeed * (0.7 + Math.random() * 0.8); // 0.7x to 1.5x normal speed
+              }
+              
+              // Adjust timing to keep overall animation time consistent
+              const elapsed = Date.now() - animationStartTime;
+              const progress = elapsed / targetTotalTime;
+              const charsRemaining = totalCharCount - outputSoFar.replace(/<[^>]*>/g, '').length;
+              
+              if (progress > 0.8 && charsRemaining > totalCharCount * 0.3) {
+                // If we're running behind schedule (80% time used but >30% chars remaining)
+                speed *= 0.7; // Speed up to catch up
+              } else if (progress < 0.5 && charsRemaining < totalCharCount * 0.3) {
+                // If we're ahead of schedule (less than 50% time used but <30% chars remaining)
+                speed *= 1.3; // Slow down a bit
+              }
               
               setTimeout(typeNextChar, speed);
             } else {
@@ -315,9 +351,6 @@ document.addEventListener("DOMContentLoaded", () => {
           }
           typeNextChar();
         }
-      } else {
-        // Remove the cursor when typing is finished
-        element.innerHTML = element.innerHTML.replace('<span class="typing-cursor"></span>', '');
       }
       
       // Auto-scroll while typing

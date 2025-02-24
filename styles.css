@@ -216,17 +216,4 @@ section[id] {
     transform: translateY(1px);
   }
   
-  /* Cursor animation for typing effect */
-  .typing-cursor {
-    display: inline-block;
-    width: 2px;
-    height: 14px;
-    background-color: currentColor;
-    margin-left: 2px;
-    animation: cursor-blink 1s infinite;
-  }
-  
-  @keyframes cursor-blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-  }
+  /* No cursor animation - removed */
