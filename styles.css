@@ -141,20 +141,26 @@ section[id] {
     position: relative;
     margin-bottom: 1rem;
     max-width: 85%;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
   }
   
   .user-message,
   .assistant-message {
     animation: fadeIn 0.3s ease;
+    width: 100%;
   }
   
   .user-message {
     margin-left: auto; /* Right align */
     flex-direction: row-reverse; /* Icon on the right */
+    justify-content: flex-end;
   }
   
   .assistant-message {
     margin-right: auto; /* Left align */
+    justify-content: flex-start;
   }
   
   .user-message .message-content {

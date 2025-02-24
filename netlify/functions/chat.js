@@ -59,10 +59,6 @@ export const handler = async (event, context) => {
       embeddingTypes: ['float']
     });
 
-    // Log the full response structure for debugging
-    console.log('Full embed response structure:', JSON.stringify(embedResponse, null, 2).substring(0, 500));
-
-    // Check if embeddings exist before accessing
     if (!embedResponse.embeddings || !embedResponse.embeddings.float || !embedResponse.embeddings.float[0]) {
       console.error('No embeddings returned from Cohere');
       return {
@@ -148,11 +144,21 @@ export const handler = async (event, context) => {
     // Log the parameters for debugging
     const chatParams = {
       model: "command-r",
-      preamble: preamble,
-      chatHistory: formattedHistory.length > 0 ? formattedHistory : undefined,
-      message: `${message}\n\nUse this context to answer concisely:\n${context}\n\nRemember to be brief and only discuss directly relevant information.`,
-      connectors: [{ id: "web-search" }]
+      messages: [
+        {
+          role: "USER",
+          message: `${message}\n\nUse this context to answer concisely:\n${context}\n\nRemember to be brief and only discuss directly relevant information.`
+        }
+      ]
     };
+    
+    // Add previous conversation messages if available
+    if (formattedHistory.length > 0) {
+      chatParams.chatHistory = formattedHistory;
+    }
+    
+    // Add preamble
+    chatParams.preamble = preamble;
     
     console.log('Chat params:', JSON.stringify(chatParams, null, 2));
     

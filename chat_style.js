@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Function to append message immediately
   function appendMessage(role, text) {
     const messageWrapper = document.createElement("div");
-    messageWrapper.className = "flex items-start gap-4 my-4 message-bubble";
+    messageWrapper.className = "message-bubble";
     
     // Add role-specific classes for styling
     if (role === "user") {
@@ -149,7 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Function for typing effect
   function appendMessageWithTypingEffect(role, text) {
     const messageWrapper = document.createElement("div");
-    messageWrapper.className = "flex items-start gap-4 my-4 message-bubble";
+    messageWrapper.className = "message-bubble";
     
     // Add role-specific classes
     if (role === "user") {
@@ -245,6 +245,10 @@ document.addEventListener("DOMContentLoaded", () => {
     text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
     text = text.replace(/`(.*?)`/g, '<code class="bg-gray-100 px-1 rounded text-sm">$1</code>');
     
+    // Add special class for project names to highlight them
+    text = text.replace(/Tobias|Knolling Bot|Artificial Synaptic Pruning|Magnetic Wallet/g, 
+      '<span class="text-blue-600 font-medium">$&</span>');
+    
     return text;
   }
   
@@ -277,7 +281,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const id = "thinking-" + Date.now();
     const thinkingDiv = document.createElement("div");
     thinkingDiv.id = id;
-    thinkingDiv.className = "flex items-start gap-4 my-4 message-bubble assistant-message thinking-bubble";
+    thinkingDiv.className = "message-bubble assistant-message thinking-bubble";
     
     // Create icon
     const iconDiv = document.createElement("div");
