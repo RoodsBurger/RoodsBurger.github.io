@@ -47,7 +47,6 @@ class ChatInterface {
 
     async generateResponse(message) {
         try {
-            console.log('Sending message to API:', message);
             const response = await fetch('/.netlify/functions/chat', {
                 method: 'POST',
                 headers: {
@@ -57,7 +56,6 @@ class ChatInterface {
             });
 
             const data = await response.json();
-            console.log('API response:', data); // Log the full response for debugging
 
             if (!response.ok) {
                 throw new Error(data.error || `Server error: ${response.status}`);
@@ -67,7 +65,7 @@ class ChatInterface {
                 throw new Error(data.error);
             }
 
-            return data.response || "I couldn't generate a response. Please try again.";
+            return data.response;
         } catch (error) {
             console.error('API Error:', error);
             throw new Error('Failed to get response from the chat service.');
