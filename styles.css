@@ -231,6 +231,7 @@ section[id] {
   #chat-panel {
     transition: all 0.3s ease;
     max-height: 80vh;
+    width: 24rem;
   }
   
   
@@ -270,6 +271,9 @@ section[id] {
     background: #9ca3af;
   }
   
+
+  
+  /* Mobile-specific chat styles */
   @media (max-width: 768px) {
     /* Full-screen chat panel on mobile */
     #chat-panel.mobile-chat-open {
@@ -283,20 +287,36 @@ section[id] {
       display: flex;
       flex-direction: column;
     }
-    /* Header remains fixed at the top */
-    #chat-panel.mobile-chat-open.chat-header {
-      flex: none;
+    
+    /* Sticky header so it remains visible */
+    #chat-panel.mobile-chat-open .chat-header {
+      position: sticky;
+      top: 0;
+      background-color: #f9fafb; /* or your preferred background color */
+      z-index: 10;
     }
-    /* Messages area fills available space and scrolls */
+    
+    /* Ensure messages area scrolls */
     #chat-panel.mobile-chat-open #mini-chat-messages {
       flex: 1;
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
-    /* Input area remains fixed at the bottom */
+    
+    /* Sticky input area at the bottom */
     #chat-panel.mobile-chat-open .chat-input-area {
-      flex: none;
+      position: sticky;
+      bottom: 0;
+      background-color: #f9fafb;
+      z-index: 10;
+    }
+    
+    /* Hide the chat bubble container when chat is open */
+    #chat-bubble-container.hide {
+      display: none;
     }
   }
+
   
 
 
