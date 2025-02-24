@@ -51,16 +51,15 @@ export const handler = async (event, context) => {
         const embedData = await embedResponse.json();
         const queryEmbedding = embedData.embeddings[0];
 
-        // Initialize Pinecone with the correct cloud configuration
+        // Initialize Pinecone - updated for Serverless
         console.log('Initializing Pinecone...');
         const pc = new Pinecone({
-            apiKey: process.env.PINECONE_API_KEY,
-            environment: process.env.PINECONE_ENVIRONMENT
+            apiKey: process.env.PINECONE_API_KEY
         });
 
         // Query Pinecone
         console.log('Querying Pinecone...');
-        const index = pc.Index(process.env.INDEX_NAME);
+        const index = pc.index(process.env.INDEX_NAME);
         const queryResponse = await index.query({
             vector: queryEmbedding,
             topK: 3,
