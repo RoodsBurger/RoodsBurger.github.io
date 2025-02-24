@@ -107,7 +107,7 @@ export const handler = async (event, context) => {
     const index = pc.index(process.env.INDEX_NAME);
     const queryResponse = await index.query({
       vector: vectorToQuery,
-      topK: 2,
+      topK: 3,
       includeMetadata: true
     });
     
@@ -137,19 +137,15 @@ export const handler = async (event, context) => {
             address only the question askled and mention only relevant projects and \
             background. You should also make sure ro properly format your answer, \
             including proper spacing, formatting, new lines, paragraphs, etc." \n\n \
-            Based on this message: ${message}\n\n If the message is related,\ 
-            Use this context to concisely answer questions about Rodolfo \
-            and his projects, you should not just copy and paste from the context, \
-            instead formulate a concise answer that addresses some of the information \
+            ${message}\n\n Use this context to concisely answer questions about Rodolfo \
+            and his projects, you should not just copy and paste for the context, \
+            instead formulates a concise answer that addresses some of the information \
             mentioned in the context in a nice and readable format. \
             You should also make sure to not include the question and craft an answer \
-            that sounds natural, organic using the context: ${context}.\n\n \ 
-            If the context is not relevant to the message, or if the message does not \ 
-            directly asks about Rodolfo and his projects, you should ignore the context and \
-            answer the message as you see fit, in this case keep it very short and direct\ 
-            do not give information you were not directly asked for.`
+            that sounds natural, organic using the context: ${context}`
         }
-      ]
+      ],
+      preamble: "You are an AI assistant for Rodolfo's portfolio website. You should address each question as concise as possible and make sure to address only the question askled and mention only relevant projects and background."
     };
     console.log('Chat params:', JSON.stringify(chatParams, null, 2));
     
