@@ -286,48 +286,53 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
           // Type text character by character with highly variable speed
           let charIndex = 0;
+          let inWord = false;
           
           function typeNextChar() {
             if (charIndex < chunk.content.length) {
               // Add next character to output
-              outputSoFar += chunk.content[charIndex];
+              const char = chunk.content[charIndex];
+              outputSoFar += char;
               element.innerHTML = outputSoFar;
               charIndex++;
               
+              // Check if we're in a word or not
+              if (char === ' ' || char === '\n' || '.!?,;:()[]{}"\'-'.includes(char)) {
+                inWord = false;
+              } else {
+                inWord = true;
+              }
+              
               // Create more dramatic speed variations
               let speed = baseSpeed;
-              const char = chunk.content[charIndex - 1];
               
-              // Occasional pauses for "thinking"
-              const randomPause = Math.random() < 0.05; // 5% chance of a pause
+              // Only pause after completed words or at punctuation
+              const canPause = !inWord;
+              const randomPause = Math.random() < 0.03 && canPause; // 3% chance of a pause, only at word boundaries
               
               if (randomPause) {
-                // Add a random pause between 300-800ms
-                speed = baseSpeed + Math.floor(Math.random() * 500) + 300;
-              }
-              // Even longer pause at paragraph breaks
-              else if (char === '.' && charIndex < chunk.content.length && chunk.content[charIndex] === '\n') {
-                speed = baseSpeed * 5;
+                // Add a shorter random pause between 200-500ms
+                speed = baseSpeed + Math.floor(Math.random() * 300) + 200;
               }
               // Longer pause at end of sentences
               else if ('.!?'.includes(char)) {
-                speed = baseSpeed * (2 + Math.random() * 2); // 2-4x pause at sentence end
+                speed = baseSpeed * (1.5 + Math.random()); // 1.5-2.5x pause at sentence end
               }
               // Medium pause at commas and other punctuation
               else if (',;:'.includes(char)) {
-                speed = baseSpeed * (1.5 + Math.random());
+                speed = baseSpeed * (1.2 + Math.random() * 0.5);
               }
-              // Slight speed up for common words
-              else if (charIndex > 2 && ' the a and to of in is '.includes(' ' + chunk.content.slice(Math.max(0, charIndex - 4), charIndex) + ' ')) {
-                speed = baseSpeed * 0.6;
+              // Slight speed up for common words (only check when at the end of common words)
+              else if (charIndex > 2 && !inWord && ' the a and to of in is '.includes(' ' + chunk.content.slice(Math.max(0, charIndex - 5), charIndex))) {
+                speed = baseSpeed * 0.8;
               }
-              // Random burst of fast typing
-              else if (Math.random() < 0.1) { // 10% chance of a speed burst
-                speed = baseSpeed * 0.3;
+              // Random burst of fast typing (only for entire words, not mid-word)
+              else if (Math.random() < 0.05 && !inWord) { // 5% chance of a speed burst at word boundaries
+                speed = baseSpeed * 0.5;
               }
               // Regular random variation for natural feel
               else {
-                speed = baseSpeed * (0.7 + Math.random() * 0.8); // 0.7x to 1.5x normal speed
+                speed = baseSpeed * (0.8 + Math.random() * 0.5); // 0.8x to 1.3x normal speed
               }
               
               // Adjust timing to keep overall animation time consistent
@@ -335,12 +340,12 @@ document.addEventListener("DOMContentLoaded", () => {
               const progress = elapsed / targetTotalTime;
               const charsRemaining = totalCharCount - outputSoFar.replace(/<[^>]*>/g, '').length;
               
-              if (progress > 0.8 && charsRemaining > totalCharCount * 0.3) {
-                // If we're running behind schedule (80% time used but >30% chars remaining)
+              if (progress > 0.7 && charsRemaining > totalCharCount * 0.4) {
+                // If we're running behind schedule (70% time used but >40% chars remaining)
                 speed *= 0.7; // Speed up to catch up
-              } else if (progress < 0.5 && charsRemaining < totalCharCount * 0.3) {
-                // If we're ahead of schedule (less than 50% time used but <30% chars remaining)
-                speed *= 1.3; // Slow down a bit
+              } else if (progress < 0.4 && charsRemaining < totalCharCount * 0.3) {
+                // If we're ahead of schedule (less than 40% time used but <30% chars remaining)
+                speed *= 1.2; // Slow down a bit
               }
               
               setTimeout(typeNextChar, speed);
