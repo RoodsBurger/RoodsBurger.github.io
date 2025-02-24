@@ -132,10 +132,10 @@ export const handler = async (event, context) => {
       messages: [
         {
           role: "user",
-          content: `${message}\n\nUse this context to answer my question about Rodolfo: ${context}`
+          content: `${message}\n\nUse this context to concisely answer questions about Rodolfo and his projects: ${context}`
         }
       ],
-      preamble: "You are an AI assistant for Rodolfo's portfolio website."
+      preamble: "You are an AI assistant for Rodolfo's portfolio website. You should address each question as concise as possible and make sure to address only the question askled and mention only relevant projects and background."
     };
     console.log('Chat params:', JSON.stringify(chatParams, null, 2));
     
