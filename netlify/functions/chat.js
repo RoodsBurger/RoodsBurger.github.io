@@ -123,10 +123,11 @@ export const handler = async (event, context) => {
             context = "No specific information available.";
         }
 
-        // Generate chat response with Cohere v2 API
-        console.log('Generating chat response with Cohere v2...');
+        // Generate chat response with Cohere API
+        console.log('Generating chat response with Cohere...');
         
-        const chatResponse = await cohere.chat({
+        // Log the parameters for debugging
+        console.log('Chat params:', JSON.stringify({
             model: "command",
             messages: [
                 {
@@ -134,25 +135,42 @@ export const handler = async (event, context) => {
                     content: message
                 }
             ],
-            preamble: `You are an AI assistant for Rodolfo's portfolio website. 
-                      Use this context to answer questions about Rodolfo: ${context}
-                      Be friendly and concise. If you're not sure about something, 
-                      say so rather than making assumptions.`
-        });
+            // Optional preamble for context
+            preamble: `You are an AI assistant for Rodolfo's portfolio website.`
+        }, null, 2));
         
-        if (chatResponse && chatResponse.text) {
-            console.log('Cohere chat response preview:', chatResponse.text.substring(0, 200) + '...');
-        } else {
-            console.log('No valid response from Cohere chat');
+        try {
+            const chatResponse = await cohere.chat({
+                model: "command",
+                messages: [
+                    {
+                        role: "user",
+                        content: message
+                    }
+                ],
+                // Adding context as a separate field if preamble doesn't work
+                context: `Use this context to answer questions about Rodolfo: ${context}
+                        Be friendly and concise. If you're not sure about something, 
+                        say so rather than making assumptions.`
+            });
+            
+            if (chatResponse && chatResponse.text) {
+                console.log('Cohere chat response preview:', chatResponse.text.substring(0, 200) + '...');
+            } else {
+                console.log('Full response from Cohere:', JSON.stringify(chatResponse, null, 2).substring(0, 500));
+            }
+            
+            return {
+                statusCode: 200,
+                headers,
+                body: JSON.stringify({
+                    response: chatResponse.text || chatResponse.response?.text || "I'm sorry, I couldn't generate a response at the moment."
+                })
+            };
+        } catch (error) {
+            console.error('Cohere API error:', error);
+            throw error; // Rethrow to be caught by the outer try/catch
         }
-
-        return {
-            statusCode: 200,
-            headers,
-            body: JSON.stringify({
-                response: chatResponse.text || "I'm sorry, I couldn't generate a response at the moment."
-            })
-        };
     } catch (error) {
         console.error('Error in chat function:', error);
         return {
