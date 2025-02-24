@@ -72,9 +72,9 @@ export const handler = async (event, context) => {
             .map(match => match.metadata.text)
             .join('\n');
 
-        // Generate chat response with Cohere
-        console.log('Generating chat response...');
-        const chatResponse = await fetch('https://api.cohere.ai/v1/chat', {
+        // Generate chat response with Cohere v2 API
+        console.log('Generating chat response with Cohere v2...');
+        const chatResponse = await fetch('https://api.cohere.ai/v2/chat', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${process.env.COHERE_API_KEY}`,
@@ -82,10 +82,11 @@ export const handler = async (event, context) => {
             },
             body: JSON.stringify({
                 message: message,
-                preamble: `You are an AI assistant for Rodolfo's portfolio website. 
-                          Use this context to answer questions about Rodolfo: ${context}
-                          Be friendly and concise. If you're not sure about something, 
-                          say so rather than making assumptions.`,
+                chat_history: [], // Empty for now, but you could track history if needed
+                prompt: `You are an AI assistant for Rodolfo's portfolio website. 
+                        Use this context to answer questions about Rodolfo: ${context}
+                        Be friendly and concise. If you're not sure about something, 
+                        say so rather than making assumptions.`,
                 temperature: 0.7
             })
         });
@@ -94,22 +95,11 @@ export const handler = async (event, context) => {
             throw new Error(`Cohere chat error: ${await chatResponse.text()}`);
         }
 
-        // After getting the chat response, add this:
         const chatData = await chatResponse.json();
-        console.log('Cohere chat response structure:', JSON.stringify(chatData).substring(0, 500)); // Log a preview
+        console.log('Cohere chat response structure:', JSON.stringify(chatData).substring(0, 500)); // For debugging
 
-        // Then modify how we extract the text:
-        let responseText;
-        if (chatData && chatData.response) {
-            responseText = chatData.response.text || chatData.response; // Try both possibilities
-        } else if (chatData && chatData.text) {
-            responseText = chatData.text;
-        } else if (chatData && chatData.generations && chatData.generations.length > 0) {
-            responseText = chatData.generations[0].text;
-        } else {
-            responseText = "I couldn't generate a response at this time.";
-            console.log('Unknown Cohere response structure:', JSON.stringify(chatData));
-        }
+        // Extract text according to the v2 API structure
+        let responseText = chatData.text || "I couldn't generate a response at this time.";
 
         return {
             statusCode: 200,
