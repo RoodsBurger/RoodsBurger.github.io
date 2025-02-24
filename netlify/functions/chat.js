@@ -1,5 +1,5 @@
 import { Pinecone } from '@pinecone-database/pinecone';
-import { CohereClient } from 'cohere-ai';
+import { CohereClientV2 } from 'cohere-ai';
 
 const headers = {
     'Access-Control-Allow-Origin': 'https://rraimundo.me',
@@ -44,7 +44,7 @@ export const handler = async (event, context) => {
 
         // Initialize Cohere client
         console.log('Initializing Cohere client...');
-        const cohere = new CohereClient({
+        const cohere = new CohereClientV2({
             token: process.env.COHERE_API_KEY
         });
 
