@@ -277,15 +277,14 @@ section[id] {
       top: 0;
       left: 0;
       width: 100%;
-      height: 100vh; /* full viewport height */
-      max-height: 100vh;
+      height: 100%;
       border-radius: 0;
       z-index: 100;
       display: flex;
       flex-direction: column;
     }
     /* Header remains fixed at the top */
-    #chat-panel.mobile-chat-open .chat-header {
+    #chat-panel.mobile-chat-open.chat-header {
       flex: none;
     }
     /* Messages area fills available space and scrolls */

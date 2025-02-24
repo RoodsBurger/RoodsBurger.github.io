@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
   // Load the floating chat HTML and then initialize chat functionality
-  fetch('floating-chat.html')
+  fetch('/floating-chat.html')
     .then(response => response.text())
     .then(html => {
       const chatContainer = document.createElement('div');
