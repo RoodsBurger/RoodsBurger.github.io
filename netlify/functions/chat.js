@@ -51,15 +51,13 @@ export const handler = async (event, context) => {
         const embedData = await embedResponse.json();
         const queryEmbedding = embedData.embeddings[0];
 
-        // Initialize Pinecone with more flexibility
+        // Initialize Pinecone
         console.log('Initializing Pinecone...');
-        try {
-        // First try with environment (for backward compatibility)
         const pc = new Pinecone({
             apiKey: process.env.PINECONE_API_KEY
         });
         
-        console.log('Pinecone initialized with environment parameter');
+        console.log('Pinecone initialized successfully');
         
         // Query Pinecone
         console.log('Querying Pinecone...');
@@ -69,12 +67,7 @@ export const handler = async (event, context) => {
             topK: 3,
             includeMetadata: true
         });
-                
-        } catch (error) {
-        console.error('Error with Pinecone initialization:', error.message);
-        throw error;
-        }
-
+        
         const context = queryResponse.matches
             .map(match => match.metadata.text)
             .join('\n');
