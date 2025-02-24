@@ -1,10 +1,11 @@
-const { CohereClient } = require('cohere-ai');
-const { Pinecone } = require('@pinecone-database/pinecone');
+import { Pinecone } from '@pinecone-database/pinecone';
 
-// Initialize Cohere client
-const cohere = new CohereClient({
-    token: process.env.COHERE_API_KEY
-});
+const headers = {
+    'Access-Control-Allow-Origin': 'https://rraimundo.me',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Content-Type': 'application/json'
+};
 
 // Initialize Pinecone client
 const pc = new Pinecone({
@@ -12,15 +13,7 @@ const pc = new Pinecone({
     environment: process.env.PINECONE_ENVIRONMENT
 });
 
-exports.handler = async (event, context) => {
-    // Add CORS headers
-    const headers = {
-        'Access-Control-Allow-Origin': 'https://rraimundo.me',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Content-Type': 'application/json'
-    };
-
+export const handler = async (event, context) => {
     // Handle preflight request
     if (event.httpMethod === 'OPTIONS') {
         return {
@@ -39,18 +32,31 @@ exports.handler = async (event, context) => {
     }
 
     try {
-        console.log('Parsing request body...');
+        console.log('Starting chat function...');
         const { message } = JSON.parse(event.body);
 
-        console.log('Getting embedding...');
-        const embeddingResponse = await cohere.embed({
-            texts: [message],
-            model: 'embed-english-v3.0',
-            inputType: 'search_query'
+        // Get embedding from Cohere
+        const embedResponse = await fetch('https://api.cohere.ai/v1/embed', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${process.env.COHERE_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                texts: [message],
+                model: 'embed-english-v3.0',
+                input_type: 'search_query'
+            })
         });
 
-        const queryEmbedding = embeddingResponse.embeddings[0];
+        if (!embedResponse.ok) {
+            throw new Error(`Cohere embedding error: ${await embedResponse.text()}`);
+        }
 
+        const embedData = await embedResponse.json();
+        const queryEmbedding = embedData.embeddings[0];
+
+        // Query Pinecone
         console.log('Querying Pinecone...');
         const index = pc.Index(process.env.INDEX_NAME);
         const queryResponse = await index.query({
@@ -63,22 +69,35 @@ exports.handler = async (event, context) => {
             .map(match => match.metadata.text)
             .join('\n');
 
+        // Generate chat response with Cohere
         console.log('Generating chat response...');
-        const chatResponse = await cohere.chat({
-            message,
-            preamble: `You are an AI assistant for Rodolfo's portfolio website. 
-                      Use this context to answer questions about Rodolfo: ${context}
-                      Be friendly and concise. If you're not sure about something, 
-                      say so rather than making assumptions.`,
-            temperature: 0.7,
-            connectorId: 'rodolfo-portfolio'
+        const chatResponse = await fetch('https://api.cohere.ai/v1/chat', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${process.env.COHERE_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: message,
+                preamble: `You are an AI assistant for Rodolfo's portfolio website. 
+                          Use this context to answer questions about Rodolfo: ${context}
+                          Be friendly and concise. If you're not sure about something, 
+                          say so rather than making assumptions.`,
+                temperature: 0.7
+            })
         });
+
+        if (!chatResponse.ok) {
+            throw new Error(`Cohere chat error: ${await chatResponse.text()}`);
+        }
+
+        const chatData = await chatResponse.json();
 
         return {
             statusCode: 200,
             headers,
             body: JSON.stringify({
-                response: chatResponse.text
+                response: chatData.text
             })
         };
     } catch (error) {
