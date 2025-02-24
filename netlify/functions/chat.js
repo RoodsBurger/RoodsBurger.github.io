@@ -57,6 +57,19 @@ export const handler = async (event, context) => {
             embeddingTypes: ['float']
         });
 
+        // Log the full response structure for debugging
+        console.log('Full embed response structure:', JSON.stringify(embedResponse, null, 2).substring(0, 500));
+
+        // Check if embeddings exist before accessing
+        if (!embedResponse.embeddings || !embedResponse.embeddings[0]) {
+            console.error('No embeddings returned from Cohere');
+            return {
+                statusCode: 500,
+                headers,
+                body: JSON.stringify({ error: 'Failed to generate embeddings' })
+            };
+        }
+
         const queryEmbedding = embedResponse.embeddings[0];
 
         // Initialize Pinecone
@@ -68,7 +81,12 @@ export const handler = async (event, context) => {
         // Query Pinecone
         console.log('Querying Pinecone...');
         console.log('Query embedding type:', typeof queryEmbedding);
-        console.log('Query embedding preview:', JSON.stringify(queryEmbedding).substring(0, 100));
+        
+        if (queryEmbedding) {
+            console.log('Query embedding preview:', JSON.stringify(queryEmbedding).substring(0, 100) + '...');
+        } else {
+            console.log('Query embedding is undefined or null');
+        }
 
         // Make sure queryEmbedding is an array of numbers
         let vectorToQuery = queryEmbedding;
@@ -76,6 +94,14 @@ export const handler = async (event, context) => {
             // If it's an object, try to extract the values
             vectorToQuery = queryEmbedding.values || Object.values(queryEmbedding);
             console.log('Extracted vector values');
+        }
+
+        // Debug logging for vector
+        console.log('Vector type:', typeof vectorToQuery);
+        console.log('Is array:', Array.isArray(vectorToQuery));
+        if (Array.isArray(vectorToQuery)) {
+            console.log('Vector length:', vectorToQuery.length);
+            console.log('First few values:', vectorToQuery.slice(0, 5));
         }
 
         const index = pc.index(process.env.INDEX_NAME);
@@ -114,13 +140,17 @@ export const handler = async (event, context) => {
                       say so rather than making assumptions.`
         });
         
-        console.log('Cohere chat response preview:', JSON.stringify(chatResponse).substring(0, 200) + '...');
+        if (chatResponse && chatResponse.text) {
+            console.log('Cohere chat response preview:', chatResponse.text.substring(0, 200) + '...');
+        } else {
+            console.log('No valid response from Cohere chat');
+        }
 
         return {
             statusCode: 200,
             headers,
             body: JSON.stringify({
-                response: chatResponse.text
+                response: chatResponse.text || "I'm sorry, I couldn't generate a response at the moment."
             })
         };
     } catch (error) {
