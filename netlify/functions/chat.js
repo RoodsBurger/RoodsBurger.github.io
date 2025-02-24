@@ -107,7 +107,7 @@ export const handler = async (event, context) => {
     const index = pc.index(process.env.INDEX_NAME);
     const queryResponse = await index.query({
       vector: vectorToQuery,
-      topK: 3,
+      topK: 2,
       includeMetadata: true
     });
     
