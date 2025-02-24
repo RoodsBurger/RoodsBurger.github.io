@@ -55,7 +55,7 @@ export const handler = async (event, context) => {
         console.log('Initializing Pinecone...');
         const pc = new Pinecone({
             apiKey: process.env.PINECONE_API_KEY,
-            environment: process.env.PINECONE_ENVIRONMENT || 'gcp-starter'
+            environment: process.env.PINECONE_ENVIRONMENT
         });
 
         // Query Pinecone
