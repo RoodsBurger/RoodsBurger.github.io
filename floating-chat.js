@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function() {
       bubbleContainer.className = "assistant-bubble py-2 pr-3 pl-3 max-w-[80%] flex items-baseline text-sm";
 
       const avatar = document.createElement("div");
-      avatar.className = "w-4 h-4 rounded-full bg-blue-100 flex-shrink-0 flex items-center justify-center mr-2";
+      avatar.className = "w-4 h-4 rounded-full bg-white flex-shrink-0 flex items-center justify-center mr-2";
       avatar.innerHTML = `
         <svg class="w-2.5 h-2.5 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd"
@@ -205,7 +205,7 @@ document.addEventListener("DOMContentLoaded", function() {
         element.innerHTML += text.charAt(index);
         setTimeout(() => {
           typeWriterEffect(element, text, index + 1);
-        }, 30);
+        }, 50);
       }
     }
 
