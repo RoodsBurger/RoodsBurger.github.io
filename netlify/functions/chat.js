@@ -137,14 +137,16 @@ export const handler = async (event, context) => {
             address only the question askled and mention only relevant projects and \
             background. You should also make sure ro properly format your answer, \
             including proper spacing, formatting, new lines, paragraphs, etc." \n\n \
-            ${message}\n\n Use this context to concisely answer questions about Rodolfo \
+            Based on this message: ${message}\n\n Use this context to concisely answer questions about Rodolfo \
             and his projects, you should not just copy and paste for the context, \
             instead formulates a concise answer that addresses some of the information \
             mentioned in the context in a nice and readable format. \
             You should also make sure to not include the question and craft an answer \
             that sounds natural, organic using the context: ${context}.\n\n \ 
-            If the context is not relevant to the question, you can ignore it and \
-            answer the question as you see fit.`
+            If the context is not relevant to the message, or if the message does not \ 
+            directly asks about Rodolfo and his projects, you should ignore the context and \
+            answer the message as you see fit, even if it it does not contain anything\ 
+            about Rodolfo.`
         }
       ]
     };
