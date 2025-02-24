@@ -8,17 +8,17 @@ document.addEventListener("DOMContentLoaded", () => {
       const messageText = userInput.value.trim();
       if (!messageText) return;
   
-      // Clear the default introductory message if it's still present.
+      // Clear the default introductory message if present (assumes it's the only child initially)
       if (chatMessages.children.length === 1) {
         chatMessages.innerHTML = "";
       }
   
-      // Append the user's message.
+      // Append the user's message to the chat container
       appendMessage("user", messageText);
       userInput.value = "";
   
       try {
-        // Send the user's message to your Netlify function.
+        // Send the message to your Netlify function
         const response = await fetch("/.netlify/functions/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -29,34 +29,20 @@ document.addEventListener("DOMContentLoaded", () => {
           throw new Error("Network response was not ok");
         }
   
-        let data = await response.json();
-        console.log("Received raw data:", data);
+        const data = await response.json();
+        console.log("Received data:", data);
   
-        // If the function returned a "body" property, parse it.
-        if (data.body) {
-          try {
-            data = JSON.parse(data.body);
-          } catch (e) {
-            console.error("Error parsing data.body:", e);
-          }
-        }
-  
-        console.log("Parsed data:", data);
-  
-        // Extract the assistant's response text.
+        // Extract the full assistant response from the returned message content.
         let fullResponseText = "";
         if (data && data.message && Array.isArray(data.message.content)) {
           fullResponseText = data.message.content
             .map(chunk => chunk.text)
             .join(" ");
-        } else if (data && data.text) {
-          fullResponseText = data.text;
         } else {
-          console.warn("Response structure unexpected. Using fallback text.");
-          fullResponseText = "No message returned.";
+          fullResponseText = "I'm sorry, I couldn't generate a response at the moment.";
         }
   
-        // Append the assistant's response.
+        // Append the assistant's response to the chat container
         appendMessage("assistant", fullResponseText);
       } catch (error) {
         console.error("Error fetching chat response:", error);
@@ -65,11 +51,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   
     function appendMessage(role, text) {
-      // Create a wrapper for the new message.
+      // Create the message wrapper element
       const messageWrapper = document.createElement("div");
       messageWrapper.className = "flex items-start gap-4 my-2";
   
-      // Create an icon for the message based on the role.
+      // Create an icon element based on the role
       const iconDiv = document.createElement("div");
       iconDiv.className = "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0";
       if (role === "assistant") {
@@ -86,19 +72,19 @@ document.addEventListener("DOMContentLoaded", () => {
                               </svg>`;
       }
   
-      // Create the container for the message text.
+      // Create the container for the message text
       const messageContent = document.createElement("div");
       messageContent.className = "flex-1";
       messageContent.innerHTML = `<div class="prose prose-sm">
-                                    <p class="text-gray-600">${text}</p>
-                                  </div>`;
+                                      <p class="text-gray-600">${text}</p>
+                                    </div>`;
   
-      // Append the icon and text to the wrapper and then to the chat container.
+      // Append the icon and text to the wrapper, then to the chat container
       messageWrapper.appendChild(iconDiv);
       messageWrapper.appendChild(messageContent);
       chatMessages.appendChild(messageWrapper);
   
-      // Auto-scroll to the bottom of the chat container.
+      // Auto-scroll to the bottom of the chat container
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
   });
