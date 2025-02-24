@@ -65,13 +65,22 @@ export const handler = async (event, context) => {
             apiKey: process.env.PINECONE_API_KEY
         });
         
-        console.log('Pinecone initialized successfully');
-        
         // Query Pinecone
         console.log('Querying Pinecone...');
+        console.log('Query embedding type:', typeof queryEmbedding);
+        console.log('Query embedding preview:', JSON.stringify(queryEmbedding).substring(0, 100));
+
+        // Make sure queryEmbedding is an array of numbers
+        let vectorToQuery = queryEmbedding;
+        if (typeof queryEmbedding === 'object' && !Array.isArray(queryEmbedding)) {
+            // If it's an object, try to extract the values
+            vectorToQuery = queryEmbedding.values || Object.values(queryEmbedding);
+            console.log('Extracted vector values');
+        }
+
         const index = pc.index(process.env.INDEX_NAME);
         const queryResponse = await index.query({
-            vector: queryEmbedding,
+            vector: vectorToQuery,
             topK: 3,
             includeMetadata: true
         });
