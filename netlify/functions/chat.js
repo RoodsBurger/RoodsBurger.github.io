@@ -149,8 +149,8 @@ export const handler = async (event, context) => {
                 ]
             });
             
-            if (chatResponse && chatResponse.message && chatResponse.message.text) {
-                console.log('Cohere chat response preview:', chatResponse.response.text.substring(0, 200) + '...');
+            if (chatResponse && chatResponse.message && chatResponse.message.content.text) {
+                console.log('Cohere chat response preview:', chatResponse.message.content.text.substring(0, 200) + '...');
                 
                 return {
                     statusCode: 200,
