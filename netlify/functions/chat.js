@@ -57,7 +57,10 @@ export const handler = async (event, context) => {
             embeddingTypes: ['float']
         });
 
-        // Check if embeddings exist before accessing
+        // Log the full response structure for debugging
+        console.log('Full embed response structure:', JSON.stringify(embedResponse, null, 2).substring(0, 500));
+
+        // Check if embeddings exist before accessing - the structure might be different for V2
         if (!embedResponse.embeddings || !embedResponse.embeddings.float || !embedResponse.embeddings.float[0]) {
             console.error('No embeddings returned from Cohere');
             return {
@@ -77,17 +80,33 @@ export const handler = async (event, context) => {
         
         // Query Pinecone
         console.log('Querying Pinecone...');
-        console.log('Vector type:', typeof queryEmbedding);
-        console.log('Is array:', Array.isArray(queryEmbedding));
+        console.log('Query embedding type:', typeof queryEmbedding);
         
-        if (Array.isArray(queryEmbedding)) {
-            console.log('Vector length:', queryEmbedding.length);
-            console.log('First few values:', queryEmbedding.slice(0, 5));
+        if (queryEmbedding) {
+            console.log('Query embedding preview:', JSON.stringify(queryEmbedding).substring(0, 100) + '...');
+        } else {
+            console.log('Query embedding is undefined or null');
+        }
+
+        // Make sure queryEmbedding is an array of numbers
+        let vectorToQuery = queryEmbedding;
+        if (typeof queryEmbedding === 'object' && !Array.isArray(queryEmbedding)) {
+            // If it's an object, try to extract the values
+            vectorToQuery = queryEmbedding.values || Object.values(queryEmbedding);
+            console.log('Extracted vector values');
+        }
+
+        // Debug logging for vector
+        console.log('Vector type:', typeof vectorToQuery);
+        console.log('Is array:', Array.isArray(vectorToQuery));
+        if (Array.isArray(vectorToQuery)) {
+            console.log('Vector length:', vectorToQuery.length);
+            console.log('First few values:', vectorToQuery.slice(0, 5));
         }
 
         const index = pc.index(process.env.INDEX_NAME);
         const queryResponse = await index.query({
-            vector: queryEmbedding,
+            vector: vectorToQuery,
             topK: 3,
             includeMetadata: true
         });
@@ -107,65 +126,32 @@ export const handler = async (event, context) => {
         // Generate chat response with Cohere API
         console.log('Generating chat response with Cohere...');
         
+        // Log the parameters for debugging
+        console.log('Chat params:', JSON.stringify({
+            model: "command-r-plus-08-2024",
+            messages: [
+                {
+                    role: "user",
+                    content: message
+                }
+            ],
+            preamble: `You are an AI assistant for Rodolfo's portfolio website.`
+        }, null, 2));
+        
         try {
             const chatResponse = await cohere.chat({
                 model: "command-r-plus-08-2024",
-                preamble: "You are an AI assistant for Rodolfo's portfolio website. Provide helpful information about Rodolfo's projects, background, and interests based on the context provided.",
                 messages: [
                     {
                         role: "user",
-                        content: message
-                    },
-                    {
-                        role: "system",
-                        content: `Use this context to answer the question: ${context}`
+                        content: `${message}\n\nUse this context to answer my question about Rodolfo: ${context}`
                     }
                 ]
             });
             
-            console.log('Full chat response:', JSON.stringify(chatResponse, null, 2).substring(0, 500));
-            
-            // Handle the new response structure
-            if (chatResponse && chatResponse.message && chatResponse.message.content) {
-                // The content might be an array of text objects
-                if (Array.isArray(chatResponse.message.content)) {
-                    const responseText = chatResponse.message.content
-                        .filter(item => item.type === 'text')
-                        .map(item => item.text)
-                        .join('\n');
-                        
-                    console.log('Extracted response text:', responseText.substring(0, 200) + '...');
-                    
-                    return {
-                        statusCode: 200,
-                        headers,
-                        body: JSON.stringify({
-                            response: responseText
-                        })
-                    };
-                } 
-                // Or it might be a string directly
-                else if (typeof chatResponse.message.content === 'string') {
-                    return {
-                        statusCode: 200,
-                        headers,
-                        body: JSON.stringify({
-                            response: chatResponse.message.content
-                        })
-                    };
-                }
-            }
-            
-            // Fallback options for backward compatibility
-            else if (chatResponse && chatResponse.text) {
-                return {
-                    statusCode: 200,
-                    headers,
-                    body: JSON.stringify({
-                        response: chatResponse.text
-                    })
-                };
-            } else if (chatResponse && chatResponse.response && chatResponse.response.text) {
+            if (chatResponse && chatResponse.response && chatResponse.response.text) {
+                console.log('Cohere chat response preview:', chatResponse.response.text.substring(0, 200) + '...');
+                
                 return {
                     statusCode: 200,
                     headers,
@@ -174,7 +160,8 @@ export const handler = async (event, context) => {
                     })
                 };
             } else {
-                console.log('Unexpected response structure:', JSON.stringify(chatResponse, null, 2));
+                console.log('Full response from Cohere:', JSON.stringify(chatResponse, null, 2).substring(0, 500));
+                
                 return {
                     statusCode: 200,
                     headers,
@@ -185,14 +172,7 @@ export const handler = async (event, context) => {
             }
         } catch (error) {
             console.error('Cohere API error:', error);
-            return {
-                statusCode: 500,
-                headers,
-                body: JSON.stringify({
-                    error: 'Error generating response',
-                    details: error.message
-                })
-            };
+            throw error; // Rethrow to be caught by the outer try/catch
         }
     } catch (error) {
         console.error('Error in chat function:', error);
