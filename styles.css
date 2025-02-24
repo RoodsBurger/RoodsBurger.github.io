@@ -233,19 +233,6 @@ section[id] {
     max-height: 80vh;
   }
   
-  /* Typing indicator animation */
-  @keyframes thinking {
-    0% { opacity: 0.5; }
-    50% { opacity: 1; }
-    100% { opacity: 0.5; }
-  }
-  .thinking-dots {
-    animation: thinking 1.5s infinite;
-    min-width: 60px;
-    display: inline-block;
-    padding-left: 0.5rem;
-  }
-  
   
   /* Message bubbles */
   .user-bubble {
@@ -284,9 +271,10 @@ section[id] {
   }
   
   /* Mobile chat panel */
+/* Mobile chat panel */
 @media (max-width: 768px) {
   #chat-panel.mobile-chat-open {
-    position: fixed; /* was absolute */
+    position: fixed;
     top: 0;
     right: 0;
     left: 0;
@@ -297,15 +285,27 @@ section[id] {
     z-index: 100;
     overflow-y: auto;
   }
-
+  
   body.overflow-hidden {
     overflow: hidden;
   }
-
+  
   #chat-bubble {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
+  
+  /* When the keyboard is open, fix the input area at the bottom */
+  #chat-panel.keyboard-open .chat-input-area {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 101;
+    background-color: #f9fafb;
+    padding: 1rem; /* Adjust as needed */
+  }
 }
+
 
   
   /* Message formatting */

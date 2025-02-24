@@ -21,6 +21,20 @@ document.addEventListener("DOMContentLoaded", function() {
     const miniChatMessages = document.getElementById("mini-chat-messages");
     let conversationHistory = [];
 
+    // When the input is focused, add a class to adjust for the keyboard
+    miniUserInput.addEventListener("focus", function() {
+      if (window.innerWidth < 768) {
+        chatPanel.classList.add("keyboard-open");
+        // Optionally scroll to the bottom
+        miniChatMessages.scrollTop = miniChatMessages.scrollHeight;
+      }
+    });
+    miniUserInput.addEventListener("blur", function() {
+      if (window.innerWidth < 768) {
+        chatPanel.classList.remove("keyboard-open");
+      }
+    });
+
     // Initialize with the welcome message
     function setupInitialMessage() {
       miniChatMessages.innerHTML = "";

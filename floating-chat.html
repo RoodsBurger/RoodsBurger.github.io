@@ -32,13 +32,14 @@
       </div>
   
       <!-- Input Area (Sticky so it remains visible on mobile) -->
-      <div class="border-t border-gray-200 p-3 bg-gray-50 sticky bottom-0">
+      <!-- Chat Input Area -->
+      <div class="chat-input-area border-t border-gray-200 p-3 bg-gray-50 sticky bottom-0">
         <form id="mini-chat-form" class="flex gap-2">
           <input type="text" 
-                 id="mini-user-input"
-                 class="flex-1 px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                 placeholder="Type your message..."
-                 autocomplete="off">
+                id="mini-user-input"
+                class="flex-1 px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Type your message..."
+                autocomplete="off">
           <button type="submit"
                   class="bg-gray-100 text-blue-600 p-0 w-9 h-9 rounded-full hover:bg-gray-200 transition duration-300 flex items-center justify-center border border-gray-300" 
                   aria-label="Send message">
