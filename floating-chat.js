@@ -51,7 +51,6 @@ document.addEventListener("DOMContentLoaded", function() {
       if (window.innerWidth < 768) {
         // On mobile, open in full-screen mode, disable background scrolling, and hide the chat bubble
         chatPanel.classList.add("mobile-chat-open");
-        document.body.classList.add("overflow-hidden");
         chatBubbleContainer.classList.add("hide");
       }
       miniUserInput.focus();
@@ -61,7 +60,6 @@ document.addEventListener("DOMContentLoaded", function() {
     closeChat.addEventListener("click", function() {
       chatPanel.classList.add("hidden");
       chatPanel.classList.remove("mobile-chat-open");
-      document.body.classList.remove("overflow-hidden");
       chatBubbleContainer.classList.remove("hide");
     });
 
@@ -69,7 +67,6 @@ document.addEventListener("DOMContentLoaded", function() {
     window.addEventListener("resize", function() {
       if (window.innerWidth >= 768) {
         chatPanel.classList.remove("mobile-chat-open");
-        document.body.classList.remove("overflow-hidden");
         chatBubbleContainer.classList.remove("hide");
       }
     });
@@ -210,7 +207,6 @@ document.addEventListener("DOMContentLoaded", function() {
         if (!isClickInsideChat && !isClickOnChatBubble) {
           chatPanel.classList.add("hidden");
           chatPanel.classList.remove("mobile-chat-open");
-          document.body.classList.remove("overflow-hidden");
           chatBubbleContainer.classList.remove("hide");
         }
       }
