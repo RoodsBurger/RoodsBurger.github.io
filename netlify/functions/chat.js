@@ -29,7 +29,7 @@ export const handler = async (event, context) => {
   try {
     console.log('Starting chat function...');
     const requestBody = JSON.parse(event.body);
-    const message = requestBody.message;
+    const { message, conversationHistory = [] } = requestBody;
     console.log('Received message:', message);
 
     // Validate message
@@ -57,9 +57,6 @@ export const handler = async (event, context) => {
       embeddingTypes: ['float']
     });
 
-    // Log the full response structure for debugging
-    console.log('Full embed response structure:', JSON.stringify(embedResponse, null, 2).substring(0, 500));
-
     // Check if embeddings exist before accessing
     if (!embedResponse.embeddings || !embedResponse.embeddings.float || !embedResponse.embeddings.float[0]) {
       console.error('No embeddings returned from Cohere');
@@ -80,28 +77,11 @@ export const handler = async (event, context) => {
     
     // Query Pinecone
     console.log('Querying Pinecone...');
-    console.log('Query embedding type:', typeof queryEmbedding);
     
-    if (queryEmbedding) {
-      console.log('Query embedding preview:', JSON.stringify(queryEmbedding).substring(0, 100) + '...');
-    } else {
-      console.log('Query embedding is undefined or null');
-    }
-
     // Ensure queryEmbedding is an array of numbers
     let vectorToQuery = queryEmbedding;
     if (typeof queryEmbedding === 'object' && !Array.isArray(queryEmbedding)) {
-      // If it's an object, try to extract the values
       vectorToQuery = queryEmbedding.values || Object.values(queryEmbedding);
-      console.log('Extracted vector values');
-    }
-
-    // Debug logging for vector
-    console.log('Vector type:', typeof vectorToQuery);
-    console.log('Is array:', Array.isArray(vectorToQuery));
-    if (Array.isArray(vectorToQuery)) {
-      console.log('Vector length:', vectorToQuery.length);
-      console.log('First few values:', vectorToQuery.slice(0, 5));
     }
 
     const index = pc.index(process.env.INDEX_NAME);
@@ -120,49 +100,69 @@ export const handler = async (event, context) => {
       console.log('Retrieved context:', context.substring(0, 200) + '...');
     } else {
       console.log('No relevant context found in Pinecone');
-      context = "No specific information available.";
+      context = "No specific information available about this topic.";
     }
+
+    // Format conversation history for Cohere
+    const formattedHistory = conversationHistory.map(msg => ({
+      role: msg.role,
+      content: msg.content
+    }));
 
     // Generate chat response with Cohere API
     console.log('Generating chat response with Cohere...');
     
-    // Log the parameters for debugging
+    // Prepare messages array with system prompt, history, and current message
+    const messages = [
+      {
+        role: "system",
+        content: `You are a helpful, concise assistant for Rodolfo's portfolio website. 
+        Follow these guidelines:
+        1. Keep responses brief and to the point
+        2. Only mention Rodolfo's projects when directly relevant to the question
+        3. Answer general questions normally without forcing references to the portfolio
+        4. Maintain a friendly, professional tone`
+      },
+      ...formattedHistory
+    ];
+    
+    // Add the current user message with context
+    messages.push({
+      role: "user",
+      content: message
+    });
+    
+    // Add context as a separate system message if relevant
+    if (context && context !== "No specific information available about this topic.") {
+      messages.push({
+        role: "system",
+        content: `Here is some relevant information about Rodolfo that might help with your response: ${context}`
+      });
+    }
+    
     const chatParams = {
       model: "command-r",
-      messages: [
-        {
-          role: "user",
-          content: `"You are an AI assistant for Rodolfo's portfolio website.\
-            You should address each question as concise as possible and make sure to \
-            address only the question askled and mention only relevant projects and \
-            background. You should also make sure ro properly format your answer, \
-            including proper spacing, formatting, new lines, paragraphs, etc." \n\n \
-            ${message}\n\n Use this context to concisely answer questions about Rodolfo \
-            and his projects, you should not just copy and paste for the context, \
-            instead formulates a concise answer that addresses some of the information \
-            mentioned in the context in a nice and readable format. \
-            You should also make sure to not include the question and craft an answer \
-            that sounds natural, organic using the context: ${context}`
-        }
-      ],
-      preamble: "You are an AI assistant for Rodolfo's portfolio website. You should address each question as concise as possible and make sure to address only the question askled and mention only relevant projects and background."
+      messages: messages,
+      temperature: 0.7
     };
-    console.log('Chat params:', JSON.stringify(chatParams, null, 2));
+    
+    console.log('Chat params structure:', JSON.stringify({
+      messageCount: chatParams.messages.length,
+      modelName: chatParams.model
+    }, null, 2));
     
     let chatResponse;
     try {
       chatResponse = await cohere.chat(chatParams);
     } catch (error) {
       console.error('Cohere API error:', error);
-      throw error; // Rethrow to be caught by the outer try/catch
+      throw error;
     }
     
-    // Ensure the chatResponse is in the expected format.
+    // Ensure the chatResponse is in the expected format
     if (chatResponse && chatResponse.message && Array.isArray(chatResponse.message.content)) {
-      // Log a preview of the response
       console.log('Cohere chat response preview:', chatResponse.message.content[0].text.substring(0, 200) + '...');
       
-      // Return the full chat response under "message"
       return {
         statusCode: 200,
         headers,
@@ -171,7 +171,7 @@ export const handler = async (event, context) => {
         })
       };
     } else {
-      console.log('Full response from Cohere:', JSON.stringify(chatResponse, null, 2).substring(0, 500));
+      console.log('Unexpected response format from Cohere:', JSON.stringify(chatResponse, null, 2).substring(0, 500));
       return {
         statusCode: 200,
         headers,
