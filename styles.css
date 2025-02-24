@@ -274,48 +274,56 @@ section[id] {
 
   
   /* Mobile-specific chat styles */
-  @media (max-width: 768px) {
-    /* Full-screen chat panel on mobile */
-    #chat-panel.mobile-chat-open {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border-radius: 0;
-      z-index: 100;
-      display: flex;
-      flex-direction: column;
-    }
-    
-    /* Sticky header so it remains visible */
-    #chat-panel.mobile-chat-open .chat-header {
-      position: sticky;
-      top: 0;
-      background-color: #f9fafb; /* or your preferred background color */
-      z-index: 10;
-    }
-    
-    /* Ensure messages area scrolls */
-    #chat-panel.mobile-chat-open #mini-chat-messages {
-      flex: 1;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-    
-    /* Sticky input area at the bottom */
-    #chat-panel.mobile-chat-open .chat-input-area {
-      position: sticky;
-      bottom: 0;
-      background-color: #f9fafb;
-      z-index: 10;
-    }
-    
-    /* Hide the chat bubble container when chat is open */
-    #chat-bubble-container.hide {
-      display: none;
-    }
+@media (max-width: 768px) {
+  /* Full-screen chat panel on mobile – override default bottom/right values */
+  #chat-panel.mobile-chat-open {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0 !important;
+    width: 100%;
+    height: 100vh;
+    border-radius: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
   }
+  
+  /* Fixed header: always visible at the top */
+  #chat-panel.mobile-chat-open .chat-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    background-color: #f9fafb; /* or your preferred background */
+  }
+  
+  /* Fixed input area: always visible at the bottom */
+  #chat-panel.mobile-chat-open .chat-input-area {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    background-color: #f9fafb;
+  }
+  
+  /* Scrollable messages area: accounts for header and input heights */
+  #chat-panel.mobile-chat-open #mini-chat-messages {
+    margin-top: 4rem;  /* adjust if your header height differs */
+    margin-bottom: 4rem; /* adjust if your input area height differs */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    height: calc(100vh - 8rem); /* 100vh minus header + input heights */
+  }
+  
+  /* Hide the chat bubble container when the chat is open */
+  #chat-bubble-container.hide {
+    display: none;
+  }
+}
 
   
 
