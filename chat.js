@@ -8,20 +8,20 @@ document.addEventListener("DOMContentLoaded", () => {
       const messageText = userInput.value.trim();
       if (!messageText) return;
   
-      // Clear default message if present (assumes only one child exists initially)
+      // Clear default message if present (assuming only one child exists initially)
       if (chatMessages.children.length === 1) {
         chatMessages.innerHTML = "";
       }
   
-      // Append the user's message
+      // Append the user's message to the chat container
       appendMessage("user", messageText);
   
       // Clear the input field
       userInput.value = "";
   
       try {
-        // Send the message to your backend endpoint
-        const response = await fetch("/api/chat", {
+        // Send the user's message to your Netlify function at /.netlify/functions/chat
+        const response = await fetch("/.netlify/functions/chat", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -35,13 +35,20 @@ document.addEventListener("DOMContentLoaded", () => {
   
         const data = await response.json();
   
-        // Extract full response text from Cohere's reply
-        // Expected format: { message: { content: [ { type: "text", text: "..." }, ... ] } }
+        // Assuming your backend returns a JSON response in the format:
+        // {
+        //   "message": {
+        //     "content": [
+        //       { "type": "text", "text": "Part one..." },
+        //       { "type": "text", "text": "Part two..." }
+        //     ]
+        //   }
+        // }
         const fullResponseText = data.message.content
           .map((chunk) => chunk.text)
           .join(" ");
   
-        // Append the assistant's response
+        // Append the assistant's response to the chat container
         appendMessage("assistant", fullResponseText);
       } catch (error) {
         console.error("Error fetching chat response:", error);
@@ -50,14 +57,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   
     function appendMessage(role, text) {
-      // Create the message wrapper
+      // Create the message wrapper element
       const messageWrapper = document.createElement("div");
       messageWrapper.className = "flex items-start gap-4 my-2";
   
-      // Create the icon for the message based on its role
+      // Create the icon based on the role
       const iconDiv = document.createElement("div");
       iconDiv.className = "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0";
-  
       if (role === "assistant") {
         iconDiv.classList.add("bg-blue-100");
         iconDiv.innerHTML = `<svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -77,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                     <p class="text-gray-600">${text}</p>
                                   </div>`;
   
-      // Append both icon and text to the wrapper and then to the chat container
+      // Append the icon and text to the message wrapper, then append to the chat container
       messageWrapper.appendChild(iconDiv);
       messageWrapper.appendChild(messageContent);
       chatMessages.appendChild(messageWrapper);
