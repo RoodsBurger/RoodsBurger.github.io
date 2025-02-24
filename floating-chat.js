@@ -205,7 +205,7 @@ document.addEventListener("DOMContentLoaded", function() {
         element.innerHTML += text.charAt(index);
         setTimeout(() => {
           typeWriterEffect(element, text, index + 1);
-        }, 50);
+        }, 10);
       }
     }
 
