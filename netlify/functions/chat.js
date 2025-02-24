@@ -56,8 +56,7 @@ export const handler = async (event, context) => {
         try {
         // First try with environment (for backward compatibility)
         const pc = new Pinecone({
-            apiKey: process.env.PINECONE_API_KEY,
-            environment: "us-east-1"  // Hardcoded based on your dashboard
+            apiKey: process.env.PINECONE_API_KEY
         });
         
         console.log('Pinecone initialized with environment parameter');
