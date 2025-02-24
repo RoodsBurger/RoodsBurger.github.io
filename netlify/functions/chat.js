@@ -156,7 +156,7 @@ export const handler = async (event, context) => {
                     statusCode: 200,
                     headers,
                     body: JSON.stringify({
-                        response: chatResponse.response.text
+                        response: chatResponse.message.text
                     })
                 };
             } else {
