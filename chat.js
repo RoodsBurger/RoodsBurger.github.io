@@ -20,12 +20,8 @@ class ChatInterface {
                 // Show loading state
                 this.addLoadingMessage();
                 
-                // Get relevant context from Pinecone
-                const queryEmbedding = await this.getEmbedding(message);
-                const context = await this.queryPinecone(queryEmbedding);
-                
-                // Generate response with Cohere
-                const response = await this.generateResponse(message, context);
+                // Call serverless function to handle the chat interaction
+                const response = await this.generateResponse(message);
                 
                 // Remove loading message and add response
                 this.removeLoadingMessage();
@@ -37,7 +33,6 @@ class ChatInterface {
             }
         });
 
-        // Use requestSubmit to trigger a trusted submit event when Enter is pressed
         this.userInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -50,67 +45,21 @@ class ChatInterface {
         });
     }
 
-    async getEmbedding(text) {
-        // Use the correct endpoint for embeddings
-        const response = await fetch('https://api.cohere.ai/embed', {
+    async generateResponse(message) {
+        const response = await fetch('/.netlify/functions/chat', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer `,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                texts: [text],
-                model: 'embed-english-v3.0',
-                input_type: 'search_query'
-            })
+            body: JSON.stringify({ message })
         });
-        if (!response.ok) {
-            throw new Error(`Cohere Embedding API error: ${response.statusText}`);
-        }
-        const data = await response.json();
-        return data.embeddings[0];
-    }
 
-    async queryPinecone(embedding) {
-        const response = await fetch(`/.netlify/functions/pinecone-proxy`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                vector: embedding,
-                topK: 3,
-                includeMetadata: true
-            })
-        });
         if (!response.ok) {
-            throw new Error(`Pinecone API error: ${response.statusText}`);
+            throw new Error(`Chat API error: ${response.statusText}`);
         }
-        const data = await response.json();
-        return data.matches.map(match => match.metadata.text).join('\n');
-    }    
 
-    async generateResponse(message, context) {
-        const response = await fetch('https://api.cohere.ai/v1/chat', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer `,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                message: message,
-                preamble: `You are an AI assistant for Rodolfo's portfolio website. 
-                          Use this context to answer questions about Rodolfo: ${context}
-                          Be friendly and concise. If you're not sure about something, 
-                          say so rather than making assumptions.`,
-                temperature: 0.7
-            })
-        });
-        if (!response.ok) {
-            throw new Error(`Cohere Chat API error: ${response.statusText}`);
-        }
         const data = await response.json();
-        return data.response.text;
+        return data.response;
     }
 
     addMessage(content, isUser = false) {
