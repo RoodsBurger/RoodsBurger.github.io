@@ -29,7 +29,7 @@ class ChatInterface {
             } catch (error) {
                 console.error('Error:', error);
                 this.removeLoadingMessage();
-                this.addMessage('Sorry, I encountered an error. Please try again.');
+                this.addMessage('Sorry, I encountered an error. Please try again later.');
             }
         });
 
@@ -46,20 +46,30 @@ class ChatInterface {
     }
 
     async generateResponse(message) {
-        const response = await fetch('/.netlify/functions/chat', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ message })
-        });
+        try {
+            const response = await fetch('/.netlify/functions/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message })
+            });
 
-        if (!response.ok) {
-            throw new Error(`Chat API error: ${response.statusText}`);
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || `Server error: ${response.status}`);
+            }
+
+            if (data.error) {
+                throw new Error(data.error);
+            }
+
+            return data.response;
+        } catch (error) {
+            console.error('API Error:', error);
+            throw new Error('Failed to get response from the chat service.');
         }
-
-        const data = await response.json();
-        return data.response;
     }
 
     addMessage(content, isUser = false) {
@@ -84,11 +94,21 @@ class ChatInterface {
         
         const textDiv = document.createElement('div');
         textDiv.className = 'flex-1';
-        textDiv.innerHTML = `<p class="text-gray-600 whitespace-pre-wrap">${content}</p>`;
+        const sanitizedContent = this.escapeHtml(content);
+        textDiv.innerHTML = `<p class="text-gray-600 whitespace-pre-wrap">${sanitizedContent}</p>`;
         messageDiv.appendChild(textDiv);
         
         this.chatMessages.appendChild(messageDiv);
         this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+    }
+
+    escapeHtml(unsafe) {
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
     }
 
     addLoadingMessage() {
