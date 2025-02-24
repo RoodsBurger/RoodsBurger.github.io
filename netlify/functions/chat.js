@@ -128,11 +128,11 @@ export const handler = async (event, context) => {
     
     // Log the parameters for debugging
     const chatParams = {
-      model: "command-r-plus-08-2024",
+      model: "command-r",
       messages: [
         {
           role: "user",
-          content: `${message}\n\nUse this context to concisely answer questions about Rodolfo and his projects: ${context}`
+          content: `"You are an AI assistant for Rodolfo's portfolio website. You should address each question as concise as possible and make sure to address only the question askled and mention only relevant projects and background. You should also make sure ro properly format your answer, including proper spacing, formatting, new lines, paragraphs, etc." \n\n ${message}\n\n Use this context to concisely answer questions about Rodolfo and his projects: ${context}`
         }
       ],
       preamble: "You are an AI assistant for Rodolfo's portfolio website. You should address each question as concise as possible and make sure to address only the question askled and mention only relevant projects and background."
