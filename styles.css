@@ -137,11 +137,21 @@ section[id] {
 
 /* Chat-specific styles */
 
-/* Bubble styles */
-.message-bubble {
+/* Bubble styles with integrated avatars */
+.user-bubble {
+    background-color: rgba(209, 250, 229, 0.4); /* Very light green */
+    color: #1F2937;
+    border-radius: 18px 4px 18px 18px;
+    border: 1px solid rgba(167, 243, 208, 0.5);
     position: relative;
-    max-width: 85%;
-    word-wrap: break-word;
+  }
+  
+  .assistant-bubble {
+    background-color: rgba(219, 234, 254, 0.4); /* Very light blue */
+    color: #1F2937;
+    border-radius: 4px 18px 18px 18px;
+    border: 1px solid rgba(191, 219, 254, 0.5);
+    position: relative;
   }
   
   /* Animation for typing indicator */
@@ -153,6 +163,7 @@ section[id] {
   
   .thinking-dots {
     animation: thinking 1.5s infinite;
+    padding-left: 0.5rem;
   }
   
   /* Custom scrollbar for chat */
@@ -172,25 +183,6 @@ section[id] {
   
   #chat-messages::-webkit-scrollbar-thumb:hover {
     background: #9ca3af;
-  }
-  
-  /* Message bubbles and indicators */
-  .user-bubble {
-    background-color: #ECFDF5;
-    color: #065F46;
-    border-radius: 18px 18px 0 18px;
-  }
-  
-  .assistant-bubble {
-    background-color: #EFF6FF;
-    color: #1E40AF;
-    border-radius: 18px 18px 18px 0;
-  }
-  
-  /* AI avatar styling */
-  #chat-messages .bg-blue-100 {
-    background-color: #DBEAFE;
-    border: 1px solid #BFDBFE;
   }
   
   /* Typography within chat bubbles */

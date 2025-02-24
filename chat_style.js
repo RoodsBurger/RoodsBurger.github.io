@@ -93,36 +93,31 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Create message wrapper
     const messageWrapper = document.createElement("div");
-    messageWrapper.className = "flex items-start my-4 thinking-indicator";
+    messageWrapper.className = "flex items-start my-4 thinking-indicator justify-start";
     messageWrapper.id = thinkingId;
 
-    // Create the message content with left alignment for assistant
-    const messageContent = document.createElement("div");
-    messageContent.className = "flex items-start max-w-[80%]";
+    // Create the integrated bubble with avatar
+    const bubbleContainer = document.createElement("div");
+    bubbleContainer.className = "assistant-bubble py-3 pr-4 pl-10 relative max-w-[80%] flex items-start";
     
-    // Create the avatar for assistant
+    // Create avatar
     const avatar = document.createElement("div");
-    avatar.className = "w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mr-2";
+    avatar.className = "absolute left-2 top-3 w-6 h-6 rounded-full bg-white flex items-center justify-center";
     avatar.innerHTML = `
-      <svg class="w-4 h-4 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+      <svg class="w-3.5 h-3.5 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
         <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H9.771l-.166.33A2.99 2.99 0 0110 13c.341 0 .675-.052.988-.152L11.166 12zM13 15a1 1 0 100-2 1 1 0 000 2zm-3 1a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
       </svg>
     `;
-
-    // Create bubble for text
-    const bubble = document.createElement("div");
-    bubble.className = "bg-blue-100 rounded-2xl py-2 px-4 text-gray-700";
     
     // Create the text with thinking dots animation
     const text = document.createElement("div");
-    text.className = "thinking-dots";
+    text.className = "thinking-dots w-full";
     text.textContent = "Thinking";
-    bubble.appendChild(text);
     
     // Assemble the message
-    messageContent.appendChild(avatar);
-    messageContent.appendChild(bubble);
-    messageWrapper.appendChild(messageContent);
+    bubbleContainer.appendChild(avatar);
+    bubbleContainer.appendChild(text);
+    messageWrapper.appendChild(bubbleContainer);
     
     // Add to chat container
     chatMessages.appendChild(messageWrapper);
@@ -182,63 +177,52 @@ document.addEventListener("DOMContentLoaded", () => {
       messageWrapper.className += " justify-start"; // Left-align assistant messages
     }
 
-    // Create the message content with avatar and bubble
-    const messageContent = document.createElement("div");
-    messageContent.className = "flex items-start max-w-[80%]";
-    
-    if (role === "user") {
-      messageContent.className += " flex-row-reverse"; // Reverse order for user message (avatar on right)
-    }
-    
-    // Create the avatar
+    // Create the integrated bubble with avatar
+    const bubbleContainer = document.createElement("div");
+    bubbleContainer.className = role === "user" 
+      ? "user-bubble py-3 pl-4 pr-10 relative max-w-[80%] flex items-start" 
+      : "assistant-bubble py-3 pr-4 pl-10 relative max-w-[80%] flex items-start";
+
+    // Create avatar that will be positioned inside the bubble
     const avatar = document.createElement("div");
-    avatar.className = "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0";
     
     if (role === "user") {
-      avatar.className += " ml-2 bg-green-100";
+      avatar.className = "absolute right-2 top-3 w-6 h-6 rounded-full bg-white flex items-center justify-center";
       avatar.innerHTML = `
-        <svg class="w-4 h-4 text-green-600" viewBox="0 0 20 20" fill="currentColor">
+        <svg class="w-3.5 h-3.5 text-green-600" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
         </svg>
       `;
     } else {
-      avatar.className += " mr-2 bg-blue-100";
+      avatar.className = "absolute left-2 top-3 w-6 h-6 rounded-full bg-white flex items-center justify-center";
       avatar.innerHTML = `
-        <svg class="w-4 h-4 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+        <svg class="w-3.5 h-3.5 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H9.771l-.166.33A2.99 2.99 0 0110 13c.341 0 .675-.052.988-.152L11.166 12zM13 15a1 1 0 100-2 1 1 0 000 2zm-3 1a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
         </svg>
       `;
     }
-
-    // Create bubble for text
-    const bubble = document.createElement("div");
-    bubble.className = role === "user" 
-      ? "bg-green-100 rounded-2xl py-2 px-4 text-gray-700" 
-      : "bg-blue-100 rounded-2xl py-2 px-4 text-gray-700";
     
     // Create the text element
     const messageText = document.createElement("div");
-    messageText.className = "message-text prose prose-sm";
+    messageText.className = "message-text prose prose-sm w-full";
     
     // Format the text with markdown-like formatting
     const formattedText = formatMessageText(text);
     
-    // Assemble the message
-    messageContent.appendChild(avatar);
+    // Add avatar to bubble
+    bubbleContainer.appendChild(avatar);
     
     if (immediate) {
       // Display full message immediately
       messageText.innerHTML = formattedText;
-      bubble.appendChild(messageText);
-      messageContent.appendChild(bubble);
-      messageWrapper.appendChild(messageContent);
+      bubbleContainer.appendChild(messageText);
+      messageWrapper.appendChild(bubbleContainer);
       chatMessages.appendChild(messageWrapper);
     } else {
       // Start with empty text and type it out
       messageText.innerHTML = '';
-      bubble.appendChild(messageText);
-      messageContent.appendChild(bubble);
-      messageWrapper.appendChild(messageContent);
+      bubbleContainer.appendChild(messageText);
+      messageWrapper.appendChild(bubbleContainer);
       chatMessages.appendChild(messageWrapper);
       
       // Type out the message
@@ -250,7 +234,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   
   // Function to simulate typing
-  function typeMessage(text, element, speed = 25) {
+  function typeMessage(text, element, baseSpeed = 30) {
+    // Create a cursor element
+    const cursor = document.createElement('span');
+    cursor.className = 'typing-cursor';
+    element.appendChild(cursor);
+    
     // Convert HTML to array of characters and HTML tags
     const htmlChunks = [];
     let inTag = false;
@@ -280,7 +269,7 @@ document.addEventListener("DOMContentLoaded", () => {
       htmlChunks.push({ type: inTag ? 'tag' : 'text', content: currentChunk });
     }
     
-    // Type out each chunk
+    // Type out each chunk with variable speed
     let i = 0;
     function typeNextChunk() {
       if (i < htmlChunks.length) {
@@ -288,16 +277,36 @@ document.addEventListener("DOMContentLoaded", () => {
         
         if (chunk.type === 'tag') {
           // Add HTML tags instantly
-          element.innerHTML += chunk.content;
+          element.innerHTML = element.innerHTML.replace('<span class="typing-cursor"></span>', '');
+          element.innerHTML += chunk.content + '<span class="typing-cursor"></span>';
           i++;
           typeNextChunk();
         } else {
-          // Type text character by character
+          // Type text character by character with variable speed
           let charIndex = 0;
           function typeNextChar() {
             if (charIndex < chunk.content.length) {
-              element.innerHTML += chunk.content[charIndex];
+              // Remove cursor first
+              element.innerHTML = element.innerHTML.replace('<span class="typing-cursor"></span>', '');
+              
+              // Add next character
+              element.innerHTML += chunk.content[charIndex] + '<span class="typing-cursor"></span>';
               charIndex++;
+              
+              // Variable typing speed based on several factors
+              let speed = baseSpeed;
+              
+              // Slow down at punctuation
+              if ('.!?,;:'.includes(chunk.content[charIndex - 1])) {
+                speed = baseSpeed * 3; // Pause longer at punctuation
+              } 
+              // Speed up for common words or patterns
+              else if (charIndex > 2 && ' the a and to of in is '.includes(' ' + chunk.content.slice(Math.max(0, charIndex - 4), charIndex) + ' ')) {
+                speed = baseSpeed * 0.7;
+              }
+              // Random variations to make it feel organic
+              speed *= (0.8 + Math.random() * 0.4); // Random factor between 0.8 and 1.2
+              
               setTimeout(typeNextChar, speed);
             } else {
               i++;
@@ -306,6 +315,9 @@ document.addEventListener("DOMContentLoaded", () => {
           }
           typeNextChar();
         }
+      } else {
+        // Remove the cursor when typing is finished
+        element.innerHTML = element.innerHTML.replace('<span class="typing-cursor"></span>', '');
       }
       
       // Auto-scroll while typing
