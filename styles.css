@@ -216,4 +216,96 @@ section[id] {
     transform: translateY(1px);
   }
   
-  /* No cursor animation - removed */
+ /* Floating Chat Styles - Add to styles.css */
+
+/* Button animation */
+#chat-bubble {
+    transition: transform 0.3s ease;
+    transform-origin: bottom right;
+  }
+  
+  #chat-bubble:hover {
+    transform: scale(1.05);
+  }
+  
+  /* Chat panel transitions */
+  #chat-panel {
+    transition: all 0.3s ease;
+    max-height: 80vh;
+  }
+  
+  /* Typing indicator animation */
+  @keyframes thinking {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
+  }
+  
+  .thinking-dots {
+    animation: thinking 1.5s infinite;
+    min-width: 60px;
+    display: inline-block;
+  }
+  
+  /* Message bubbles */
+  .user-bubble {
+    background-color: rgba(209, 250, 229, 0.4);
+    color: #1F2937;
+    border-radius: 18px 4px 18px 18px;
+    border: 1px solid rgba(167, 243, 208, 0.5);
+    position: relative;
+  }
+  
+  .assistant-bubble {
+    background-color: rgba(219, 234, 254, 0.4);
+    color: #1F2937;
+    border-radius: 4px 18px 18px 18px;
+    border: 1px solid rgba(191, 219, 254, 0.5);
+    position: relative;
+  }
+  
+  /* Custom scrollbar */
+  #mini-chat-messages::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  #mini-chat-messages::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+  
+  #mini-chat-messages::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 10px;
+  }
+  
+  #mini-chat-messages::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
+  
+  /* Mobile chat panel */
+  @media (max-width: 768px) {
+    #chat-panel.mobile-chat-open {
+      bottom: 0;
+      right: 0;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 100%;
+      border-radius: 0;
+      z-index: 100;
+    }
+    
+    body.overflow-hidden {
+      overflow: hidden;
+    }
+    
+    #chat-bubble {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+  }
+  
+  /* Message formatting */
+  .message-text p:last-child {
+    margin-bottom: 0;
+  }
