@@ -1,15 +1,21 @@
 // netlify/functions/pinecone-proxy.js
 
 exports.handler = async function(event, context) {
-    // Parse the JSON body sent by the client
+    if (event.httpMethod !== "POST") {
+      return {
+        statusCode: 405,
+        headers: { 'Allow': 'POST' },
+        body: JSON.stringify({ error: 'Method Not Allowed. Use POST.' })
+      };
+    }
+  
     const data = JSON.parse(event.body);
-    
+  
     try {
-      // Make the API call to Pinecone
       const response = await fetch('https://rodolfo-portfolio.us-east-1.pinecone.io/query', {
         method: 'POST',
         headers: {
-          'Api-Key': process.env.PINECONE_API_KEY, // set in Netlify environment
+          'Api-Key': process.env.PINECONE_API_KEY, // set in Netlify env variables
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
@@ -20,7 +26,6 @@ exports.handler = async function(event, context) {
         statusCode: 200,
         body: JSON.stringify(result)
       };
-      
     } catch (error) {
       console.error('Pinecone Proxy Error:', error);
       return {
