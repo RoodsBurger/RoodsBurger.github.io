@@ -7,12 +7,6 @@ const headers = {
     'Content-Type': 'application/json'
 };
 
-// Initialize Pinecone client
-const pc = new Pinecone({
-    apiKey: process.env.PINECONE_API_KEY,
-    environment: process.env.PINECONE_ENVIRONMENT
-});
-
 export const handler = async (event, context) => {
     // Handle preflight request
     if (event.httpMethod === 'OPTIONS') {
@@ -36,6 +30,7 @@ export const handler = async (event, context) => {
         const { message } = JSON.parse(event.body);
 
         // Get embedding from Cohere
+        console.log('Getting embedding from Cohere...');
         const embedResponse = await fetch('https://api.cohere.ai/v1/embed', {
             method: 'POST',
             headers: {
@@ -55,6 +50,13 @@ export const handler = async (event, context) => {
 
         const embedData = await embedResponse.json();
         const queryEmbedding = embedData.embeddings[0];
+
+        // Initialize Pinecone with the correct cloud configuration
+        console.log('Initializing Pinecone...');
+        const pc = new Pinecone({
+            apiKey: process.env.PINECONE_API_KEY,
+            environment: process.env.PINECONE_ENVIRONMENT || 'gcp-starter'
+        });
 
         // Query Pinecone
         console.log('Querying Pinecone...');
@@ -97,7 +99,7 @@ export const handler = async (event, context) => {
             statusCode: 200,
             headers,
             body: JSON.stringify({
-                response: chatData.text
+                response: chatData.response.text
             })
         };
     } catch (error) {
