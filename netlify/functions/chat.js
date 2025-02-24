@@ -94,15 +94,32 @@ export const handler = async (event, context) => {
             throw new Error(`Cohere chat error: ${await chatResponse.text()}`);
         }
 
+        // After getting the chat response, add this:
         const chatData = await chatResponse.json();
+        console.log('Cohere chat response structure:', JSON.stringify(chatData).substring(0, 500)); // Log a preview
+
+        // Then modify how we extract the text:
+        let responseText;
+        if (chatData && chatData.response) {
+            responseText = chatData.response.text || chatData.response; // Try both possibilities
+        } else if (chatData && chatData.text) {
+            responseText = chatData.text;
+        } else if (chatData && chatData.generations && chatData.generations.length > 0) {
+            responseText = chatData.generations[0].text;
+        } else {
+            responseText = "I couldn't generate a response at this time.";
+            console.log('Unknown Cohere response structure:', JSON.stringify(chatData));
+        }
 
         return {
             statusCode: 200,
             headers,
             body: JSON.stringify({
-                response: chatData.response.text
+                response: responseText
             })
         };
+
+        
     } catch (error) {
         console.error('Error in chat function:', error);
         return {
