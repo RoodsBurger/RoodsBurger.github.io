@@ -60,8 +60,8 @@ export const handler = async (event, context) => {
         // Log the full response structure for debugging
         console.log('Full embed response structure:', JSON.stringify(embedResponse, null, 2).substring(0, 500));
 
-        // Check if embeddings exist before accessing
-        if (!embedResponse.embeddings || !embedResponse.embeddings[0]) {
+        // Check if embeddings exist before accessing - the structure is embedResponse.embeddings.float[0]
+        if (!embedResponse.embeddings || !embedResponse.embeddings.float || !embedResponse.embeddings.float[0]) {
             console.error('No embeddings returned from Cohere');
             return {
                 statusCode: 500,
@@ -70,7 +70,7 @@ export const handler = async (event, context) => {
             };
         }
 
-        const queryEmbedding = embedResponse.embeddings[0];
+        const queryEmbedding = embedResponse.embeddings.float[0];
 
         // Initialize Pinecone
         console.log('Initializing Pinecone...');
