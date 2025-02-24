@@ -82,6 +82,7 @@ export const handler = async (event, context) => {
             },
             body: JSON.stringify({
                 message: message,
+                model: 'command-r-plus-08-2024',
                 chat_history: [], // Empty for now, but you could track history if needed
                 prompt: `You are an AI assistant for Rodolfo's portfolio website. 
                         Use this context to answer questions about Rodolfo: ${context}
