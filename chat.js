@@ -55,7 +55,7 @@ class ChatInterface {
         const response = await fetch('https://api.cohere.ai/embed', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer rqSc1qIkHG1TiMUGD2Eml0D4Lw6Rf2XpRsUgfSqr`,
+                'Authorization': `Bearer `,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
@@ -88,13 +88,13 @@ class ChatInterface {
         }
         const data = await response.json();
         return data.matches.map(match => match.metadata.text).join('\n');
-    }
+    }    
 
     async generateResponse(message, context) {
         const response = await fetch('https://api.cohere.ai/v1/chat', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer rqSc1qIkHG1TiMUGD2Eml0D4Lw6Rf2XpRsUgfSqr`,
+                'Authorization': `Bearer `,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
