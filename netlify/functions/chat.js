@@ -1,4 +1,5 @@
 import { Pinecone } from '@pinecone-database/pinecone';
+import { CohereClient } from 'cohere-ai';
 
 const headers = {
     'Access-Control-Allow-Origin': 'https://rraimundo.me',
@@ -41,27 +42,22 @@ export const handler = async (event, context) => {
             };
         }
 
-        // Get embedding from Cohere
-        console.log('Getting embedding from Cohere...');
-        const embedResponse = await fetch('https://api.cohere.ai/v1/embed', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${process.env.COHERE_API_KEY}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                texts: [message],
-                model: 'embed-english-v3.0',
-                input_type: 'search_query'
-            })
+        // Initialize Cohere client
+        console.log('Initializing Cohere client...');
+        const cohere = new CohereClient({
+            token: process.env.COHERE_API_KEY
         });
 
-        if (!embedResponse.ok) {
-            throw new Error(`Cohere embedding error: ${await embedResponse.text()}`);
-        }
+        // Get embedding from Cohere v2
+        console.log('Getting embedding from Cohere v2...');
+        const embedResponse = await cohere.v2.embed({
+            texts: [message],
+            model: 'embed-english-v3.0',
+            inputType: 'search_query',
+            embeddingTypes: ['float']
+        });
 
-        const embedData = await embedResponse.json();
-        const queryEmbedding = embedData.embeddings[0];
+        const queryEmbedding = embedResponse.embeddings[0];
 
         // Initialize Pinecone
         console.log('Initializing Pinecone...');
@@ -80,51 +76,42 @@ export const handler = async (event, context) => {
             includeMetadata: true
         });
         
-        const context = queryResponse.matches
-            .map(match => match.metadata.text)
-            .join('\n');
-
-        console.log('Retrieved context:', context.substring(0, 200) + '...'); // Log a preview of context
+        let context = "";
+        if (queryResponse.matches && queryResponse.matches.length > 0) {
+            context = queryResponse.matches
+                .filter(match => match.metadata && match.metadata.text)
+                .map(match => match.metadata.text)
+                .join('\n');
+            console.log('Retrieved context:', context.substring(0, 200) + '...');
+        } else {
+            console.log('No relevant context found in Pinecone');
+            context = "No specific information available.";
+        }
 
         // Generate chat response with Cohere v2 API
         console.log('Generating chat response with Cohere v2...');
-        console.log('Message to send:', message);
-
-        const chatResponse = await fetch('https://api.cohere.ai/v2/chat', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${process.env.COHERE_API_KEY}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                message: message,
-                model: 'command-r-plus-08-2024',
-                chat_history: [],
-                prompt: `You are an AI assistant for Rodolfo's portfolio website. 
-                        Use this context to answer questions about Rodolfo: ${context}
-                        Be friendly and concise. If you're not sure about something, 
-                        say so rather than making assumptions.`,
-                temperature: 0.7
-            })
+        
+        const chatResponse = await cohere.chat({
+            model: "command",
+            messages: [
+                {
+                    role: "user",
+                    content: message
+                }
+            ],
+            preamble: `You are an AI assistant for Rodolfo's portfolio website. 
+                      Use this context to answer questions about Rodolfo: ${context}
+                      Be friendly and concise. If you're not sure about something, 
+                      say so rather than making assumptions.`
         });
-
-        if (!chatResponse.ok) {
-            const errorText = await chatResponse.text();
-            console.error('Cohere API error response:', errorText);
-            throw new Error(`Cohere chat error: ${errorText}`);
-        }
-
-        const chatData = await chatResponse.json();
-        console.log('Cohere chat response structure:', JSON.stringify(chatData).substring(0, 500));
-
-        // Extract text according to the v2 API structure
-        let responseText = chatData.text || "I couldn't generate a response at this time.";
+        
+        console.log('Cohere chat response preview:', JSON.stringify(chatResponse).substring(0, 200) + '...');
 
         return {
             statusCode: 200,
             headers,
             body: JSON.stringify({
-                response: responseText
+                response: chatResponse.text
             })
         };
     } catch (error) {
