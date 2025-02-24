@@ -128,7 +128,7 @@ export const handler = async (event, context) => {
         
         // Log the parameters for debugging
         console.log('Chat params:', JSON.stringify({
-            model: "command-r-plus-08-2024",
+            model: "command-r",
             messages: [
                 {
                     role: "user",
@@ -149,7 +149,7 @@ export const handler = async (event, context) => {
                 ]
             });
             
-            if (chatResponse && chatResponse.response && chatResponse.response.text) {
+            if (chatResponse && chatResponse.message && chatResponse.message.text) {
                 console.log('Cohere chat response preview:', chatResponse.response.text.substring(0, 200) + '...');
                 
                 return {
