@@ -21,27 +21,12 @@ document.addEventListener("DOMContentLoaded", function() {
     const miniChatMessages = document.getElementById("mini-chat-messages");
     let conversationHistory = [];
 
-    // When the input is focused, add a class to adjust for the keyboard
-    miniUserInput.addEventListener("focus", function() {
-      if (window.innerWidth < 768) {
-        chatPanel.classList.add("keyboard-open");
-        // Optionally scroll to the bottom
-        miniChatMessages.scrollTop = miniChatMessages.scrollHeight;
-      }
-    });
-    miniUserInput.addEventListener("blur", function() {
-      if (window.innerWidth < 768) {
-        chatPanel.classList.remove("keyboard-open");
-      }
-    });
-
     // Initialize with the welcome message
     function setupInitialMessage() {
       miniChatMessages.innerHTML = "";
       const messageWrapper = document.createElement("div");
       messageWrapper.className = "flex items-start my-4 justify-start";
       const bubbleContainer = document.createElement("div");
-      // Use flex with items-baseline so the avatar is aligned with the first line
       bubbleContainer.className = "assistant-bubble py-2 pr-3 pl-3 max-w-[80%] flex items-baseline text-sm";
       const avatar = document.createElement("div");
       avatar.className = "w-4 h-4 rounded-full bg-white flex-shrink-0 flex items-center justify-center mr-2";
@@ -63,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function() {
     chatBubble.addEventListener("click", function() {
       chatPanel.classList.remove("hidden");
       if (window.innerWidth < 768) {
-        // On mobile, use full-screen mode and disable body scrolling
+        // On mobile, open in full-screen mode and disable background scrolling
         chatPanel.classList.add("mobile-chat-open");
         document.body.classList.add("overflow-hidden");
       }
@@ -113,18 +98,16 @@ document.addEventListener("DOMContentLoaded", function() {
       }
     });
 
-    // Append a user message with the icon aligned inline with text (icon on the right)
+    // Append a user message with the icon aligned inline (icon on the right)
     function appendUserMessage(text) {
       const messageWrapper = document.createElement("div");
       messageWrapper.className = "flex my-3 justify-end";
       const bubbleContainer = document.createElement("div");
-      // flex container with items-baseline and text-right
       bubbleContainer.className = "user-bubble py-2 pl-3 pr-3 max-w-[80%] flex items-baseline text-sm justify-end";
       const messageText = document.createElement("div");
       messageText.className = "message-text prose prose-sm w-full text-right";
       messageText.innerHTML = formatMessageText(text);
       const avatar = document.createElement("div");
-      // Icon on the right, so add left margin
       avatar.className = "w-4 h-4 rounded-full bg-white flex-shrink-0 flex items-center justify-center ml-2";
       avatar.innerHTML = `<svg class="w-2.5 h-2.5 text-green-600" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
@@ -136,7 +119,7 @@ document.addEventListener("DOMContentLoaded", function() {
       miniChatMessages.scrollTop = miniChatMessages.scrollHeight;
     }
 
-    // Append an assistant message with the icon inline with text (icon on the left) and a typewriter effect
+    // Append an assistant message with the icon inline (icon on the left) using a typewriter effect
     function appendAssistantMessage(text) {
       const messageWrapper = document.createElement("div");
       messageWrapper.className = "flex my-3 justify-start";
@@ -180,7 +163,6 @@ document.addEventListener("DOMContentLoaded", function() {
       avatar.innerHTML = `<svg class="w-2.5 h-2.5 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H9.771l-.166.33A2.99 2.99 0 0110 13c.341 0 .675-.052.988-.152L11.166 12zM13 15a1 1 0 100-2 1 1 0 000 2zm-3 1a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
         </svg>`;
-      // Use a span for the thinking text so the animation is visible
       const textEl = document.createElement("span");
       textEl.className = "thinking-dots text-sm";
       textEl.textContent = "Thinking";
