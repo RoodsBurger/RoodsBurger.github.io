@@ -1,150 +1,89 @@
-class ChatInterface {
-    constructor() {
-        this.chatMessages = document.getElementById('chat-messages');
-        this.chatForm = document.getElementById('chat-form');
-        this.userInput = document.getElementById('user-input');
-        this.setupEventListeners();
-    }
-
-    setupEventListeners() {
-        this.chatForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const message = this.userInput.value.trim();
-            if (!message) return;
-
-            // Add user message to chat
-            this.addMessage(message, true);
-            this.userInput.value = '';
-            
-            try {
-                // Show loading state
-                this.addLoadingMessage();
-                
-                // Call serverless function to handle the chat interaction
-                const response = await this.generateResponse(message);
-                
-                // Remove loading message and add response
-                this.removeLoadingMessage();
-                this.addMessage(response);
-            } catch (error) {
-                console.error('Error:', error);
-                this.removeLoadingMessage();
-                this.addMessage('Sorry, I encountered an error. Please try again later.');
-            }
+document.addEventListener("DOMContentLoaded", () => {
+    const chatForm = document.getElementById("chat-form");
+    const userInput = document.getElementById("user-input");
+    const chatMessages = document.getElementById("chat-messages");
+  
+    chatForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const messageText = userInput.value.trim();
+      if (!messageText) return;
+  
+      // Clear default message if present (assumes only one child exists initially)
+      if (chatMessages.children.length === 1) {
+        chatMessages.innerHTML = "";
+      }
+  
+      // Append the user's message
+      appendMessage("user", messageText);
+  
+      // Clear the input field
+      userInput.value = "";
+  
+      try {
+        // Send the message to your backend endpoint
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ message: messageText }),
         });
-
-        this.userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                if (this.chatForm.requestSubmit) {
-                    this.chatForm.requestSubmit();
-                } else {
-                    this.chatForm.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-                }
-            }
-        });
-    }
-
-    async generateResponse(message) {
-        try {
-            const response = await fetch('/.netlify/functions/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ message })
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || `Server error: ${response.status}`);
-            }
-
-            if (data.error) {
-                throw new Error(data.error);
-            }
-
-            return data.response;
-        } catch (error) {
-            console.error('API Error:', error);
-            throw new Error('Failed to get response from the chat service.');
+  
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
         }
+  
+        const data = await response.json();
+  
+        // Extract full response text from Cohere's reply
+        // Expected format: { message: { content: [ { type: "text", text: "..." }, ... ] } }
+        const fullResponseText = data.message.content
+          .map((chunk) => chunk.text)
+          .join(" ");
+  
+        // Append the assistant's response
+        appendMessage("assistant", fullResponseText);
+      } catch (error) {
+        console.error("Error fetching chat response:", error);
+        appendMessage("assistant", "Sorry, something went wrong.");
+      }
+    });
+  
+    function appendMessage(role, text) {
+      // Create the message wrapper
+      const messageWrapper = document.createElement("div");
+      messageWrapper.className = "flex items-start gap-4 my-2";
+  
+      // Create the icon for the message based on its role
+      const iconDiv = document.createElement("div");
+      iconDiv.className = "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0";
+  
+      if (role === "assistant") {
+        iconDiv.classList.add("bg-blue-100");
+        iconDiv.innerHTML = `<svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"></path>
+                              </svg>`;
+      } else {
+        iconDiv.classList.add("bg-green-100");
+        iconDiv.innerHTML = `<svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                              </svg>`;
+      }
+  
+      // Create the container for the message text
+      const messageContent = document.createElement("div");
+      messageContent.className = "flex-1";
+      messageContent.innerHTML = `<div class="prose prose-sm">
+                                    <p class="text-gray-600">${text}</p>
+                                  </div>`;
+  
+      // Append both icon and text to the wrapper and then to the chat container
+      messageWrapper.appendChild(iconDiv);
+      messageWrapper.appendChild(messageContent);
+      chatMessages.appendChild(messageWrapper);
+  
+      // Auto-scroll to the bottom of the chat container
+      chatMessages.scrollTop = chatMessages.scrollHeight;
     }
-
-    addMessage(content, isUser = false) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = 'flex items-start gap-4 mb-4 animate-fade-in';
-        
-        const iconDiv = document.createElement('div');
-        iconDiv.className = `w-8 h-8 rounded-full ${isUser ? 'bg-gray-100' : 'bg-blue-100'} flex items-center justify-center flex-shrink-0`;
-        
-        const icon = document.createElement('svg');
-        icon.className = `w-4 h-4 ${isUser ? 'text-gray-600' : 'text-blue-600'}`;
-        icon.setAttribute('fill', 'none');
-        icon.setAttribute('stroke', 'currentColor');
-        icon.setAttribute('viewBox', '0 0 24 24');
-        
-        icon.innerHTML = isUser 
-            ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />'
-            : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />';
-        
-        iconDiv.appendChild(icon);
-        messageDiv.appendChild(iconDiv);
-        
-        const textDiv = document.createElement('div');
-        textDiv.className = 'flex-1';
-        const sanitizedContent = this.escapeHtml(content);
-        textDiv.innerHTML = `<p class="text-gray-600 whitespace-pre-wrap">${sanitizedContent}</p>`;
-        messageDiv.appendChild(textDiv);
-        
-        this.chatMessages.appendChild(messageDiv);
-        this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
-    }
-
-    escapeHtml(unsafe) {
-        return unsafe
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-
-    addLoadingMessage() {
-        const loadingDiv = document.createElement('div');
-        loadingDiv.id = 'loading-message';
-        loadingDiv.className = 'flex items-center gap-2 text-gray-500 mb-4';
-        loadingDiv.innerHTML = `
-            <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
-            <span>Thinking...</span>
-        `;
-        this.chatMessages.appendChild(loadingDiv);
-        this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
-    }
-
-    removeLoadingMessage() {
-        const loadingDiv = document.getElementById('loading-message');
-        if (loadingDiv) {
-            loadingDiv.remove();
-        }
-    }
-}
-
-// Initialize chat interface when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    // Add fade-in animation style
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in {
-            animation: fadeIn 0.3s ease-out forwards;
-        }
-    `;
-    document.head.appendChild(style);
-
-    new ChatInterface();
-});
+  });
+  
