@@ -30,9 +30,7 @@ export const handler = async (event, context) => {
     console.log('Starting chat function...');
     const requestBody = JSON.parse(event.body);
     const message = requestBody.message;
-    const history = requestBody.history || [];
     console.log('Received message:', message);
-    console.log('Conversation history length:', history.length);
 
     // Validate message
     if (!message || typeof message !== 'string' || !message.trim()) {
@@ -59,6 +57,10 @@ export const handler = async (event, context) => {
       embeddingTypes: ['float']
     });
 
+    // Log the full response structure for debugging
+    console.log('Full embed response structure:', JSON.stringify(embedResponse, null, 2).substring(0, 500));
+
+    // Check if embeddings exist before accessing
     if (!embedResponse.embeddings || !embedResponse.embeddings.float || !embedResponse.embeddings.float[0]) {
       console.error('No embeddings returned from Cohere');
       return {
@@ -120,46 +122,31 @@ export const handler = async (event, context) => {
       console.log('No relevant context found in Pinecone');
       context = "No specific information available.";
     }
-    
-    // Format conversation history for Cohere
-    const formattedHistory = history.slice(0, -1).map(item => ({
-      role: item.role === 'user' ? 'USER' : 'CHATBOT',
-      message: item.message
-    }));
-    
-    console.log('Formatted history:', JSON.stringify(formattedHistory).substring(0, 200));
 
     // Generate chat response with Cohere API
     console.log('Generating chat response with Cohere...');
-    
-    // More specific preamble to control verbosity
-    const preamble = `You are an AI assistant for Rodolfo Raimundo's portfolio website. Your responses should be:
-    1. Brief and to the point (2-4 sentences maximum unless asked for more detail)
-    2. ONLY mention projects or background DIRECTLY relevant to the question
-    3. Avoid filler phrases like "As mentioned in Rodolfo's portfolio"
-    4. Format your answers with proper paragraphs
-    5. Be accurate and specific based on the context provided
-    6. NEVER make up information not present in the context`;
     
     // Log the parameters for debugging
     const chatParams = {
       model: "command-r",
       messages: [
         {
-          role: "USER",
-          message: `${message}\n\nUse this context to answer concisely:\n${context}\n\nRemember to be brief and only discuss directly relevant information.`
+          role: "user",
+          content: `"You are an AI assistant for Rodolfo's portfolio website.\
+            You should address each question as concise as possible and make sure to \
+            address only the question askled and mention only relevant projects and \
+            background. You should also make sure ro properly format your answer, \
+            including proper spacing, formatting, new lines, paragraphs, etc." \n\n \
+            ${message}\n\n Use this context to concisely answer questions about Rodolfo \
+            and his projects, you should not just copy and paste for the context, \
+            instead formulates a concise answer that addresses some of the information \
+            mentioned in the context in a nice and readable format. \
+            You should also make sure to not include the question and craft an answer \
+            that sounds natural, organic using the context: ${context}`
         }
-      ]
+      ],
+      preamble: "You are an AI assistant for Rodolfo's portfolio website. You should address each question as concise as possible and make sure to address only the question askled and mention only relevant projects and background."
     };
-    
-    // Add previous conversation messages if available
-    if (formattedHistory.length > 0) {
-      chatParams.chatHistory = formattedHistory;
-    }
-    
-    // Add preamble
-    chatParams.preamble = preamble;
-    
     console.log('Chat params:', JSON.stringify(chatParams, null, 2));
     
     let chatResponse;
