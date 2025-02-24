@@ -8,15 +8,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const messageText = userInput.value.trim();
       if (!messageText) return;
   
-      // Clear default message if present (assuming only one child exists initially)
+      // Clear the default introductory message if it exists
       if (chatMessages.children.length === 1) {
         chatMessages.innerHTML = "";
       }
   
       // Append the user's message to the chat container
       appendMessage("user", messageText);
-  
-      // Clear the input field
       userInput.value = "";
   
       try {
@@ -34,19 +32,19 @@ document.addEventListener("DOMContentLoaded", () => {
         }
   
         const data = await response.json();
+        console.log("Received data:", data);
   
-        // Assuming your backend returns a JSON response in the format:
-        // {
-        //   "message": {
-        //     "content": [
-        //       { "type": "text", "text": "Part one..." },
-        //       { "type": "text", "text": "Part two..." }
-        //     ]
-        //   }
-        // }
-        const fullResponseText = data.message.content
-          .map((chunk) => chunk.text)
-          .join(" ");
+        // Check if the response has the expected structure
+        let fullResponseText = "";
+        if (data && data.message && data.message.content) {
+          fullResponseText = data.message.content.map(chunk => chunk.text).join(" ");
+        } else if (data && data.text) {
+          // Fallback if your backend returns a plain text response
+          fullResponseText = data.text;
+        } else {
+          console.warn("Response structure unexpected. Using fallback text.");
+          fullResponseText = "No message returned.";
+        }
   
         // Append the assistant's response to the chat container
         appendMessage("assistant", fullResponseText);
@@ -61,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const messageWrapper = document.createElement("div");
       messageWrapper.className = "flex items-start gap-4 my-2";
   
-      // Create the icon based on the role
+      // Create the icon element based on the role
       const iconDiv = document.createElement("div");
       iconDiv.className = "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0";
       if (role === "assistant") {
@@ -83,12 +81,11 @@ document.addEventListener("DOMContentLoaded", () => {
                                     <p class="text-gray-600">${text}</p>
                                   </div>`;
   
-      // Append the icon and text to the message wrapper, then append to the chat container
       messageWrapper.appendChild(iconDiv);
       messageWrapper.appendChild(messageContent);
       chatMessages.appendChild(messageWrapper);
   
-      // Auto-scroll to the bottom of the chat container
+      // Auto-scroll to the bottom
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
   });
