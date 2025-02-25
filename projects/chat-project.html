@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="theme-color" content="#1a1a2e"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assistant - Rodolfo Raimundo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="icon" href="/artifacts/logo.png" type="image/png">
+    <style>
+        .gif-video {
+            pointer-events: none;
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+        }
+        .gif-video::-webkit-media-controls {
+            display: none !important;
+        }
+        .gif-video::-webkit-media-controls-enclosure {
+            display: none !important;
+        }
+        .mobile-grid {
+            display: none;
+        }
+        @media (max-width: 768px) {
+            .desktop-grid {
+                display: none;
+            }
+            .mobile-grid {
+                display: block;
+            }
+        }
+    </style>
+    <script src="../scripts.js" defer></script>
+    <script src="../navbar.js" defer></script>
+    <script src="../navbar-component.js" defer></script>
+    <script src="../floating-chat.js"></script>
+</head>
+<body class="bg-white">
+    <!-- Navigation -->
+    <nav-bar base-path=".."></nav-bar>
+
+    <!-- Project Header -->
+    <section class="pt-24 pb-6 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto">
+                <div class="mb-6">
+                    <a 
+                      href="../index.html#projects" 
+                      class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold transition-colors"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="w-5 h-5"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                            <polyline points="9 5 2 12 9 19"></polyline>
+                        </svg>
+                        <span>Back to Projects</span>
+                    </a>
+                </div>
+                <h1 class="text-4xl font-bold text-gray-900 mb-4">AI Assistant Integration</h1>
+                <div class="flex flex-wrap items-center gap-3 mb-8">
+                    <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm">Natural Language Processing</span>
+                    <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm">Netlify</span>
+                    <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm">Cohere</span>
+                    <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm">Pinecone</span>
+                </div>
+
+                <div class="hidden md:grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 desktop-grid">
+                    <div class="relative rounded-xl overflow-hidden bg-gray-100">
+                        <img src="/artifacts/chat_architecture.png" alt="Chat Architecture" class="w-full h-64 object-cover">
+                    </div>
+                    <div class="relative rounded-xl overflow-hidden bg-gray-100">
+                        <img src="/artifacts/chat_interface.png" alt="Chat Interface" class="w-full h-64 object-cover">
+                    </div>
+                    <div class="relative rounded-xl overflow-hidden bg-gray-100">
+                        <img src="/artifacts/chat_mobile.png" alt="Mobile Chat" class="w-full h-64 object-cover">
+                    </div>
+                </div>
+                
+                <div class="block md:hidden grid grid-cols-1 gap-4 mb-4 mobile-grid">
+                    <div class="relative rounded-xl overflow-hidden bg-[#efefef] h-64">
+                        <img src="/artifacts/chat_interface.png" alt="Chat Interface" class="w-full h-full object-contain">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Project Content -->
+    <section class="py-12">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto">
+                <div class="prose prose-lg">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Overview</h2>
+                    <p class="text-gray-600 mb-8">
+                        This project integrates a custom AI assistant into my portfolio website, providing visitors with 
+                        an interactive way to learn about my projects, skills, and experiences. By leveraging modern AI 
+                        technologies and serverless architecture, I created a responsive chatbot that can answer questions 
+                        about my work while maintaining a low operational footprint.
+                    </p>
+
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Key Features</h2>
+                    <ul class="space-y-4 text-gray-600 mb-8">
+                        <li class="flex items-start gap-3">
+                            <span class="text-blue-600">•</span>
+                            <span>Vector-based knowledge retrieval system using Pinecone for accurate information matching</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-blue-600">•</span>
+                            <span>Natural language processing powered by Cohere's Command-R model for human-like responses</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-blue-600">•</span>
+                            <span>Serverless implementation with Netlify Functions for efficient, cost-effective deployment</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-blue-600">•</span>
+                            <span>Responsive UI with both dedicated chat page and floating widget integration</span>
+                        </li>
+                    </ul>
+
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Technical Details</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                        <div class="bg-gray-50 rounded-xl p-6">
+                            <h3 class="font-semibold text-gray-900 mb-4">Vector Database</h3>
+                            <ul class="space-y-3 text-gray-600">
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-600 font-bold">•</span>
+                                    <span>Pinecone vector database for efficient semantic search capabilities</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-600 font-bold">•</span>
+                                    <span>Embeddings generated from personal content using Cohere's embed-english-v3.0 model</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-600 font-bold">•</span>
+                                    <span>Cosine similarity matching for finding relevant information based on query context</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-6">
+                            <h3 class="font-semibold text-gray-900 mb-4">Serverless Architecture</h3>
+                            <ul class="space-y-3 text-gray-600">
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-600 font-bold">•</span>
+                                    <span>Netlify Functions for backend processing and API integration</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-600 font-bold">•</span>
+                                    <span>Stateless design with conversation history maintained client-side</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-600 font-bold">•</span>
+                                    <span>Zero cold-start delay with efficient query processing pipeline</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Implementation</h2>
+                    <p class="text-gray-600 mb-8">
+                        The chat system employs a multi-step process for each interaction:
+                    </p>
+                    <ol class="text-gray-600 space-y-4 mb-8">
+                        <li class="flex items-start gap-3">
+                            <span class="text-blue-600 font-semibold">1.</span>
+                            <span>User input is converted to an embedding vector using Cohere's embedding API</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-blue-600 font-semibold">2.</span>
+                            <span>The embedding is used to query Pinecone for the most relevant pieces of information from my portfolio</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-blue-600 font-semibold">3.</span>
+                            <span>Retrieved information is sent as context along with the user query to Cohere's chat completion API</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-blue-600 font-semibold">4.</span>
+                            <span>The AI response is generated with instructions to only use verified information from the context</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-blue-600 font-semibold">5.</span>
+                            <span>The response is displayed with a typewriter effect for an engaging user experience</span>
+                        </li>
+                    </ol>
+
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">UI/UX Considerations</h2>
+                    <p class="text-gray-600 mb-8">
+                        The assistant is integrated into the site in two ways: a dedicated chat page for in-depth conversations 
+                        and a floating widget accessible from any page. Both implementations feature responsive design for mobile 
+                        and desktop, typing indicators for better user experience, and conversation history persistence. 
+                        The mobile experience includes special handling for virtual keyboards and viewport adjustments.
+                    </p>
+
+                    <div class="bg-blue-50 rounded-xl p-6 mb-8">
+                        <h3 class="font-semibold text-blue-900 mb-4">Want to learn more?</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-none md:flex md:flex-row gap-4">
+                            <div class="text-center md:text-left">
+                                <a href="https://github.com/RoodsBurger/RoodsBurger.github.io" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700">
+                                    <span>GitHub Repository</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                    </svg>
+                                </a>
+                            </div>
+                            <div class="text-center md:text-left">
+                                <a href="../chat.html" class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700">
+                                    <span>Try My Chat</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-8 text-center text-gray-500 text-sm bg-gray-50 relative">
+        <div class="container mx-auto px-6">
+            © 2024 Rodolfo Raimundo
+        </div>
+    </footer>
+</body>
+</html>

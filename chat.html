@@ -11,20 +11,66 @@
     <script src="./scripts.js" defer></script>
     <script src="./navbar.js" defer></script>
     <script src="./navbar-component.js" defer></script>
-    <script src="./chat_style.js" defer></script>
     <style>
-        /* Custom styles for chat interface */
+        /* Chat styles */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+            border-radius: 0.75rem;
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+            background-color: white;
+        }
+        
+        .chat-header {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            background-color: #f9fafb;
+            display: flex;
+            align-items: center;
+        }
+        
+        #mini-chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            scroll-behavior: smooth;
+        }
+        
+        .chat-input-area {
+            border-top: 1px solid #e5e7eb;
+            padding: 0.75rem;
+            background-color: #f9fafb;
+        }
+        
+        /* Message bubbles */
+        .user-bubble {
+            background-color: rgba(209, 250, 229, 0.4);
+            color: #1F2937;
+            border-radius: 18px 4px 18px 18px;
+            border: 1px solid rgba(167, 243, 208, 0.5);
+            position: relative;
+        }
+        
+        .assistant-bubble {
+            background-color: rgba(219, 234, 254, 0.4);
+            color: #1F2937;
+            border-radius: 4px 18px 18px 18px;
+            border: 1px solid rgba(191, 219, 254, 0.5);
+            position: relative;
+        }
+        
         .thinking-dots {
             display: inline-block;
             min-width: 60px;
+            animation: thinking 1.5s infinite;
         }
         
-        .message-text p:last-child {
-            margin-bottom: 0;
-        }
-        
-        #chat-messages {
-            scroll-behavior: smooth;
+        @keyframes thinking {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
         }
     </style>
 </head>
@@ -37,7 +83,7 @@
         <div class="container mx-auto px-6">
             <div class="max-w-4xl mx-auto">
                 <div class="mb-6">
-                    <a href="index.html" 
+                    <a href="./projects/chat-project.html" 
                        class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg"
                              class="w-5 h-5"
@@ -50,7 +96,7 @@
                             <line x1="2" y1="12" x2="22" y2="12"></line>
                             <polyline points="9 5 2 12 9 19"></polyline>
                         </svg>
-                        <span>Back to Home</span>
+                        <span>Back to Project</span>
                     </a>
                 </div>
 
@@ -68,24 +114,36 @@
         <div class="container mx-auto px-6">
             <div class="max-w-4xl mx-auto">
                 <!-- Chat Container -->
-                <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                    <!-- Messages Area -->
-                    <div id="chat-messages" class="h-[500px] overflow-y-auto p-6 space-y-4">
-                        <!-- Message bubbles will be inserted here by JavaScript -->
+                <div class="chat-container shadow-sm">
+                    <!-- Chat Header -->
+                    <div class="chat-header">
+                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                            <svg class="w-4 h-4 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" 
+                                      d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H9.771l-.166.33A2.99 2.99 0 0110 13c.341 0 .675-.052.988-.152L11.166 12zM13 15a1 1 0 100-2 1 1 0 000 2zm-3 1a1 1 0 100-2 1 1 0 000 2z" 
+                                      clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <h3 class="text-md font-semibold text-gray-800">Rodolfo's AI Assistant</h3>
                     </div>
 
-                    <!-- Input Area -->
-                    <div class="border-t border-gray-200 p-4 bg-gray-50">
-                        <form id="chat-form" class="flex gap-4">
+                    <!-- Messages Area -->
+                    <div id="mini-chat-messages">
+                        <!-- Messages will be inserted here -->
+                    </div>
+
+                    <!-- Chat Input Area -->
+                    <div class="chat-input-area">
+                        <form id="mini-chat-form" class="flex gap-2">
                             <input type="text" 
-                                   id="user-input"
-                                   class="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                   id="mini-user-input"
+                                   class="flex-1 px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                    placeholder="Type your message..."
                                    autocomplete="off">
                             <button type="submit"
-                                    class="bg-gray-100 text-blue-600 p-0 w-12 h-12 rounded-full hover:bg-gray-200 transition-colors flex items-center justify-center border border-gray-300" 
+                                    class="bg-gray-100 text-blue-600 p-0 w-10 h-10 rounded-full hover:bg-gray-200 transition duration-300 flex items-center justify-center border border-gray-300" 
                                     aria-label="Send message">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
                                           d="M5 12h14m-4-4l4 4-4 4" />
                                 </svg>
@@ -106,10 +164,9 @@
                     <div class="bg-gray-50 rounded-xl p-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-2">Suggested Questions</h3>
                         <ul class="text-gray-600 space-y-1">
-                            <li>• Tell me about your quadruped robot project</li>
-                            <li>• What research have you done in computational neuroscience?</li>
-                            <li>• What hobbies do you have outside of tech?</li>
-                            <li>• What technologies did you use for the Knolling Bot?</li>
+                            <li>• Tell me about Tobias.</li>
+                            <li>• What research has Rodolfo done in neuroscience?</li>
+                            <li>• What hobbies does Rodolfo have outside of tech?</li>
                         </ul>
                     </div>
                 </div>
@@ -124,5 +181,202 @@
         </div>
     </footer>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const miniChatForm = document.getElementById("mini-chat-form");
+            const miniUserInput = document.getElementById("mini-user-input");
+            const miniChatMessages = document.getElementById("mini-chat-messages");
+            
+            let conversationHistory = [];
+            
+            // Setup the initial assistant welcome message
+            function setupInitialMessage() {
+                miniChatMessages.innerHTML = "";
+                const messageWrapper = document.createElement("div");
+                messageWrapper.className = "flex items-start my-4 justify-start";
+                
+                const bubbleContainer = document.createElement("div");
+                bubbleContainer.className = "assistant-bubble py-2 pr-3 pl-3 max-w-[80%] flex items-baseline text-sm";
+                
+                const avatar = document.createElement("div");
+                avatar.className = "w-4 h-4 rounded-full bg-white flex-shrink-0 flex items-center justify-center mr-2";
+                avatar.innerHTML = `
+                    <svg class="w-2.5 h-2.5 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd"
+                            d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H9.771l-.166.33A2.99 2.99 0 0110 13c.341 0 .675-.052.988-.152L11.166 12zM13 15a1 1 0 100-2 1 1 0 000 2zm-3 1a1 1 0 100-2 1 1 0 000 2z"
+                            clip-rule="evenodd" />
+                    </svg>`;
+                
+                const messageText = document.createElement("div");
+                messageText.className = "message-text prose prose-sm w-full";
+                messageText.innerHTML = "Hi! I'm Rodolfo's AI assistant. How can I help you today?";
+                
+                bubbleContainer.appendChild(avatar);
+                bubbleContainer.appendChild(messageText);
+                messageWrapper.appendChild(bubbleContainer);
+                miniChatMessages.appendChild(messageWrapper);
+            }
+            
+            setupInitialMessage();
+            
+            // Handle message submission
+            miniChatForm.addEventListener("submit", async function(e) {
+                e.preventDefault();
+                const messageText = miniUserInput.value.trim();
+                if (!messageText) return;
+                
+                appendUserMessage(messageText);
+                miniUserInput.value = "";
+                const thinkingId = showThinkingIndicator();
+                
+                try {
+                    conversationHistory.push({ role: "user", content: messageText });
+                    const response = await fetch("/.netlify/functions/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        message: messageText,
+                        conversationHistory: conversationHistory.slice(0, -1) 
+                    }),
+                    });
+                    removeThinkingIndicator(thinkingId);
+                    
+                    if (!response.ok) throw new Error("Network response was not ok");
+                    const data = await response.json();
+                    
+                    let fullResponseText = "";
+                    if (data && data.message && Array.isArray(data.message.content)) {
+                        fullResponseText = data.message.content.map(chunk => chunk.text).join(" ");
+                    } else {
+                        fullResponseText = "I'm sorry, I couldn't generate a response at the moment.";
+                    }
+                    
+                    conversationHistory.push({ role: "assistant", content: fullResponseText });
+                    appendAssistantMessage(fullResponseText);
+                    
+                } catch (error) {
+                    removeThinkingIndicator(thinkingId);
+                    console.error("Error fetching chat response:", error);
+                    appendAssistantMessage("Sorry, something went wrong. Please try again later.");
+                }
+            });
+            
+            // Append a user message (icon on the right)
+            function appendUserMessage(text) {
+                const messageWrapper = document.createElement("div");
+                messageWrapper.className = "flex my-3 justify-end";
+                
+                const bubbleContainer = document.createElement("div");
+                bubbleContainer.className = "user-bubble py-2 pl-3 pr-3 max-w-[80%] flex items-baseline text-sm justify-end";
+                
+                const messageTextEl = document.createElement("div");
+                messageTextEl.className = "message-text prose prose-sm w-full text-right";
+                messageTextEl.innerHTML = formatMessageText(text);
+                
+                const avatar = document.createElement("div");
+                avatar.className = "w-4 h-4 rounded-full bg-white flex-shrink-0 flex items-center justify-center ml-2";
+                avatar.innerHTML = `
+                    <svg class="w-2.5 h-2.5 text-green-600" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd"
+                            d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                            clip-rule="evenodd" />
+                    </svg>`;
+                
+                bubbleContainer.appendChild(messageTextEl);
+                bubbleContainer.appendChild(avatar);
+                messageWrapper.appendChild(bubbleContainer);
+                miniChatMessages.appendChild(messageWrapper);
+                miniChatMessages.scrollTop = miniChatMessages.scrollHeight;
+            }
+            
+            // Append an assistant message (icon on the left) with typewriter effect
+            function appendAssistantMessage(text) {
+                const messageWrapper = document.createElement("div");
+                messageWrapper.className = "flex my-3 justify-start";
+                
+                const bubbleContainer = document.createElement("div");
+                bubbleContainer.className = "assistant-bubble py-2 pr-3 pl-3 max-w-[80%] flex items-baseline text-sm";
+                
+                const avatar = document.createElement("div");
+                avatar.className = "w-4 h-4 rounded-full bg-white flex-shrink-0 flex items-center justify-center mr-2";
+                avatar.innerHTML = `
+                    <svg class="w-2.5 h-2.5 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd"
+                            d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H9.771l-.166.33A2.99 2.99 0 0110 13c.341 0 .675-.052.988-.152L11.166 12zM13 15a1 1 0 100-2 1 1 0 000 2zm-3 1a1 1 0 100-2 1 1 0 000 2z"
+                            clip-rule="evenodd" />
+                    </svg>`;
+                
+                const messageTextEl = document.createElement("div");
+                messageTextEl.className = "message-text prose prose-sm w-full";
+                
+                bubbleContainer.appendChild(avatar);
+                bubbleContainer.appendChild(messageTextEl);
+                messageWrapper.appendChild(bubbleContainer);
+                miniChatMessages.appendChild(messageWrapper);
+                miniChatMessages.scrollTop = miniChatMessages.scrollHeight;
+                
+                // Typewriter effect
+                typeWriterEffect(messageTextEl, text, 0);
+            }
+            
+            // Typewriter effect
+            function typeWriterEffect(element, text, index) {
+                if (index < text.length) {
+                    element.innerHTML += text.charAt(index);
+                    setTimeout(() => {
+                        typeWriterEffect(element, text, index + 1);
+                    }, 10);
+                }
+            }
+            
+            // Show a thinking indicator
+            function showThinkingIndicator() {
+                const thinkingId = `thinking-${Date.now()}`;
+                const messageWrapper = document.createElement("div");
+                messageWrapper.className = "flex items-start my-4 thinking-indicator justify-start";
+                messageWrapper.id = thinkingId;
+                
+                const bubbleContainer = document.createElement("div");
+                bubbleContainer.className = "assistant-bubble py-2 pr-3 pl-3 max-w-[80%] flex items-baseline";
+                
+                const avatar = document.createElement("div");
+                avatar.className = "w-4 h-4 rounded-full bg-white flex-shrink-0 flex items-center justify-center mr-2";
+                avatar.innerHTML = `
+                    <svg class="w-2.5 h-2.5 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd"
+                            d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H9.771l-.166.33A2.99 2.99 0 0110 13c.341 0 .675-.052.988-.152L11.166 12zM13 15a1 1 0 100-2 1 1 0 000 2zm-3 1a1 1 0 100-2 1 1 0 000 2z"
+                            clip-rule="evenodd" />
+                    </svg>`;
+                
+                const textEl = document.createElement("span");
+                textEl.className = "thinking-dots text-sm";
+                textEl.textContent = "Thinking";
+                
+                bubbleContainer.appendChild(avatar);
+                bubbleContainer.appendChild(textEl);
+                messageWrapper.appendChild(bubbleContainer);
+                miniChatMessages.appendChild(messageWrapper);
+                miniChatMessages.scrollTop = miniChatMessages.scrollHeight;
+                
+                return thinkingId;
+            }
+            
+            // Remove the thinking indicator by its ID
+            function removeThinkingIndicator(thinkingId) {
+                const thinkingElement = document.getElementById(thinkingId);
+                if (thinkingElement) {
+                    thinkingElement.remove();
+                }
+            }
+            
+            // Format message text with basic markdown-like replacements
+            function formatMessageText(text) {
+                return text
+                    .replace(/\n/g, '<br>')
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>');
+            }
+        });
+    </script>
 </body>
 </html>

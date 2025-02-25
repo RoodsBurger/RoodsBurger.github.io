@@ -3,54 +3,43 @@ document.addEventListener("DOMContentLoaded", () => {
   const userInput = document.getElementById("user-input");
   const chatMessages = document.getElementById("chat-messages");
   
-  // Store conversation history
   let conversationHistory = [];
 
-  // Replace the initial message with a simpler bubble message
   function setupInitialMessage() {
-    chatMessages.innerHTML = ""; // Clear any existing content
+    chatMessages.innerHTML = "";
     
-    // Create and append the initial message
     appendMessage(
       "assistant", 
       "Hi! I'm Rodolfo's AI assistant. I can help you learn about his work in robotics, machine learning, projects, and interests. What would you like to know?",
-      true // Auto-display without typing animation for initial message
+      true 
     );
   }
 
-  // Run setup
   setupInitialMessage();
-
   chatForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const messageText = userInput.value.trim();
     if (!messageText) return;
 
-    // Append the user's message to the chat container
     appendMessage("user", messageText, true);
     userInput.value = "";
-
-    // Show thinking indicator
     const thinkingId = showThinkingIndicator();
 
     try {
-      // Add user message to conversation history
       conversationHistory.push({
         role: "user",
         content: messageText
       });
 
-      // Send the message and conversation history to your Netlify function
       const response = await fetch("/.netlify/functions/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           message: messageText,
-          conversationHistory: conversationHistory.slice(0, -1) // Send all except current message which is already included separately
+          conversationHistory: conversationHistory.slice(0, -1) 
         }),
       });
 
-      // Remove thinking indicator once response is received
       removeThinkingIndicator(thinkingId);
 
       if (!response.ok) {
@@ -60,7 +49,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await response.json();
       console.log("Received data:", data);
 
-      // Extract the full assistant response from the returned message content.
       let fullResponseText = "";
       if (data && data.message && Array.isArray(data.message.content)) {
         fullResponseText = data.message.content
@@ -70,16 +58,13 @@ document.addEventListener("DOMContentLoaded", () => {
         fullResponseText = "I'm sorry, I couldn't generate a response at the moment.";
       }
 
-      // Add assistant response to conversation history
       conversationHistory.push({
         role: "assistant",
         content: fullResponseText
       });
 
-      // Append the assistant's response to the chat container with typing animation
       appendMessage("assistant", fullResponseText);
     } catch (error) {
-      // Remove thinking indicator if there's an error
       removeThinkingIndicator(thinkingId);
       
       console.error("Error fetching chat response:", error);
@@ -87,20 +72,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Generate a unique ID for the thinking indicator
   function showThinkingIndicator() {
     const thinkingId = `thinking-${Date.now()}`;
     
-    // Create message wrapper
     const messageWrapper = document.createElement("div");
     messageWrapper.className = "flex items-start my-4 thinking-indicator justify-start";
     messageWrapper.id = thinkingId;
-
-    // Create the integrated bubble with avatar
     const bubbleContainer = document.createElement("div");
     bubbleContainer.className = "assistant-bubble py-3 pr-4 pl-10 relative max-w-[80%] flex items-start";
-    
-    // Create avatar
     const avatar = document.createElement("div");
     avatar.className = "absolute left-2 top-3 w-6 h-6 rounded-full bg-white flex items-center justify-center";
     avatar.innerHTML = `
@@ -109,23 +88,15 @@ document.addEventListener("DOMContentLoaded", () => {
       </svg>
     `;
     
-    // Create the text with thinking dots animation
     const text = document.createElement("div");
     text.className = "thinking-dots w-full";
     text.textContent = "Thinking";
     
-    // Assemble the message
     bubbleContainer.appendChild(avatar);
     bubbleContainer.appendChild(text);
     messageWrapper.appendChild(bubbleContainer);
-    
-    // Add to chat container
     chatMessages.appendChild(messageWrapper);
-    
-    // Start the animation for the thinking dots
     animateThinkingDots(thinkingId);
-    
-    // Auto-scroll to the bottom of the chat container
     chatMessages.scrollTop = chatMessages.scrollHeight;
     
     return thinkingId;
@@ -133,7 +104,6 @@ document.addEventListener("DOMContentLoaded", () => {
   
   let thinkingAnimationFrame = null;
   
-  // Animate the thinking dots
   function animateThinkingDots(thinkingId) {
     const thinkingElement = document.querySelector(`#${thinkingId} .thinking-dots`);
     if (!thinkingElement) return;
@@ -146,7 +116,6 @@ document.addEventListener("DOMContentLoaded", () => {
       thinkingElement.textContent = `Thinking${'.'.repeat(dotCount)}`;
       
       thinkingAnimationFrame = requestAnimationFrame(() => {
-        // Slowing down the animation with setTimeout
         setTimeout(updateDots, 500);
       });
     };
@@ -154,7 +123,6 @@ document.addEventListener("DOMContentLoaded", () => {
     updateDots();
   }
 
-  // Remove the thinking indicator
   function removeThinkingIndicator(thinkingId) {
     if (thinkingAnimationFrame) {
       cancelAnimationFrame(thinkingAnimationFrame);
@@ -167,23 +135,20 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function appendMessage(role, text, immediate = false) {
-    // Create the message wrapper element with appropriate alignment
     const messageWrapper = document.createElement("div");
     messageWrapper.className = "flex my-4";
     
     if (role === "user") {
-      messageWrapper.className += " justify-end"; // Right-align user messages
+      messageWrapper.className += " justify-end";
     } else {
-      messageWrapper.className += " justify-start"; // Left-align assistant messages
+      messageWrapper.className += " justify-start"; 
     }
 
-    // Create the integrated bubble with avatar
     const bubbleContainer = document.createElement("div");
     bubbleContainer.className = role === "user" 
       ? "user-bubble py-3 pl-4 pr-10 relative max-w-[80%] flex items-start" 
       : "assistant-bubble py-3 pr-4 pl-10 relative max-w-[80%] flex items-start";
 
-    // Create avatar that will be positioned inside the bubble
     const avatar = document.createElement("div");
     
     if (role === "user") {
@@ -202,44 +167,31 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     }
     
-    // Create the text element
     const messageText = document.createElement("div");
     messageText.className = "message-text prose prose-sm w-full";
-    
-    // Format the text with markdown-like formatting
     const formattedText = formatMessageText(text);
-    
-    // Add avatar to bubble
     bubbleContainer.appendChild(avatar);
     
     if (immediate) {
-      // Display full message immediately
       messageText.innerHTML = formattedText;
       bubbleContainer.appendChild(messageText);
       messageWrapper.appendChild(bubbleContainer);
       chatMessages.appendChild(messageWrapper);
     } else {
-      // Start with empty text and type it out
       messageText.innerHTML = '';
       bubbleContainer.appendChild(messageText);
       messageWrapper.appendChild(bubbleContainer);
       chatMessages.appendChild(messageWrapper);
-      
-      // Type out the message
       typeMessage(formattedText, messageText);
     }
     
-    // Auto-scroll to the bottom of the chat container
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
   
-  // Function to simulate typing with more random variations
-  function typeMessage(text, element, baseSpeed = 30) {
-    // Calculate an approximate total animation time - about 30ms per character
+  function typeMessage(text, element, baseSpeed = 50) {
     const totalCharCount = text.replace(/<[^>]*>/g, '').length;
-    const targetTotalTime = totalCharCount * 30; // target milliseconds for the whole text
+    const targetTotalTime = totalCharCount * 30; 
     
-    // Convert HTML to array of characters and HTML tags
     const htmlChunks = [];
     let inTag = false;
     let currentChunk = '';
@@ -268,7 +220,6 @@ document.addEventListener("DOMContentLoaded", () => {
       htmlChunks.push({ type: inTag ? 'tag' : 'text', content: currentChunk });
     }
     
-    // Type out each chunk with more varied speeds
     let i = 0;
     let outputSoFar = '';
     let animationStartTime = Date.now();
@@ -278,74 +229,58 @@ document.addEventListener("DOMContentLoaded", () => {
         const chunk = htmlChunks[i];
         
         if (chunk.type === 'tag') {
-          // Add HTML tags instantly
           outputSoFar += chunk.content;
           element.innerHTML = outputSoFar;
           i++;
           typeNextChunk();
         } else {
-          // Type text character by character with highly variable speed
           let charIndex = 0;
           let inWord = false;
           
           function typeNextChar() {
             if (charIndex < chunk.content.length) {
-              // Add next character to output
               const char = chunk.content[charIndex];
               outputSoFar += char;
               element.innerHTML = outputSoFar;
               charIndex++;
               
-              // Check if we're in a word or not
               if (char === ' ' || char === '\n' || '.!?,;:()[]{}"\'-'.includes(char)) {
                 inWord = false;
               } else {
                 inWord = true;
               }
               
-              // Create more dramatic speed variations
               let speed = baseSpeed;
-              
-              // Only pause after completed words or at punctuation
               const canPause = !inWord;
-              const randomPause = Math.random() < 0.03 && canPause; // 3% chance of a pause, only at word boundaries
+              const randomPause = Math.random() < 0.03 && canPause;
               
               if (randomPause) {
-                // Add a shorter random pause between 200-500ms
                 speed = baseSpeed + Math.floor(Math.random() * 300) + 200;
               }
-              // Longer pause at end of sentences
               else if ('.!?'.includes(char)) {
-                speed = baseSpeed * (1.5 + Math.random()); // 1.5-2.5x pause at sentence end
+                speed = baseSpeed * (1.5 + Math.random()); 
               }
-              // Medium pause at commas and other punctuation
               else if (',;:'.includes(char)) {
                 speed = baseSpeed * (1.2 + Math.random() * 0.5);
               }
-              // Slight speed up for common words (only check when at the end of common words)
               else if (charIndex > 2 && !inWord && ' the a and to of in is '.includes(' ' + chunk.content.slice(Math.max(0, charIndex - 5), charIndex))) {
                 speed = baseSpeed * 0.8;
               }
-              // Random burst of fast typing (only for entire words, not mid-word)
               else if (Math.random() < 0.05 && !inWord) { // 5% chance of a speed burst at word boundaries
                 speed = baseSpeed * 0.5;
               }
-              // Regular random variation for natural feel
               else {
                 speed = baseSpeed * (0.8 + Math.random() * 0.5); // 0.8x to 1.3x normal speed
               }
               
-              // Adjust timing to keep overall animation time consistent
               const elapsed = Date.now() - animationStartTime;
               const progress = elapsed / targetTotalTime;
               const charsRemaining = totalCharCount - outputSoFar.replace(/<[^>]*>/g, '').length;
               
               if (progress > 0.7 && charsRemaining > totalCharCount * 0.4) {
-                // If we're running behind schedule (70% time used but >40% chars remaining)
-                speed *= 0.7; // Speed up to catch up
+                speed *= 0.7; 
               } else if (progress < 0.4 && charsRemaining < totalCharCount * 0.3) {
-                // If we're ahead of schedule (less than 40% time used but <30% chars remaining)
-                speed *= 1.2; // Slow down a bit
+                speed *= 1.2; 
               }
               
               setTimeout(typeNextChar, speed);
@@ -357,8 +292,6 @@ document.addEventListener("DOMContentLoaded", () => {
           typeNextChar();
         }
       }
-      
-      // Auto-scroll while typing
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
     
@@ -366,13 +299,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   
   function formatMessageText(text) {
-    // Simple formatting to handle line breaks and basic markdown
     return text
-      // Convert line breaks to HTML breaks
       .replace(/\n/g, '<br>')
-      // Bold text between asterisks
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      // Italic text between single asterisks
       .replace(/\*(.*?)\*/g, '<em>$1</em>');
   }
 });
