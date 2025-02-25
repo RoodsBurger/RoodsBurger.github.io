@@ -109,8 +109,9 @@ export const handler = async (event, context) => {
         2. Only mention Rodolfo's projects when directly relevant to the question
         3. Answer general questions normally without forcing references to the portfolio
         4. You must not create false information about Rodolfo
-        5. You can provide information about Rodolfo's skills and experience beyong the portfolio
-        4. Maintain a friendly, professional tone`
+        5. All information about Rodolfo must be accurate and verifiable according to the context
+        6. You can provide information about Rodolfo's skills and experience beyong the portfolio
+        7. Maintain a friendly, professional tone`
       },
       ...formattedHistory
     ];
