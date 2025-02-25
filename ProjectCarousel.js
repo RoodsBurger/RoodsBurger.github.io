@@ -44,16 +44,24 @@ const ProjectCarousel = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Category colors mapping
   const categoryColors = {
+    'Natural Language Processing': 'bg-purple-600', 
     'Reinforcement Learning': 'bg-blue-600',
     'Deep Learning': 'bg-green-600',
-    'Computational Neuroscience': 'bg-purple-600',
-    'Industrial Design': 'bg-yellow-600',
-    'Robotics': 'bg-red-600'
+    'Computational Neuroscience': 'bg-yellow-600',
+    'Industrial Design': 'bg-red-600',
+    'Robotics': 'bg-indico-600'
   };
 
   const projects = [
+    {
+      title: "LLM-Based Assistant",
+      description: "Custom vector database-powered chatbot that integrates LLMs with serverless functions to provide contextual information about my portfolio, projects, and experience.",
+      image: "/artifacts/chat_interface.png",
+      link: "projects/chat-project.html",
+      category: "Natural Language Processing",
+      tags: ["Cohere", "Pinecone", "Netlify"]
+    },
     {
       title: "Tobias",
       description: "4-legged robot project that integrates CAD Design, Physics Simulation, and Reinforcement Learning to achieve stable walking gaits and straight-line locomotion.",
