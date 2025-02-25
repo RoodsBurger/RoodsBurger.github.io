@@ -57,7 +57,7 @@ const ProjectCarousel = () => {
     {
       title: "LLM-Based Assistant",
       description: "Custom vector database-powered chatbot that integrates LLMs with serverless functions to provide contextual information about my portfolio, projects, and experience.",
-      image: "/artifacts/chat_interface.png",
+      image: "/artifacts/chat_diagram.png",
       link: "projects/chat-project.html",
       category: "Natural Language Processing",
       tags: ["Cohere", "Pinecone", "Netlify"]
