@@ -225,13 +225,13 @@ section[id] {
 #chat-bubble:hover {
     background-color: #2563eb; /* Similar to your index button hover */
 }
-
   
   /* Chat panel transitions */
   #chat-panel {
     transition: all 0.3s ease;
     max-height: 80vh;
     width: 24rem;
+    border-radius: 10px;
   }
   
   
