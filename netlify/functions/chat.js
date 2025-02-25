@@ -174,7 +174,8 @@ export const handler = async (event, context) => {
           5. You must not answer questions outside of the context provided to you about Rodolfo.
           6. If you are unsure about a response, you can ask for clarification or provide a general response.
           7. You MUST keep responses concise, short, and focused on the question asked.
-          8. Maintain a friendly, professional tone.
+          8. You MUST never copy and paste from context, instead paraphrase in a natural, well-formatted, and readable fashion.
+          9. Maintain a friendly, professional tone.
 
           The information about Rodolfo comes from multiple sources including his portfolio website, resume, CV, academic coursework, and other documents. These sources contain details about his projects, work experiences, academic background, skills, and personal interests.`
       },
