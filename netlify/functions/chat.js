@@ -63,6 +63,68 @@ export const handler = async (event, context) => {
     }
 
     const queryEmbedding = embedResponse.embeddings.float[0];
+    
+    // Filter conversation history to keep the most relevant messages
+    let filteredHistory = [];
+    
+    if (conversationHistory.length > 0) {
+      // Always keep the last exchange (most recent context)
+      const lastExchangeStart = Math.max(0, conversationHistory.length - 2);
+      const lastExchange = conversationHistory.slice(lastExchangeStart);
+      
+      // For older messages, get their embeddings and compute similarity
+      if (conversationHistory.length > 2) {
+        const olderMessages = conversationHistory.slice(0, lastExchangeStart);
+        
+        // Get embeddings for older messages
+        const messageTexts = olderMessages.map(msg => msg.content);
+        
+        try {
+          const historicalEmbedResponse = await cohere.embed({
+            texts: messageTexts,
+            model: 'embed-english-v3.0',
+            inputType: messageTexts.map((_, i) => 
+              olderMessages[i].role === 'user' ? 'search_query' : 'search_document'
+            ),
+            embeddingTypes: ['float']
+          });
+          
+          if (historicalEmbedResponse.embeddings && historicalEmbedResponse.embeddings.float) {
+            // Compute cosine similarity between current query and each historical message
+            const similarities = historicalEmbedResponse.embeddings.float.map(embedding => {
+              return cosineSimilarity(queryEmbedding, embedding);
+            });
+            
+            // Create array of {message, similarity} pairs
+            const messageSimilarities = olderMessages.map((msg, i) => ({
+              message: msg,
+              similarity: similarities[i] || 0
+            }));
+            
+            // Sort by similarity (descending) and take top messages
+            const topMessages = messageSimilarities
+              .sort((a, b) => b.similarity - a.similarity)
+              .slice(0, 3) // Keep top 3 most semantically relevant messages
+              .map(item => item.message);
+            
+            // Combine with the last exchange
+            filteredHistory = [...topMessages, ...lastExchange];
+          } else {
+            console.warn('No embeddings returned for historical messages, keeping only last exchange');
+            filteredHistory = lastExchange;
+          }
+        } catch (error) {
+          console.error('Error getting embeddings for historical messages:', error);
+          filteredHistory = lastExchange;
+        }
+      } else {
+        filteredHistory = lastExchange;
+      }
+    }
+    
+    console.log(`Filtered conversation history from ${conversationHistory.length} to ${filteredHistory.length} messages`);
+
+    // Query Pinecone for relevant context
     console.log('Initializing Pinecone...');
     const pc = new Pinecone({
       apiKey: process.env.PINECONE_API_KEY
@@ -93,7 +155,7 @@ export const handler = async (event, context) => {
       context = "No specific information available about this topic.";
     }
 
-    const formattedHistory = conversationHistory.map(msg => ({
+    const formattedHistory = filteredHistory.map(msg => ({
       role: msg.role,
       content: msg.content
     }));
@@ -191,3 +253,26 @@ export const handler = async (event, context) => {
     };
   }
 };
+
+// Utility function to compute cosine similarity between two vectors
+function cosineSimilarity(vecA, vecB) {
+  if (!vecA || !vecB || vecA.length !== vecB.length) {
+    return 0;
+  }
+  
+  let dotProduct = 0;
+  let normA = 0;
+  let normB = 0;
+  
+  for (let i = 0; i < vecA.length; i++) {
+    dotProduct += vecA[i] * vecB[i];
+    normA += vecA[i] * vecA[i];
+    normB += vecB[i] * vecB[i];
+  }
+  
+  if (normA === 0 || normB === 0) {
+    return 0;
+  }
+  
+  return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+}
