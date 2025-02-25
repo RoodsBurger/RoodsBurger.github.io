@@ -9,7 +9,6 @@ const headers = {
 };
 
 export const handler = async (event, context) => {
-  // Handle preflight request
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
@@ -32,7 +31,6 @@ export const handler = async (event, context) => {
     const { message, conversationHistory = [] } = requestBody;
     console.log('Received message:', message);
 
-    // Validate message
     if (!message || typeof message !== 'string' || !message.trim()) {
       console.warn('Warning: Empty or invalid message received');
       return {
@@ -42,13 +40,11 @@ export const handler = async (event, context) => {
       };
     }
 
-    // Initialize Cohere client
     console.log('Initializing Cohere client...');
     const cohere = new CohereClientV2({
       token: process.env.COHERE_API_KEY
     });
 
-    // Get embedding from Cohere
     console.log('Getting embedding from Cohere...');
     const embedResponse = await cohere.embed({
       texts: [message],
@@ -57,7 +53,6 @@ export const handler = async (event, context) => {
       embeddingTypes: ['float']
     });
 
-    // Check if embeddings exist before accessing
     if (!embedResponse.embeddings || !embedResponse.embeddings.float || !embedResponse.embeddings.float[0]) {
       console.error('No embeddings returned from Cohere');
       return {
@@ -68,17 +63,12 @@ export const handler = async (event, context) => {
     }
 
     const queryEmbedding = embedResponse.embeddings.float[0];
-
-    // Initialize Pinecone
     console.log('Initializing Pinecone...');
     const pc = new Pinecone({
       apiKey: process.env.PINECONE_API_KEY
     });
     
-    // Query Pinecone
     console.log('Querying Pinecone...');
-    
-    // Ensure queryEmbedding is an array of numbers
     let vectorToQuery = queryEmbedding;
     if (typeof queryEmbedding === 'object' && !Array.isArray(queryEmbedding)) {
       vectorToQuery = queryEmbedding.values || Object.values(queryEmbedding);
@@ -103,36 +93,33 @@ export const handler = async (event, context) => {
       context = "No specific information available about this topic.";
     }
 
-    // Format conversation history for Cohere
     const formattedHistory = conversationHistory.map(msg => ({
       role: msg.role,
       content: msg.content
     }));
 
-    // Generate chat response with Cohere API
     console.log('Generating chat response with Cohere...');
-    
-    // Prepare messages array with system prompt, history, and current message
     const messages = [
       {
         role: "system",
-        content: `You are a helpful, concise assistant for Rodolfo's portfolio website. 
+        content: `You are a helpful, concise assistant for Rodolfo. You have knowledge of his projects 
+        and can provide general information about his work, education, and interests. 
         Follow these guidelines:
         1. Keep responses brief and to the point
         2. Only mention Rodolfo's projects when directly relevant to the question
         3. Answer general questions normally without forcing references to the portfolio
+        4. You must not create false information about Rodolfo
+        5. You can provide information about Rodolfo's skills and experience beyong the portfolio
         4. Maintain a friendly, professional tone`
       },
       ...formattedHistory
     ];
     
-    // Add the current user message with context
     messages.push({
       role: "user",
       content: message
     });
     
-    // Add context as a separate system message if relevant
     if (context && context !== "No specific information available about this topic.") {
       messages.push({
         role: "system",
@@ -159,7 +146,6 @@ export const handler = async (event, context) => {
       throw error;
     }
     
-    // Ensure the chatResponse is in the expected format
     if (chatResponse && chatResponse.message && Array.isArray(chatResponse.message.content)) {
       console.log('Cohere chat response preview:', chatResponse.message.content[0].text.substring(0, 200) + '...');
       
