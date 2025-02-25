@@ -77,7 +77,7 @@ export const handler = async (event, context) => {
     const index = pc.index(process.env.INDEX_NAME);
     const queryResponse = await index.query({
       vector: vectorToQuery,
-      topK: 3,
+      topK: 5, // Increased from 3 to 5 for more context
       includeMetadata: true
     });
     
@@ -102,16 +102,17 @@ export const handler = async (event, context) => {
     const messages = [
       {
         role: "system",
-        content: `You are a helpful, concise assistant for Rodolfo. You have knowledge of his projects 
-        and can provide general information about his work, education, and interests. 
-        Follow these guidelines:
-        1. Keep responses brief and to the point
-        2. Only mention Rodolfo's projects when directly relevant to the question
-        3. Answer general questions normally without forcing references to the portfolio
-        4. You must not create false information about Rodolfo
-        5. All information about Rodolfo must be accurate and verifiable according to the context
-        6. You can provide information about Rodolfo's skills and experience beyong the portfolio
-        7. Maintain a friendly, professional tone`
+        content: `You are Rodolfo's AI assistant that provides information about Rodolfo Raimundo's work, projects, education, experiences, and interests.
+
+          IMPORTANT RULES TO FOLLOW:
+          1. ONLY share factual information about Rodolfo that is explicitly mentioned in the context provided to you.
+          2. If asked about Rodolfo and you don't have specific information in the context, respond with "I don't have specific information about that aspect of Rodolfo's background" rather than making assumptions.
+          3. NEVER invent or assume details about Rodolfo's biography, skills, projects, or interests that aren't explicitly stated in the context.
+          4. When answering general technical questions unrelated to Rodolfo, you may provide helpful information based on your general knowledge.
+          5. Keep responses concise and focused on the question asked.
+          6. Maintain a friendly, professional tone.
+
+          The information about Rodolfo comes from multiple sources including his portfolio website, resume, CV, academic coursework, and other documents. These sources contain details about his projects, work experiences, academic background, skills, and personal interests.`
       },
       ...formattedHistory
     ];
@@ -124,14 +125,19 @@ export const handler = async (event, context) => {
     if (context && context !== "No specific information available about this topic.") {
       messages.push({
         role: "system",
-        content: `Here is some relevant information about Rodolfo that might help with your response: ${context}`
+        content: `Here is the ONLY verified information about Rodolfo from his portfolio, resume, CV, coursework, and other documents that you should use in your response. Do not make claims about Rodolfo beyond what is explicitly stated here: ${context}`
+      });
+    } else {
+      messages.push({
+        role: "system",
+        content: `You do not have specific information about Rodolfo related to this query. If the question is about Rodolfo, acknowledge that you don't have that specific information. If it's a general technical question, you can answer based on your general knowledge.`
       });
     }
     
     const chatParams = {
       model: "command-r",
       messages: messages,
-      temperature: 0.7
+      temperature: 0.3, // Reduced temperature for more factual responses
     };
     
     console.log('Chat params structure:', JSON.stringify({
