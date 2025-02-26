@@ -8,6 +8,59 @@ const headers = {
   'Content-Type': 'application/json'
 };
 
+// List of keywords that might appear in academic papers but are likely not relevant to Rodolfo's bio
+const ACADEMIC_KEYWORDS = [
+  'coefficient', 'triangles', 'null model', 'assortativity', 
+  'topological', 'phenomenon', 'covariance', 'algorithm', 'theorem',
+  'approximation', 'logarithmic', 'distribution', 'lemma', 'proof',
+  'wherein', 'citation', 'referenced', 'methodology', 'furthermore'
+];
+
+// Categorize sources as either profile-related or academic
+const isProfileSource = (source) => {
+  const profileSources = ['index.html', 'hobbies.html', 'rodolfo_resume.pdf', 'rraimundo_cv.pdf', 'tobias.html', 'knolling.html', 'pruning.html'];
+  return profileSources.some(s => source.includes(s));
+};
+
+// Function to detect if a chunk is likely from an academic paper and not relevant to a bio question
+const isLikelyAcademicContent = (text) => {
+  // Count how many academic keywords appear in the text
+  const keywordCount = ACADEMIC_KEYWORDS.filter(keyword => 
+    text.toLowerCase().includes(keyword.toLowerCase())
+  ).length;
+  
+  // If text contains multiple academic keywords, it's likely an academic paper content
+  return keywordCount >= 3;
+};
+
+// Filter context to remove likely irrelevant academic content for bio questions
+const filterContext = (chunks, query) => {
+  const queryLower = query.toLowerCase();
+  const isPersonalQuestion = ['you', 'your', 'hobby', 'hobbies', 'interest', 'climb', 'climbing', 'ceramic', 'teaching'].some(term => 
+    queryLower.includes(term)
+  );
+  
+  if (isPersonalQuestion) {
+    // For personal questions, prioritize profile sources and filter out academic content
+    const filteredChunks = chunks.filter(chunk => {
+      const source = chunk.metadata?.source || '';
+      const text = chunk.metadata?.text || '';
+      
+      // Keep if it's from a profile source
+      if (isProfileSource(source)) return true;
+      
+      // Filter out academic-looking content if it's not a profile source
+      return !isLikelyAcademicContent(text);
+    });
+    
+    // If we have at least some relevant chunks, return those
+    return filteredChunks.length > 0 ? filteredChunks : chunks;
+  }
+  
+  // For technical questions, keep everything
+  return chunks;
+};
+
 export const handler = async (event, context) => {
   if (event.httpMethod === 'OPTIONS') {
     return {
@@ -137,18 +190,37 @@ export const handler = async (event, context) => {
     }
 
     const index = pc.index(process.env.INDEX_NAME);
+    
+    // Query more results than we need so we can filter afterwards
     const queryResponse = await index.query({
       vector: vectorToQuery,
-      topK: 5, // Increased from 3 to 5 for more context
+      topK: 10, // Increased from 5 to 10 to allow for filtering
       includeMetadata: true
     });
     
     let context = "";
     if (queryResponse.matches && queryResponse.matches.length > 0) {
-      context = queryResponse.matches
+      // Filter the matches based on relevance to the query
+      const filteredMatches = filterContext(queryResponse.matches, message);
+      
+      // Use only the top 5 after filtering
+      const topMatches = filteredMatches.slice(0, 5);
+      
+      console.log('Source files for context:');
+      topMatches.forEach((match, idx) => {
+        if (match.metadata && match.metadata.source) {
+          console.log(`${idx + 1}. ${match.metadata.source} (score: ${match.score.toFixed(4)})`);
+        }
+      });
+      
+      context = topMatches
         .filter(match => match.metadata && match.metadata.text)
-        .map(match => match.metadata.text)
-        .join('\n');
+        .map(match => {
+          // Add source information to the context for better debugging
+          return `[From: ${match.metadata.source || 'unknown'}]\n${match.metadata.text}`;
+        })
+        .join('\n\n');
+        
       console.log('Retrieved context:', context.substring(0, 200) + '...');
     } else {
       console.log('No relevant context found in Pinecone');
@@ -175,7 +247,9 @@ export const handler = async (event, context) => {
           6. If you are unsure about a response, you can ask for clarification or provide a general response.
           7. You MUST keep responses concise, short, and focused on the question asked.
           8. You MUST never copy and paste from context, instead paraphrase in a natural, well-formatted, and readable fashion.
-          9. Maintain a friendly, professional tone.
+          9. When writting lists, use bullet points or numbered lists for clarity with proper spacing and line breaks.
+          10. Maintain a friendly, professional tone.
+          11. If the context seems completely unrelated to the question, you should say "I don't have specific information about that" rather than trying to force an answer based on irrelevant content.
 
           The information about Rodolfo comes from multiple sources including his portfolio website, resume, CV, academic coursework, and other documents. These sources contain details about his projects, work experiences, academic background, skills, and personal interests.`
       },
@@ -202,7 +276,7 @@ export const handler = async (event, context) => {
     const chatParams = {
       model: "command-r",
       messages: messages,
-      temperature: 0.3, // Reduced temperature for more factual responses
+      temperature: 0.3, 
     };
     
     console.log('Chat params structure:', JSON.stringify({
