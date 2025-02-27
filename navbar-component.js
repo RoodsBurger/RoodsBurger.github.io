@@ -51,8 +51,8 @@ class NavBar extends HTMLElement {
           </div>
   
           <!-- Mobile Menu -->
-          <div class="md:hidden menu-animation menu-closed absolute top-16 left-0 w-full ${mobileMenuClasses} z-50">
-            <div class="container mx-auto px-6 py-4 flex flex-col space-y-4">
+          <div class="md:hidden menu-animation menu-closed absolute top-16 left-0 w-full ${mobileMenuClasses} z-50 shadow-lg">
+            <div class="container mx-auto px-6 py-4 flex flex-col space-y-4 items-end">
               <a href="${this.basePath}#about">About</a>
               <a href="${this.basePath}#projects">Projects</a>
               <a href="${this.basePath}#hobbies">Beyond Tech</a>
