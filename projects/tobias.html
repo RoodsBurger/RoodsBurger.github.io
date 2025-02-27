@@ -24,6 +24,13 @@
         .mobile-sequence {
             display: none;
         }
+        /* Special mobile video cropping for wide videos */
+        .mobile-video {
+            object-fit: cover;
+            object-position: center;
+            height: 100%;
+            width: 100%;
+        }
         @media (max-width: 768px) {
             .desktop-grid {
                 display: none;
@@ -183,7 +190,7 @@
                         </li>
                         <li class="flex items-start gap-3">
                             <span class="text-blue-600">•</span>
-                            <span>Successful sim-to-real transfer through both closed-loop control and action replay methods</span>
+                            <span>Successful sim-to-real transfer through both closed-loop control, using IMU sensors, and action replay methods</span>
                         </li>
                     </ul>
 
@@ -234,6 +241,48 @@
                     </div>
 
                     <h2 class="text-2xl font-bold text-gray-900 mb-4">Results & Impact</h2>
+                    
+                    <!-- New Result Video Section - Wide and Narrow Video -->
+                    <div class="mb-8">
+                        <!-- Desktop: Wide Video -->
+                        <div class="hidden md:block relative rounded-xl overflow-hidden bg-gray-100">
+                            <div class="aspect-w-16 aspect-h-5">
+                                <video 
+                                    class="gif-video rounded-xl"
+                                    autoplay
+                                    loop
+                                    muted
+                                    playsinline
+                                    webkit-playsinline
+                                >
+                                    <source src="/artifacts/tobias_narrow.mov">
+                                </video>
+                            </div>
+                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                                <p class="text-white text-sm font-medium">SAC Model: Sim2Real</p>
+                            </div>
+                        </div>
+
+                        <!-- Mobile: Narrow Video -->
+                        <div class="block md:hidden relative rounded-xl overflow-hidden bg-gray-100">
+                            <div class="aspect-w-16 aspect-h-9">
+                                <video 
+                                    class="mobile-video rounded-xl"
+                                    autoplay
+                                    loop
+                                    muted
+                                    playsinline
+                                    webkit-playsinline
+                                >
+                                    <source src="/artifacts/tobias_narrow.mov">
+                                </video>
+                            </div>
+                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                                <p class="text-white text-sm font-medium">SAC Model: Sim2Real</p>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <p class="text-gray-600 mb-8">
                         The project demonstrated the effectiveness of entropy-based RL in robotics, with the SAC implementation 
                         significantly outperforming both DQN and traditional approaches. Our Action Replay method proved particularly 
