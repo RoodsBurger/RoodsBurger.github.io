@@ -133,23 +133,57 @@ export const handler = async (event, context) => {
         const messageTexts = olderMessages.map(msg => msg.content);
         
         try {
-          const historicalEmbedResponse = await cohere.embed({
-            texts: messageTexts,
-            model: 'embed-english-v3.0',
-            inputType: messageTexts.map((_, i) => 
-              olderMessages[i].role === 'user' ? 'search_query' : 'search_document'
-            ),
-            embeddingTypes: ['float']
-          });
+          // Process user and assistant messages separately
+          const userMessages = olderMessages.filter(msg => msg.role === 'user');
+          const assistantMessages = olderMessages.filter(msg => msg.role === 'assistant');
           
-          if (historicalEmbedResponse.embeddings && historicalEmbedResponse.embeddings.float) {
+          let allEmbeddings = [];
+          let messageMap = [];
+          
+          // Process user messages if any exist
+          if (userMessages.length > 0) {
+            const userTexts = userMessages.map(msg => msg.content);
+            const userEmbedResponse = await cohere.embed({
+              texts: userTexts,
+              model: 'embed-english-v3.0',
+              inputType: 'search_query',
+              embeddingTypes: ['float']
+            });
+            
+            if (userEmbedResponse.embeddings && userEmbedResponse.embeddings.float) {
+              userEmbedResponse.embeddings.float.forEach((embedding, i) => {
+                allEmbeddings.push(embedding);
+                messageMap.push(userMessages[i]);
+              });
+            }
+          }
+          
+          // Process assistant messages if any exist
+          if (assistantMessages.length > 0) {
+            const assistantTexts = assistantMessages.map(msg => msg.content);
+            const assistantEmbedResponse = await cohere.embed({
+              texts: assistantTexts,
+              model: 'embed-english-v3.0',
+              inputType: 'search_document',
+              embeddingTypes: ['float']
+            });
+            
+            if (assistantEmbedResponse.embeddings && assistantEmbedResponse.embeddings.float) {
+              assistantEmbedResponse.embeddings.float.forEach((embedding, i) => {
+                allEmbeddings.push(embedding);
+                messageMap.push(assistantMessages[i]);
+              });
+            }
+          }
+          
+          if (allEmbeddings.length > 0) {
             // Compute cosine similarity between current query and each historical message
-            const similarities = historicalEmbedResponse.embeddings.float.map(embedding => {
+            const similarities = allEmbeddings.map(embedding => {
               return cosineSimilarity(queryEmbedding, embedding);
             });
             
             // Create array of {message, similarity} pairs
-            const messageSimilarities = olderMessages.map((msg, i) => ({
+            const messageSimilarities = messageMap.map((msg, i) => ({
               message: msg,
               similarity: similarities[i] || 0
             }));
