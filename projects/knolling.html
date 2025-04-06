@@ -21,14 +21,21 @@
         .gif-video::-webkit-media-controls-enclosure {
             display: none !important;
         }
-        .mobile-grid {
+        .mobile-sequence {
             display: none;
+        }
+        /* Special mobile video cropping for wide videos */
+        .mobile-video {
+            object-fit: cover;
+            object-position: center;
+            height: 100%;
+            width: 100%;
         }
         @media (max-width: 768px) {
             .desktop-grid {
                 display: none;
             }
-            .mobile-grid {
+            .mobile-sequence {
                 display: block;
             }
         }
@@ -75,25 +82,81 @@
                     <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm">Computer Vision</span>
                 </div>
 
-                <div class="hidden md:grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 desktop-grid">
+                <!-- Desktop Grid -->
+                <div class="hidden md:grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                     <div class="relative rounded-xl overflow-hidden bg-gray-100">
-                        <img src="/artifacts/knolling1.jpg" alt="Tidy Image" class="w-full h-64 object-cover">
+                        <div class="aspect-w-16 aspect-h-9">
+                            <video 
+                                class="gif-video"
+                                autoplay
+                                loop
+                                muted
+                                playsinline
+                                webkit-playsinline
+                            >
+                                <source src="/artifacts/knolling_videos/tidy68_front.mp4">
+                            </video>
+                        </div>
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                            <p class="text-white text-sm font-medium">10k Training Steps</p>
+                        </div>
                     </div>
+                    
                     <div class="relative rounded-xl overflow-hidden bg-gray-100">
-                        <img src="/artifacts/knolling2.jpg" alt="Tidy Image" class="w-full h-64 object-cover">
+                        <div class="aspect-w-16 aspect-h-9">
+                            <video 
+                                class="gif-video"
+                                autoplay
+                                loop
+                                muted
+                                playsinline
+                                webkit-playsinline
+                            >
+                                <source src="/artifacts/knolling_videos/tidy68_top.mp4">
+                            </video>
+                        </div>
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                            <p class="text-white text-sm font-medium">200k Training Steps</p>
+                        </div>
                     </div>
+                    
                     <div class="relative rounded-xl overflow-hidden bg-gray-100">
-                        <img src="/artifacts/knolling3.jpg" alt="Messy Image 2" class="w-full h-64 object-cover">
+                        <div class="aspect-w-16 aspect-h-9">
+                            <video 
+                                class="gif-video"
+                                autoplay
+                                loop
+                                muted
+                                playsinline
+                                webkit-playsinline
+                            >
+                                <source src="/artifacts/knolling_videos/tidy68_virtual.mp4">
+                            </video>
+                        </div>
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                            <p class="text-white text-sm font-medium">1M Training Steps</p>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="block md:hidden grid grid-cols-1 gap-4 mb-4 mobile-grid">
-                    <div class="relative rounded-xl overflow-hidden bg-[#efefef] h-64">
-                        <img src="/artifacts/knolling1.jpg" alt="Tidy Image" class="w-full h-full object-contain">
-                    </div>
-                </div>
-                
 
+                <!-- Mobile Sequence -->
+                <div class="block md:hidden relative rounded-xl overflow-hidden bg-gray-100 mb-4">
+                    <div class="aspect-w-16 aspect-h-9 relative">
+                        <video 
+                            id="sequenceVideo"
+                            class="gif-video"
+                            autoplay
+                            muted
+                            playsinline
+                            webkit-playsinline
+                        >
+                            <source src="/artifacts/knolling_videos/tidy68_top.mp4">
+                        </video>
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                        <p id="videoCaption" class="text-white text-sm font-medium">10k Training Steps</p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
