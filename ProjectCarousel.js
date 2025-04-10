@@ -55,14 +55,6 @@ const ProjectCarousel = () => {
 
   const projects = [
     {
-      title: "LLM-Based Assistant",
-      description: "Custom vector database-powered chatbot that integrates LLMs with serverless functions to provide contextual information about my portfolio, projects, and experience.",
-      image: "/artifacts/chat_diagram.png",
-      link: "projects/chat-project.html",
-      category: "Natural Language Processing",
-      tags: ["Cohere", "Pinecone", "Netlify"]
-    },
-    {
       title: "Tobias",
       description: "4-legged robot project that integrates CAD Design, Physics Simulation, and Reinforcement Learning to achieve stable walking gaits and straight-line locomotion.",
       image: "/artifacts/tobias_render_2.png",
@@ -77,6 +69,14 @@ const ProjectCarousel = () => {
       link: "projects/knolling.html",
       category: "Deep Learning",
       tags: ["YOLO", "Diffusion", "ControlNet"]
+    },
+    {
+      title: "LLM-Based Assistant",
+      description: "Custom vector database-powered chatbot that integrates LLMs with serverless functions to provide contextual information about my portfolio, projects, and experience.",
+      image: "/artifacts/chat_diagram.png",
+      link: "projects/chat-project.html",
+      category: "Natural Language Processing",
+      tags: ["Cohere", "Pinecone", "Netlify"]
     },
     {
       title: "Artificial Synaptic Pruning",
