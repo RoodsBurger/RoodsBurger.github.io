@@ -68,7 +68,7 @@ const ProjectCarousel = () => {
       image: "/artifacts/knolling_main.jpg",
       link: "projects/knolling.html",
       category: "Deep Learning",
-      tags: ["YOLO", "Diffusion", "ControlNet"]
+      tags: ["YOLO", "Diffusion", "ROS2"]
     },
     {
       title: "LLM-Based Assistant",
