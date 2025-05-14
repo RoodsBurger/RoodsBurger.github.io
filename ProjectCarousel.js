@@ -63,8 +63,8 @@ const ProjectCarousel = () => {
       tags: ["PyTorch", "Fusion", "PyBullet"]
     },
     {
-      title: "Knolling Bot",
-      description: "End-to-end Computer Vision model that combines ControlNet architecture and YOLO object detection to transform cluttered object arrangements into organized setups.",
+      title: "TidyNET",
+      description: "End-to-end Computer Vision model that combines a diffusion model, YOLO object detection, and control module to transform cluttered object arrangements into organized setups.",
       image: "/artifacts/knolling_main.jpg",
       link: "projects/knolling.html",
       category: "Deep Learning",
