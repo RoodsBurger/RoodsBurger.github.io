@@ -1,7 +1,7 @@
-const { useState, useRef } = React;
+const { useState, useRef, useCallback, useMemo } = React;
 
-// SVG components remain the same
-const ChevronLeft = () => React.createElement('svg', {
+// Optimized SVG components
+const ChevronLeft = React.memo(() => React.createElement('svg', {
   xmlns: "http://www.w3.org/2000/svg",
   width: "24",
   height: "24",
@@ -12,9 +12,9 @@ const ChevronLeft = () => React.createElement('svg', {
   strokeLinecap: "round",
   strokeLinejoin: "round",
   className: "w-8 h-8 text-gray-400 transition-colors duration-200 hover:text-blue-600"
-}, React.createElement('polyline', { points: "15 18 9 12 15 6" }));
+}, React.createElement('polyline', { points: "15 18 9 12 15 6" })));
 
-const ChevronRight = () => React.createElement('svg', {
+const ChevronRight = React.memo(() => React.createElement('svg', {
   xmlns: "http://www.w3.org/2000/svg",
   width: "24",
   height: "24",
@@ -25,7 +25,7 @@ const ChevronRight = () => React.createElement('svg', {
   strokeLinecap: "round",
   strokeLinejoin: "round",
   className: "w-8 h-8 text-gray-400 transition-colors duration-200 hover:text-blue-600"
-}, React.createElement('polyline', { points: "9 18 15 12 9 6" }));
+}, React.createElement('polyline', { points: "9 18 15 12 9 6" })));
 
 const ProjectCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -34,14 +34,22 @@ const ProjectCarousel = () => {
   const containerRef = useRef(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  // Update isMobile state on window resize
+  // Optimized resize handler with throttling
   React.useEffect(() => {
+    let resizeTimeout;
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
+      if (resizeTimeout) return;
+      resizeTimeout = setTimeout(() => {
+        setIsMobile(window.innerWidth < 768);
+        resizeTimeout = null;
+      }, 100);
     };
     
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (resizeTimeout) clearTimeout(resizeTimeout);
+    };
   }, []);
 
   const categoryColors = {
@@ -96,82 +104,59 @@ const ProjectCarousel = () => {
     }
   ];
 
-  // Items per page for desktop vs mobile
+  // Memoized calculations
   const itemsPerPage = isMobile ? 1 : 3;
-  const canScrollLeft = currentIndex > 0;
-  const canScrollRight = currentIndex < projects.length - itemsPerPage;
+  const canScrollLeft = useMemo(() => currentIndex > 0, [currentIndex]);
+  const canScrollRight = useMemo(() => currentIndex < projects.length - itemsPerPage, [currentIndex, projects.length, itemsPerPage]);
 
-  // MOUSE events
-  const handleMouseDown = (e) => {
+  // Optimized drag handlers with useCallback
+  const handleDragStart = useCallback((clientX) => {
     setIsDragging(true);
-    setDragStart(e.pageX);
-  };
+    setDragStart(clientX);
+  }, []);
 
-  const handleMouseMove = (e) => {
-    if (!isDragging) return;
-    const dragDistance = e.pageX - dragStart;
-    const containerWidth = containerRef.current.offsetWidth;
-    const threshold = containerWidth * 0.1;
+  const handleDragMove = useCallback((clientX) => {
+    if (!isDragging || !containerRef.current) return;
+    
+    const dragDistance = clientX - dragStart;
+    const threshold = containerRef.current.offsetWidth * 0.1;
 
     if (Math.abs(dragDistance) > threshold) {
       if (dragDistance > 0 && canScrollLeft) {
-        scrollLeft();
+        setCurrentIndex(prev => prev - 1);
       } else if (dragDistance < 0 && canScrollRight) {
-        scrollRight();
+        setCurrentIndex(prev => prev + 1);
       }
       setIsDragging(false);
     }
-  };
+  }, [isDragging, dragStart, canScrollLeft, canScrollRight]);
 
-  const handleMouseUp = () => {
+  const handleDragEnd = useCallback(() => {
     setIsDragging(false);
-  };
+  }, []);
 
-  const handleMouseLeave = () => {
-    setIsDragging(false);
-  };
+  // Mouse events
+  const handleMouseDown = useCallback((e) => handleDragStart(e.pageX), [handleDragStart]);
+  const handleMouseMove = useCallback((e) => handleDragMove(e.pageX), [handleDragMove]);
+  const handleMouseUp = handleDragEnd;
+  const handleMouseLeave = handleDragEnd;
 
-  // TOUCH events (mirroring mouse)
-  const handleTouchStart = (e) => {
-    setIsDragging(true);
-    setDragStart(e.touches[0].clientX);
-  };
+  // Touch events
+  const handleTouchStart = useCallback((e) => handleDragStart(e.touches[0].clientX), [handleDragStart]);
+  const handleTouchMove = useCallback((e) => handleDragMove(e.touches[0].clientX), [handleDragMove]);
+  const handleTouchEnd = handleDragEnd;
 
-  const handleTouchMove = (e) => {
-    if (!isDragging) return;
-    const dragDistance = e.touches[0].clientX - dragStart;
-    const containerWidth = containerRef.current.offsetWidth;
-    const threshold = containerWidth * 0.1;
+  // Navigation functions
+  const scrollLeft = useCallback(() => {
+    if (canScrollLeft) setCurrentIndex(prev => prev - 1);
+  }, [canScrollLeft]);
 
-    if (Math.abs(dragDistance) > threshold) {
-      if (dragDistance > 0 && canScrollLeft) {
-        scrollLeft();
-      } else if (dragDistance < 0 && canScrollRight) {
-        scrollRight();
-      }
-      setIsDragging(false);
-    }
-  };
+  const scrollRight = useCallback(() => {
+    if (canScrollRight) setCurrentIndex(prev => prev + 1);
+  }, [canScrollRight]);
 
-  const handleTouchEnd = () => {
-    setIsDragging(false);
-  };
-
-  // Arrow click logic
-  const scrollLeft = () => {
-    if (canScrollLeft) {
-      setCurrentIndex(currentIndex - 1);
-    }
-  };
-
-  const scrollRight = () => {
-    if (canScrollRight) {
-      setCurrentIndex(currentIndex + 1);
-    }
-  };
-
-  // Renders each project
-  const renderProject = (project, index) => {
+  // Memoized project renderer
+  const renderProject = useCallback((project, index) => {
     return React.createElement('div', { 
       key: index, 
       className: `w-full md:w-1/3 flex-shrink-0 px-4 py-2` 
@@ -189,7 +174,8 @@ const ProjectCarousel = () => {
             src: project.image,
             alt: project.title,
             className: 'w-full h-72 object-cover',
-            draggable: false
+            draggable: false,
+            loading: 'lazy'
           }),
           React.createElement('div', {
             key: 'category',
@@ -210,7 +196,7 @@ const ProjectCarousel = () => {
           }, project.description),
           React.createElement('div', {
             key: 'tags',
-            className: 'flex gap-2 text-sm'
+            className: 'flex gap-2 text-sm flex-wrap'
           }, project.tags.map((tag, tagIndex) => 
             React.createElement('span', {
               key: tagIndex,
@@ -220,16 +206,19 @@ const ProjectCarousel = () => {
         ])
       ])
     );
-  };
+  }, [categoryColors]);
 
-  // Create progress indicators
-  const progressDots = Array.from({ length: projects.length - (itemsPerPage - 1) }).map((_, i) => 
-    React.createElement('div', {
-      key: `dot-${i}`,
-      className: `h-1 rounded-full transition-all duration-300 ${
-        i === currentIndex ? 'w-6 bg-blue-600' : 'w-2 bg-gray-200 hover:bg-blue-200'
-      }`
-    })
+  // Memoized progress indicators
+  const progressDots = useMemo(() => 
+    Array.from({ length: projects.length - (itemsPerPage - 1) }).map((_, i) => 
+      React.createElement('div', {
+        key: `dot-${i}`,
+        className: `h-1 rounded-full transition-all duration-300 cursor-pointer ${
+          i === currentIndex ? 'w-6 bg-blue-600' : 'w-2 bg-gray-200 hover:bg-blue-200'
+        }`,
+        onClick: () => setCurrentIndex(i)
+      })
+    ), [currentIndex, projects.length, itemsPerPage]
   );
 
   return React.createElement('div', {

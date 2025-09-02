@@ -199,14 +199,14 @@ document.addEventListener("DOMContentLoaded", function() {
       typeWriterEffect(messageTextEl, text, 0);
     }
 
-    // ====== Typewriter effect ======
-    function typeWriterEffect(element, text, index) {
-      if (index < text.length) {
-        element.innerHTML += text.charAt(index);
-        setTimeout(() => {
-          typeWriterEffect(element, text, index + 1);
-        }, 10);
-      }
+    // ====== Optimized typewriter effect ======
+    function typeWriterEffect(element, text, index = 0) {
+      if (index >= text.length) return;
+      
+      element.innerHTML += text.charAt(index);
+      requestAnimationFrame(() => {
+        setTimeout(() => typeWriterEffect(element, text, index + 1), 8);
+      });
     }
 
     // ====== Show a thinking indicator ======

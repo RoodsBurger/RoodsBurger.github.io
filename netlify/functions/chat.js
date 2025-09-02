@@ -8,57 +8,62 @@ const headers = {
   'Content-Type': 'application/json'
 };
 
-// List of keywords that might appear in academic papers but are likely not relevant to Rodolfo's bio
-const ACADEMIC_KEYWORDS = [
+// Optimized keyword matching using Set for O(1) lookup
+const ACADEMIC_KEYWORDS = new Set([
   'coefficient', 'triangles', 'null model', 'assortativity', 
   'topological', 'phenomenon', 'covariance', 'algorithm', 'theorem',
   'approximation', 'logarithmic', 'distribution', 'lemma', 'proof',
   'wherein', 'citation', 'referenced', 'methodology', 'furthermore'
-];
+]);
 
-// Categorize sources as either profile-related or academic
+// Optimized profile source checking
+const PROFILE_SOURCES = new Set([
+  'index.html', 'hobbies.html', 'rodolfo_resume.pdf', 'rraimundo_cv.pdf', 
+  'tobias.html', 'knolling.html', 'pruning.html'
+]);
+
 const isProfileSource = (source) => {
-  const profileSources = ['index.html', 'hobbies.html', 'rodolfo_resume.pdf', 'rraimundo_cv.pdf', 'tobias.html', 'knolling.html', 'pruning.html'];
-  return profileSources.some(s => source.includes(s));
+  return PROFILE_SOURCES.has(source) || Array.from(PROFILE_SOURCES).some(s => source.includes(s));
 };
 
-// Function to detect if a chunk is likely from an academic paper and not relevant to a bio question
+// Optimized academic content detection
 const isLikelyAcademicContent = (text) => {
-  // Count how many academic keywords appear in the text
-  const keywordCount = ACADEMIC_KEYWORDS.filter(keyword => 
-    text.toLowerCase().includes(keyword.toLowerCase())
-  ).length;
+  const lowerText = text.toLowerCase();
+  let keywordCount = 0;
   
-  // If text contains multiple academic keywords, it's likely an academic paper content
-  return keywordCount >= 3;
+  for (const keyword of ACADEMIC_KEYWORDS) {
+    if (lowerText.includes(keyword)) {
+      keywordCount++;
+      if (keywordCount >= 3) return true; // Early exit
+    }
+  }
+  
+  return false;
 };
 
-// Filter context to remove likely irrelevant academic content for bio questions
+// Optimized context filtering
+const PERSONAL_QUESTION_TERMS = new Set([
+  'you', 'your', 'hobby', 'hobbies', 'interest', 'climb', 'climbing', 
+  'ceramic', 'teaching', 'personal', 'background', 'experience'
+]);
+
 const filterContext = (chunks, query) => {
   const queryLower = query.toLowerCase();
-  const isPersonalQuestion = ['you', 'your', 'hobby', 'hobbies', 'interest', 'climb', 'climbing', 'ceramic', 'teaching'].some(term => 
+  const isPersonalQuestion = Array.from(PERSONAL_QUESTION_TERMS).some(term => 
     queryLower.includes(term)
   );
   
-  if (isPersonalQuestion) {
-    // For personal questions, prioritize profile sources and filter out academic content
-    const filteredChunks = chunks.filter(chunk => {
-      const source = chunk.metadata?.source || '';
-      const text = chunk.metadata?.text || '';
-      
-      // Keep if it's from a profile source
-      if (isProfileSource(source)) return true;
-      
-      // Filter out academic-looking content if it's not a profile source
-      return !isLikelyAcademicContent(text);
-    });
-    
-    // If we have at least some relevant chunks, return those
-    return filteredChunks.length > 0 ? filteredChunks : chunks;
-  }
+  if (!isPersonalQuestion) return chunks;
   
-  // For technical questions, keep everything
-  return chunks;
+  // For personal questions, prioritize profile sources
+  const filteredChunks = chunks.filter(chunk => {
+    const source = chunk.metadata?.source || '';
+    const text = chunk.metadata?.text || '';
+    
+    return isProfileSource(source) || !isLikelyAcademicContent(text);
+  });
+  
+  return filteredChunks.length > 0 ? filteredChunks : chunks;
 };
 
 export const handler = async (event, context) => {
