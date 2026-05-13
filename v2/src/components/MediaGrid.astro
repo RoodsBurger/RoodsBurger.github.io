@@ -26,7 +26,7 @@ const sequenceId = `mediaseq-${Math.random().toString(36).slice(2, 9)}`;
   {items.map((item) => {
     const video = isVideo(item);
     return (
-      <figure class="relative rounded-xl overflow-hidden border border-(--color-border) bg-(--color-muted) aspect-video">
+      <figure class="relative rounded-xl overflow-hidden border border-(--color-border) bg-(--color-muted) aspect-[4/3]">
         {video ? (
           <video
             autoplay={true}
@@ -60,7 +60,7 @@ const sequenceId = `mediaseq-${Math.random().toString(36).slice(2, 9)}`;
 {/* Mobile: cycle through one at a time (videos) or a vertical stack (images) */}
 {allVideos && items.length > 1 ? (
   <figure
-    class="not-prose md:hidden relative rounded-xl overflow-hidden border border-(--color-border) bg-(--color-muted) aspect-video my-8"
+    class="not-prose md:hidden relative rounded-xl overflow-hidden border border-(--color-border) bg-(--color-muted) aspect-[4/3] my-8"
     data-mediaseq={sequenceId}
   >
     {items.map((item, i) => (
@@ -89,7 +89,7 @@ const sequenceId = `mediaseq-${Math.random().toString(36).slice(2, 9)}`;
     {items.map((item) => {
       const video = isVideo(item);
       return (
-        <figure class="relative rounded-xl overflow-hidden border border-(--color-border) bg-(--color-muted) aspect-video">
+        <figure class="relative rounded-xl overflow-hidden border border-(--color-border) bg-(--color-muted) aspect-[4/3]">
           {video ? (
             <video
               autoplay={true}
