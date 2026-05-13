@@ -11,6 +11,8 @@ interface Props {
   description?: string;
   image?: string;
   showChat?: boolean;
+  showNav?: boolean;
+  showFooter?: boolean;
   ogType?: "website" | "article";
 }
 
@@ -19,6 +21,8 @@ const {
   description = site.description,
   image = "/og-default.png",
   showChat = true,
+  showNav = true,
+  showFooter = true,
   ogType = "website",
 } = Astro.props;
 
@@ -75,13 +79,13 @@ const imageUrl = new URL(image, site.url).toString();
       Skip to content
     </a>
 
-    <Navbar />
+    {showNav && <Navbar />}
 
     <main id="main" class="flex-1">
       <slot />
     </main>
 
-    <Footer />
+    {showFooter && <Footer />}
 
     {showChat && <ChatWidget mode="floating" client:idle />}
 
