@@ -244,7 +244,6 @@ export default function ChatWidget({ mode = "floating" }: Props) {
           className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 group size-12 rounded-full bg-(--color-accent) text-(--color-accent-foreground) shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
         >
           <MessageCircle size={20} />
-          <span className="absolute inset-0 rounded-full bg-(--color-accent) animate-ping opacity-20"></span>
         </button>
       )}
       {isOpen && panel}

@@ -1,5 +1,5 @@
 ---
-type LogoKind = "image" | "image-with-yc" | "wordmark";
+type LogoKind = "image" | "image-mono" | "image-with-yc" | "wordmark";
 
 interface ExperienceItem {
   name: string;
@@ -39,37 +39,35 @@ const items: ExperienceItem[] = [
   {
     name: "Morgan Stanley",
     href: "https://www.morganstanley.com",
-    kind: "wordmark",
-    wordmarkText: "Morgan Stanley",
-    wordmarkClass: "text-base md:text-lg font-sans font-bold tracking-tight leading-tight",
+    kind: "image-mono",
+    logo: "/logos/morgan-stanley.svg",
   },
   {
     name: "Universidade de São Paulo",
     href: "https://www5.usp.br",
-    kind: "wordmark",
-    wordmarkText: "USP",
-    wordmarkClass: "text-3xl md:text-4xl font-serif font-semibold tracking-tight",
+    kind: "image-mono",
+    logo: "/logos/usp.svg",
   },
   {
     name: "groupwork Brasil",
     href: "https://groupwork.com.br/",
     kind: "wordmark",
     wordmarkText: "groupwork",
-    wordmarkClass: "text-xl md:text-2xl font-mono font-medium lowercase tracking-tight",
+    wordmarkClass: "text-2xl md:text-3xl font-mono font-medium lowercase tracking-tight",
   },
   {
     name: "nok9",
     href: "https://www.nok9.com",
     kind: "wordmark",
     wordmarkText: "nok9",
-    wordmarkClass: "text-3xl md:text-4xl font-mono font-bold lowercase tracking-tight",
+    wordmarkClass: "text-2xl md:text-3xl font-mono font-bold lowercase tracking-tight",
   },
   {
     name: "manroland",
     href: "https://www.manrolandgoss.com",
     kind: "wordmark",
     wordmarkText: "manroland",
-    wordmarkClass: "text-lg md:text-xl font-sans font-bold tracking-tight",
+    wordmarkClass: "text-xl md:text-2xl font-sans font-bold tracking-tight",
   },
 ];
 ---
@@ -97,6 +95,15 @@ const items: ExperienceItem[] = [
               loading="lazy"
               class="exp-logo h-10 md:h-12 max-w-[78%] w-auto object-contain transition-all duration-300"
             />
+          )}
+
+          {item.kind === "image-mono" && (
+            <div
+              aria-label={item.name}
+              role="img"
+              class="exp-logo-mono h-10 md:h-12 w-[78%] transition-all duration-300"
+              style={`-webkit-mask: url(${item.logo}) center/contain no-repeat; mask: url(${item.logo}) center/contain no-repeat;`}
+            ></div>
           )}
 
           {item.kind === "image-with-yc" && (
@@ -161,18 +168,19 @@ const items: ExperienceItem[] = [
     opacity: 1;
   }
   .exp-wordmark {
-    opacity: 0.5;
+    opacity: 0.55;
   }
   .exp-card:hover .exp-wordmark {
     opacity: 1;
   }
-  /* YC official logo keeps its colors (lighter dim, no grayscale) */
-  .exp-logo-yc {
-    filter: brightness(0.85);
-    opacity: 0.75;
+  /* Monochrome logos via CSS mask: the SVG is the shape, color comes
+     from background-color and is theme-aware via CSS variables */
+  .exp-logo-mono {
+    background-color: var(--color-muted-foreground);
+    opacity: 0.7;
   }
-  .exp-card:hover .exp-logo-yc {
-    filter: none;
+  .exp-card:hover .exp-logo-mono {
+    background-color: var(--color-foreground);
     opacity: 1;
   }
 </style>
