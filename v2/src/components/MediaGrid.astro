@@ -29,14 +29,15 @@ const sequenceId = `mediaseq-${Math.random().toString(36).slice(2, 9)}`;
       <figure class="relative rounded-xl overflow-hidden border border-(--color-border) bg-(--color-muted) aspect-video">
         {video ? (
           <video
-            autoplay
-            loop
-            muted
-            playsinline
+            autoplay={true}
+            loop={true}
+            muted={true}
+            playsinline={true}
+            preload="auto"
             class="w-full h-full object-cover pointer-events-none"
             aria-label={item.alt || item.caption}
           >
-            <source src={item.src} />
+            <source src={item.src} type="video/mp4" />
           </video>
         ) : (
           <img
@@ -65,15 +66,15 @@ const sequenceId = `mediaseq-${Math.random().toString(36).slice(2, 9)}`;
     {items.map((item, i) => (
       <video
         data-mediaseq-idx={i}
-        autoplay={i === 0 ? "" : undefined}
-        muted
-        playsinline
+        autoplay={i === 0}
+        muted={true}
+        playsinline={true}
         preload="auto"
         class="absolute inset-0 w-full h-full object-cover pointer-events-none transition-opacity duration-500"
         style={`opacity: ${i === 0 ? 1 : 0};`}
         aria-label={item.alt || item.caption}
       >
-        <source src={item.src} />
+        <source src={item.src} type="video/mp4" />
       </video>
     ))}
     <figcaption
@@ -91,14 +92,15 @@ const sequenceId = `mediaseq-${Math.random().toString(36).slice(2, 9)}`;
         <figure class="relative rounded-xl overflow-hidden border border-(--color-border) bg-(--color-muted) aspect-video">
           {video ? (
             <video
-              autoplay
-              loop
-              muted
-              playsinline
+              autoplay={true}
+              loop={true}
+              muted={true}
+              playsinline={true}
+              preload="auto"
               class="w-full h-full object-cover pointer-events-none"
               aria-label={item.alt || item.caption}
             >
-              <source src={item.src} />
+              <source src={item.src} type="video/mp4" />
             </video>
           ) : (
             <img

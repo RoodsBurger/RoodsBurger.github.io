@@ -17,14 +17,15 @@ const isVideo = type === "video" || src.endsWith(".mp4") || src.endsWith(".webm"
 >
   {isVideo ? (
     <video
-      autoplay
-      loop
-      muted
-      playsinline
+      autoplay={true}
+      loop={true}
+      muted={true}
+      playsinline={true}
+      preload="auto"
       class="w-full h-full object-cover pointer-events-none"
       aria-label={alt || caption}
     >
-      <source src={src} />
+      <source src={src} type="video/mp4" />
     </video>
   ) : (
     <img
