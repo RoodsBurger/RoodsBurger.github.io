@@ -87,10 +87,14 @@ const viewerId = `stl-viewer-${Math.random().toString(36).slice(2, 9)}`;
     renderer.setClearColor(0x000000, 0);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.domElement.style.display = "block";
+    renderer.domElement.style.width = "100%";
+    renderer.domElement.style.height = "100%";
     canvas.appendChild(renderer.domElement);
 
     const setSize = () => {
       const { clientWidth, clientHeight } = root;
+      if (clientWidth === 0 || clientHeight === 0) return;
       renderer.setSize(clientWidth, clientHeight, false);
       camera.aspect = clientWidth / clientHeight;
       camera.updateProjectionMatrix();
@@ -122,8 +126,8 @@ const viewerId = `stl-viewer-${Math.random().toString(36).slice(2, 9)}`;
       (geometry) => {
         loadingEl?.style.setProperty("display", "none");
         geometry.computeBoundingBox();
+        geometry.computeBoundingSphere();
         geometry.computeVertexNormals();
-        geometry.center();
 
         const material = new THREE.MeshStandardMaterial({
           color: new THREE.Color(color),
@@ -135,17 +139,31 @@ const viewerId = `stl-viewer-${Math.random().toString(36).slice(2, 9)}`;
         mesh.receiveShadow = true;
         scene.add(mesh);
 
-        // Fit camera to model
-        const bbox = geometry.boundingBox!;
-        const size = new THREE.Vector3();
-        bbox.getSize(size);
-        const maxDim = Math.max(size.x, size.y, size.z);
-        const fitDistance = (maxDim * 1.4) / Math.tan((camera.fov * Math.PI) / 360);
-        camera.position.set(fitDistance * 0.7, fitDistance * 0.5, fitDistance);
-        camera.lookAt(0, 0, 0);
-        controls.target.set(0, 0, 0);
+        // Use the model's actual bounding-sphere center as the orbit target
+        // (no geometry mutation — robust to any local coordinate system).
+        const center = new THREE.Vector3();
+        geometry.boundingBox!.getCenter(center);
+        const radius = geometry.boundingSphere?.radius ?? 1;
+
+        // Fit distance accounts for both vertical and horizontal FOV so the
+        // model is fully visible regardless of viewport aspect ratio.
+        const vFov = (camera.fov * Math.PI) / 180;
+        const hFov = 2 * Math.atan(Math.tan(vFov / 2) * camera.aspect);
+        const fitDistance = (radius * 1.3) / Math.sin(Math.min(vFov, hFov) / 2);
+
+        // 3/4 view, offset from the model's center
+        const offset = new THREE.Vector3(1, 0.6, 1)
+          .normalize()
+          .multiplyScalar(fitDistance);
+        camera.position.copy(center).add(offset);
+        camera.near = fitDistance / 100;
+        camera.far = fitDistance * 10;
+        camera.lookAt(center);
+        camera.updateProjectionMatrix();
+
+        controls.target.copy(center);
         controls.maxDistance = fitDistance * 3;
-        controls.minDistance = fitDistance * 0.4;
+        controls.minDistance = fitDistance * 0.3;
         controls.update();
 
         // Idle auto-rotate after 3s of no interaction
