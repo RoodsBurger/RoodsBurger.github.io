@@ -6,6 +6,7 @@ interface ExperienceItem {
   href: string;
   kind: LogoKind;
   logo?: string;
+  logoClass?: string;
   wordmarkText?: string;
   wordmarkClass?: string;
   wordmarkColor?: string;
@@ -17,6 +18,7 @@ const items: ExperienceItem[] = [
     href: "https://www.pindrop.com",
     kind: "image",
     logo: "/logos/pindrop.png",
+    logoClass: "max-h-16 md:max-h-20 max-w-[92%]",
   },
   {
     name: "Columbia University",
@@ -93,7 +95,7 @@ const items: ExperienceItem[] = [
               src={item.logo}
               alt={item.name}
               loading="lazy"
-              class="exp-logo max-h-14 md:max-h-16 max-w-[80%] w-auto object-contain transition-all duration-300"
+              class:list={["exp-logo w-auto object-contain transition-all duration-300", item.logoClass || "max-h-14 md:max-h-16 max-w-[80%]"]}
             />
           )}
 
