@@ -115,6 +115,13 @@ const imageUrl = new URL(image, site.url).toString();
 
       observe();
       document.addEventListener("astro:page-load", observe);
+
+      // Esc on a project detail page closes the modal (back to /#projects)
+      document.addEventListener("keydown", (e) => {
+        if (e.key !== "Escape") return;
+        if (!document.querySelector(".project-modal")) return;
+        window.location.href = "/#projects";
+      });
     </script>
   </body>
 </html>

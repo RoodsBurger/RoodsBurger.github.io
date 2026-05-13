@@ -164,21 +164,8 @@ const { title, summary, tags, links, cover } = project.data;
   }
 </style>
 
-<script>
-  // Close the project modal with Escape, matching the backdrop click.
-  // Use a named handler + remove-on-leave so it doesn't pile up across
-  // view transitions.
-  const escClose = (e: KeyboardEvent) => {
-    if (e.key !== "Escape") return;
-    if (!document.querySelector(".project-modal")) return;
-    window.location.href = "/#projects";
-  };
-
-  document.addEventListener("keydown", escClose);
-  document.addEventListener("astro:before-swap", () => {
-    document.removeEventListener("keydown", escClose);
-  });
-</script>
+<!-- Esc-to-close is wired up in BaseLayout via a single document-level
+     listener so it survives Astro view-transitions. -->
 
 <style is:global>
   .prose-content h2 {
