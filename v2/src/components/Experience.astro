@@ -53,7 +53,7 @@ const items: ExperienceItem[] = [
     href: "https://groupwork.com.br/",
     kind: "wordmark",
     wordmarkText: "groupwork",
-    wordmarkClass: "text-2xl md:text-3xl font-mono font-medium lowercase tracking-tight",
+    wordmarkClass: "text-lg md:text-xl font-mono font-medium lowercase tracking-tight",
   },
   {
     name: "nok9",
@@ -67,7 +67,7 @@ const items: ExperienceItem[] = [
     href: "https://www.manrolandgoss.com",
     kind: "wordmark",
     wordmarkText: "manroland",
-    wordmarkClass: "text-xl md:text-2xl font-sans font-bold tracking-tight",
+    wordmarkClass: "text-lg md:text-xl font-sans font-bold tracking-tight",
   },
 ];
 ---
@@ -93,7 +93,7 @@ const items: ExperienceItem[] = [
               src={item.logo}
               alt={item.name}
               loading="lazy"
-              class="exp-logo h-10 md:h-12 max-w-[78%] w-auto object-contain transition-all duration-300"
+              class="exp-logo max-h-14 md:max-h-16 max-w-[80%] w-auto object-contain transition-all duration-300"
             />
           )}
 
@@ -101,7 +101,7 @@ const items: ExperienceItem[] = [
             <div
               aria-label={item.name}
               role="img"
-              class="exp-logo-mono h-10 md:h-12 w-[78%] transition-all duration-300"
+              class="exp-logo-mono h-14 md:h-16 w-[80%] transition-all duration-300"
               style={`-webkit-mask: url(${item.logo}) center/contain no-repeat; mask: url(${item.logo}) center/contain no-repeat;`}
             ></div>
           )}
@@ -125,7 +125,7 @@ const items: ExperienceItem[] = [
 
           {item.kind === "wordmark" && (
             <span
-              class:list={["exp-wordmark text-center transition-all duration-300", item.wordmarkClass]}
+              class:list={["exp-wordmark text-center max-w-[85%] transition-all duration-300", item.wordmarkClass]}
               style={`color: ${item.wordmarkColor || "var(--color-foreground)"};`}
             >
               {item.wordmarkText || item.name}
