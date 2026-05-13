@@ -13,14 +13,21 @@ interface Props {
 
 const { items, columns = 3 } = Astro.props;
 const gridClass = columns === 2 ? "md:grid-cols-2" : "md:grid-cols-3";
+
+const isVideo = (item: MediaItem) =>
+  item.type === "video" || item.src.endsWith(".mov") || item.src.endsWith(".mp4");
+
+const allVideos = items.every(isVideo);
+const sequenceId = `mediaseq-${Math.random().toString(36).slice(2, 9)}`;
 ---
 
-<div class={`not-prose grid gap-3 md:gap-4 ${gridClass} my-8`}>
+{/* Desktop: grid */}
+<div class={`not-prose hidden md:grid gap-3 md:gap-4 ${gridClass} my-8`}>
   {items.map((item) => {
-    const isVideo = item.type === "video" || item.src.endsWith(".mov") || item.src.endsWith(".mp4");
+    const video = isVideo(item);
     return (
       <figure class="relative rounded-xl overflow-hidden border border-(--color-border) bg-(--color-muted) aspect-video">
-        {isVideo ? (
+        {video ? (
           <video
             autoplay
             loop
@@ -48,3 +55,92 @@ const gridClass = columns === 2 ? "md:grid-cols-2" : "md:grid-cols-3";
     );
   })}
 </div>
+
+{/* Mobile: cycle through one at a time (videos) or a vertical stack (images) */}
+{allVideos && items.length > 1 ? (
+  <figure
+    class="not-prose md:hidden relative rounded-xl overflow-hidden border border-(--color-border) bg-(--color-muted) aspect-video my-8"
+    data-mediaseq={sequenceId}
+  >
+    {items.map((item, i) => (
+      <video
+        data-mediaseq-idx={i}
+        autoplay={i === 0 ? "" : undefined}
+        muted
+        playsinline
+        preload="auto"
+        class="absolute inset-0 w-full h-full object-cover pointer-events-none transition-opacity duration-500"
+        style={`opacity: ${i === 0 ? 1 : 0};`}
+        aria-label={item.alt || item.caption}
+      >
+        <source src={item.src} />
+      </video>
+    ))}
+    <figcaption
+      data-mediaseq-caption
+      class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-3 py-2 text-xs text-white font-medium"
+    >
+      {items[0].caption}
+    </figcaption>
+  </figure>
+) : (
+  <div class={`not-prose md:hidden flex flex-col gap-3 my-8`}>
+    {items.map((item) => {
+      const video = isVideo(item);
+      return (
+        <figure class="relative rounded-xl overflow-hidden border border-(--color-border) bg-(--color-muted) aspect-video">
+          {video ? (
+            <video
+              autoplay
+              loop
+              muted
+              playsinline
+              class="w-full h-full object-cover pointer-events-none"
+              aria-label={item.alt || item.caption}
+            >
+              <source src={item.src} />
+            </video>
+          ) : (
+            <img
+              src={item.src}
+              alt={item.alt || item.caption || ""}
+              loading="lazy"
+              class="w-full h-full object-cover"
+            />
+          )}
+          {item.caption && (
+            <figcaption class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-3 py-2 text-xs text-white font-medium">
+              {item.caption}
+            </figcaption>
+          )}
+        </figure>
+      );
+    })}
+  </div>
+)}
+
+{allVideos && items.length > 1 && (
+  <script
+    is:inline
+    define:vars={{ sequenceId, captions: items.map((it) => it.caption || "") }}
+  >
+    (() => {
+      const root = document.querySelector(`[data-mediaseq="${sequenceId}"]`);
+      if (!root) return;
+      const videos = Array.from(root.querySelectorAll("video"));
+      const caption = root.querySelector("[data-mediaseq-caption]");
+      let current = 0;
+      const advance = () => {
+        const next = (current + 1) % videos.length;
+        videos[current].style.opacity = "0";
+        videos[next].style.opacity = "1";
+        videos[next].currentTime = 0;
+        videos[next].play().catch(() => {});
+        if (caption) caption.textContent = captions[next];
+        current = next;
+      };
+      videos.forEach((v) => v.addEventListener("ended", advance));
+      videos[0].play().catch(() => {});
+    })();
+  </script>
+)}

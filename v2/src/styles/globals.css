@@ -60,13 +60,21 @@
   body {
     background-color: var(--color-background);
     background-image:
-      linear-gradient(to right, color-mix(in oklab, var(--color-border) 35%, transparent) 1px, transparent 1px),
-      linear-gradient(to bottom, color-mix(in oklab, var(--color-border) 35%, transparent) 1px, transparent 1px);
+      linear-gradient(to right, color-mix(in oklab, var(--color-border) 40%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in oklab, var(--color-border) 40%, transparent) 1px, transparent 1px);
     background-size: 64px 64px;
     background-position: 0 0;
     color: var(--color-foreground);
     font-family: var(--font-sans);
     font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
+  }
+
+  /* Light mode: grid much subtler (light-on-light otherwise looks like ruled paper) */
+  :root[data-theme="light"] body,
+  :root:not([data-theme]) body {
+    background-image:
+      linear-gradient(to right, color-mix(in oklab, var(--color-border) 18%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in oklab, var(--color-border) 18%, transparent) 1px, transparent 1px);
   }
 
   h1, h2, h3, h4, h5, h6 {
