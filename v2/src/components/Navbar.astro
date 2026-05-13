@@ -17,23 +17,22 @@ import ThemeToggle from "@/components/ThemeToggle.tsx";
       <span class="text-(--color-muted-foreground)">.me</span>
     </a>
 
-    <nav class="hidden md:flex items-center gap-1 text-sm" aria-label="Primary">
-      {site.nav.map((item) => (
-        <a
-          href={item.href}
-          class="px-3 py-1.5 rounded-md text-(--color-muted-foreground) hover:text-(--color-foreground) hover:bg-(--color-muted) transition-colors"
-        >
-          {item.label}
-        </a>
-      ))}
-    </nav>
-
     <div class="flex items-center gap-2">
+      <nav class="hidden md:flex items-center gap-1 text-sm mr-2" aria-label="Primary">
+        {site.nav.map((item) => (
+          <a
+            href={item.href}
+            class="px-3 py-1.5 rounded-lg text-(--color-muted-foreground) hover:text-(--color-foreground) hover:bg-(--color-muted) transition-colors"
+          >
+            {item.label}
+          </a>
+        ))}
+      </nav>
       <ThemeToggle client:idle />
       <button
         id="mobile-menu-button"
         type="button"
-        class="md:hidden p-2 rounded-md text-(--color-muted-foreground) hover:bg-(--color-muted) hover:text-(--color-foreground)"
+        class="md:hidden p-2 rounded-lg text-(--color-muted-foreground) hover:bg-(--color-muted) hover:text-(--color-foreground)"
         aria-label="Toggle menu"
         aria-expanded="false"
         aria-controls="mobile-menu"
@@ -66,7 +65,7 @@ import ThemeToggle from "@/components/ThemeToggle.tsx";
       {site.nav.map((item) => (
         <a
           href={item.href}
-          class="px-3 py-2 rounded-md text-(--color-muted-foreground) hover:text-(--color-foreground) hover:bg-(--color-muted) transition-colors"
+          class="px-3 py-2 rounded-lg text-(--color-muted-foreground) hover:text-(--color-foreground) hover:bg-(--color-muted) transition-colors"
         >
           {item.label}
         </a>

@@ -67,6 +67,28 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
+    transition: background-color 350ms ease, color 350ms ease;
+  }
+
+  /* Smooth theme transition across the page */
+  html.theme-changing,
+  html.theme-changing * {
+    transition: background-color 350ms ease,
+                border-color 350ms ease,
+                color 350ms ease,
+                fill 350ms ease,
+                stroke 350ms ease !important;
+  }
+
+  /* Subtle click feedback on interactive elements */
+  a, button {
+    transition: transform 120ms ease, opacity 120ms ease, background-color 200ms ease, border-color 200ms ease, color 200ms ease;
+  }
+  a:active, button:active {
+    transform: scale(0.97);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    a:active, button:active { transform: none; }
   }
 
   /* Light mode: grid much subtler (light-on-light otherwise looks like ruled paper) */

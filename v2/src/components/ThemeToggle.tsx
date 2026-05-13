@@ -15,9 +15,15 @@ export default function ThemeToggle() {
 
   const toggle = () => {
     const next: Theme = theme === "dark" ? "light" : "dark";
+
+    // Trigger a brief CSS transition on every themed property across the page.
+    const html = document.documentElement;
+    html.classList.add("theme-changing");
+    html.dataset.theme = next;
     setTheme(next);
-    document.documentElement.dataset.theme = next;
     localStorage.setItem("theme", next);
+
+    window.setTimeout(() => html.classList.remove("theme-changing"), 380);
   };
 
   return (
@@ -25,13 +31,26 @@ export default function ThemeToggle() {
       type="button"
       onClick={toggle}
       aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
-      className="p-2 rounded-md text-(--color-muted-foreground) hover:bg-(--color-muted) hover:text-(--color-foreground) transition-colors"
+      className="theme-toggle relative size-9 grid place-items-center rounded-lg text-(--color-muted-foreground) hover:bg-(--color-muted) hover:text-(--color-foreground) transition-colors"
     >
-      {mounted && theme === "dark" ? (
-        <Sun size={18} aria-hidden="true" />
-      ) : (
-        <Moon size={18} aria-hidden="true" />
-      )}
+      <Sun
+        size={18}
+        aria-hidden="true"
+        className={`absolute transition-all duration-300 ease-out ${
+          mounted && theme === "dark"
+            ? "opacity-100 rotate-0 scale-100"
+            : "opacity-0 -rotate-90 scale-50"
+        }`}
+      />
+      <Moon
+        size={18}
+        aria-hidden="true"
+        className={`absolute transition-all duration-300 ease-out ${
+          mounted && theme === "dark"
+            ? "opacity-0 rotate-90 scale-50"
+            : "opacity-100 rotate-0 scale-100"
+        }`}
+      />
     </button>
   );
 }

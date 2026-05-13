@@ -8,7 +8,7 @@ interface Props {
 }
 
 const { src, caption, type, alt, aspect = "16/7" } = Astro.props;
-const isVideo = type === "video" || src.endsWith(".mov") || src.endsWith(".mp4");
+const isVideo = type === "video" || src.endsWith(".mp4") || src.endsWith(".webm");
 ---
 
 <figure

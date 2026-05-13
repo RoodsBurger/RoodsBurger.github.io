@@ -6,35 +6,42 @@ const hobbies = [
     title: "Climbing",
     image: "/artifacts/climbing1500_1000.png",
     description:
-      "Bouldering and sport climbing - the cleanest physical analog to algorithmic thinking I've found.",
+      "When not working with robots, I'm solving boulder problems or hanging off a fingerboard. Always down for a session.",
+    badge: "V8 Boulderer · Sport 5.12b",
   },
   {
     title: "Ceramics",
     image: "/artifacts/ceramics1200_900.png",
     description:
-      "Wheel-thrown pottery. There's a discipline in accepting that most pieces won't survive the kiln.",
+      "Pottery is my getaway from the digital world. Always trying new clay bodies and altering shapes on the wheel.",
+    badge: "Wheel throwing",
+  },
+  {
+    title: "Teaching",
+    image: "/artifacts/apole.jpg",
+    description:
+      "I've taught math and physics to over 1000 underprivileged students in São Paulo and mentor public-school students pursuing higher education.",
+    badge: "Volunteering & mentoring",
   },
   {
     title: "Hiking",
     image: "/artifacts/hiking.png",
     description:
-      "Long-distance hiking. The best ideas show up around mile seven.",
-  },
-  {
-    title: "Korean history",
-    image: "/artifacts/apole.jpg",
-    description:
-      "The Three Kingdoms, the Koryo dynasty, and the diplomacy of the colonial era. Occasionally I still write about it.",
+      "On a mission to explore as many US National Parks as possible. Currently planning my first multi-day trek up Kilimanjaro.",
+    badge: "Camping & hiking",
   },
 ];
 ---
 
-<BaseLayout title="Hobbies" description="What I get up to outside of code.">
+<BaseLayout title="Personal" description="What I get up to outside of code.">
   <section class="container-page pt-20 md:pt-40 pb-14 md:pb-24">
     <div class="max-w-3xl mb-12 md:mb-20">
       <h1 class="text-4xl md:text-6xl font-semibold tracking-tight text-balance leading-[1.05]">
-        Outside.
+        Personal
       </h1>
+      <p class="mt-3 text-base md:text-lg text-(--color-muted-foreground)">
+        What I get up to outside of code.
+      </p>
     </div>
 
     <div class="grid gap-4 md:gap-5 md:grid-cols-2" data-reveal>
@@ -48,11 +55,14 @@ const hobbies = [
               class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
             />
           </div>
-          <div class="p-5 md:p-6 space-y-1.5">
+          <div class="p-5 md:p-6 space-y-2">
             <h2 class="text-base md:text-lg font-semibold tracking-tight">{hobby.title}</h2>
             <p class="text-sm text-(--color-muted-foreground) leading-relaxed">
               {hobby.description}
             </p>
+            {hobby.badge && (
+              <p class="text-xs font-mono text-(--color-accent) pt-1">{hobby.badge}</p>
+            )}
           </div>
         </article>
       ))}

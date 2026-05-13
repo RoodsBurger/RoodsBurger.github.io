@@ -15,7 +15,7 @@ const { items, columns = 3 } = Astro.props;
 const gridClass = columns === 2 ? "md:grid-cols-2" : "md:grid-cols-3";
 
 const isVideo = (item: MediaItem) =>
-  item.type === "video" || item.src.endsWith(".mov") || item.src.endsWith(".mp4");
+  item.type === "video" || item.src.endsWith(".mp4") || item.src.endsWith(".webm");
 
 const allVideos = items.every(isVideo);
 const sequenceId = `mediaseq-${Math.random().toString(36).slice(2, 9)}`;
