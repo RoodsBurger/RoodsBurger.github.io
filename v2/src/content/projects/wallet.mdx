@@ -7,16 +7,15 @@ order: 5
 cover: "/artifacts/wallet_render.png"
 coverAlt: "Magnetic wallet render"
 period: "2024"
-model3d: "/models/wallet.glb"
+model3d: "/models/wallet.stl"
 links: {}
 ---
 
 import Model3D from "@/components/Model3D.astro";
 
 <Model3D
-  src="/models/wallet.glb"
+  src="/models/wallet.stl"
   alt="Magnetic wallet - interactive 3D model"
-  poster="/artifacts/wallet_render.png"
   caption="Drag to rotate · scroll to zoom"
 />
 
@@ -28,4 +27,4 @@ More detail (and photos of the final piece) coming soon.
 
 ## The interactive model
 
-The viewer above is a live 3D model - drag to rotate, scroll to zoom, click *View in AR* on a phone to drop it into your space. The file is a glTF binary (`.glb`) exported from Fusion 360.
+The viewer above is a live 3D model rendered with Three.js - drag to rotate, scroll to zoom. The file is a binary STL exported straight from Fusion 360 (File → 3D Print → STL, no conversion step needed).

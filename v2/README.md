@@ -108,37 +108,35 @@ netlify/
 3. Use `<MediaGrid>` / `<MediaWide>` / `<Model3D>` components in the MDX body
 4. Build — the new page appears at `/projects/<slug>` automatically
 
-## 3D models — Fusion 360 → web (GLB)
+## 3D models — Fusion 360 → web (STL)
 
-CAD projects can include an interactive 3D viewer (drag-rotate, zoom, mobile AR) via the `<Model3D>` component. It accepts a glTF Binary file (`.glb`).
+CAD projects can include an interactive 3D viewer (drag-rotate, zoom, idle auto-rotate) via the `<Model3D>` component. It renders **binary STL** directly with Three.js — no conversion step needed.
 
 **Export workflow from Fusion 360:**
 
-1. In Fusion 360 → **File → Export…**
-2. Choose **OBJ (.obj)** or **FBX (.fbx)** — both are well-supported, OBJ is simplest
-3. Convert to GLB. Easiest options:
-   - **Online**: drop the OBJ into [gltf.report](https://gltf.report/) or `https://anyconv.com/obj-to-glb-converter/` and download the GLB
-   - **Blender**: File → Import → OBJ, then File → Export → glTF 2.0 (.glb)
-   - **Plugin**: install the *Apper-glTF* or *AnyCAD-glTF* Fusion 360 add-in for direct GLB export
-4. Drop the file into `public/models/<slug>.glb`
-5. In the project MDX, set `model3d: "/models/<slug>.glb"` in frontmatter and add:
+1. In Fusion 360 → **File → 3D Print…** (or `Utilities → Make → 3D Print`)
+2. Select the body / component you want to share
+3. Untick "Send to 3D Print Utility", tick "Save as Mesh"
+4. Set format to **STL (Binary)** and click OK → save the file
+5. Drop the file at `public/models/<slug>.stl`
+6. In the project MDX:
    ```mdx
    import Model3D from "@/components/Model3D.astro";
 
    <Model3D
-     src="/models/<slug>.glb"
+     src="/models/<slug>.stl"
      alt="<short description>"
-     poster="/artifacts/<slug>_render.png"
      caption="Drag to rotate · scroll to zoom"
+     color="#5b6371"
    />
    ```
 
-**Tips for clean web models:**
-- Decimate before export if file > 5 MB (web target: < 2 MB)
-- Apply materials in Fusion before export — they survive the OBJ → GLB conversion
-- For AR on iOS, model-viewer can also use USDZ. Fusion exports USDZ directly via *File → Export*
+**Tips:**
+- Keep refinement on "Medium" or "Low" if the file gets bigger than ~5 MB — STL grows fast at high tessellation
+- The `color` prop controls the material surface tint (any hex). The viewer adds proper lighting + shadow automatically
+- For static thumbnails, render a PNG separately in Fusion and use it as the project `cover` image
 
-A demo Khronos model is shipped at `public/models/wallet.glb` so the viewer renders out of the box — replace it with your real Fusion export.
+A placeholder torus-knot ships at `public/models/wallet.stl` so the viewer renders out of the box — replace it with your real Fusion export.
 
 ## Notes on the v1 → v2 cutover
 

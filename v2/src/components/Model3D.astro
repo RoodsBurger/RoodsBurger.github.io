@@ -1,48 +1,51 @@
 ---
 interface Props {
+  /** Path to a .stl file (Fusion 360 native export) */
   src: string;
   alt: string;
-  poster?: string;
   caption?: string;
-  /** Auto-rotate the model when idle (default true) */
-  autoRotate?: boolean;
-  /** Camera orbit string, e.g. "0deg 75deg 105%" */
-  cameraOrbit?: string;
+  /** Hex color for the model surface (default: theme accent) */
+  color?: string;
+  height?: string;
 }
 
 const {
   src,
   alt,
-  poster,
   caption,
-  autoRotate = true,
-  cameraOrbit = "30deg 75deg 105%",
+  color = "#5b6371",
+  height = "480px",
 } = Astro.props;
+
+const viewerId = `stl-viewer-${Math.random().toString(36).slice(2, 9)}`;
 ---
 
-<figure class="not-prose my-8 relative rounded-xl overflow-hidden border border-(--color-border) bg-(--color-muted)">
-  <model-viewer
-    src={src}
-    alt={alt}
-    poster={poster}
-    camera-controls
-    touch-action="pan-y"
-    interaction-prompt="auto"
-    auto-rotate={autoRotate ? "" : undefined}
-    rotation-per-second="20deg"
-    auto-rotate-delay="3000"
-    camera-orbit={cameraOrbit}
-    exposure="0.9"
-    shadow-intensity="0.6"
-    shadow-softness="0.75"
-    environment-image="neutral"
-    style="width: 100%; height: 480px; background: transparent; --poster-color: transparent;"
+<figure
+  class="not-prose my-8 relative rounded-xl overflow-hidden border border-(--color-border) bg-(--color-muted)"
+  data-stl-viewer
+  data-stl-src={src}
+  data-stl-color={color}
+  data-stl-id={viewerId}
+  style={`height: ${height};`}
+  aria-label={alt}
+>
+  <div data-stl-canvas class="absolute inset-0"></div>
+
+  <div data-stl-loading class="absolute inset-0 flex items-center justify-center text-xs font-mono text-(--color-muted-foreground) tracking-wider uppercase pointer-events-none">
+    Loading model…
+  </div>
+
+  <div
+    data-stl-error
+    class="absolute inset-0 hidden flex-col items-center justify-center gap-2 text-center px-6 text-(--color-muted-foreground) pointer-events-none"
   >
-    <div slot="progress-bar" class="hidden"></div>
-    <button slot="ar-button" class="absolute bottom-3 right-3 text-xs font-mono px-3 py-1.5 rounded-full bg-(--color-accent) text-(--color-accent-foreground)">
-      View in AR
-    </button>
-  </model-viewer>
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+      <path d="m3.3 7 8.7 5 8.7-5"/>
+      <path d="M12 22V12"/>
+    </svg>
+    <p class="text-sm">3D model not loaded yet. Export an STL from Fusion 360 and drop it at <code class="font-mono text-xs">{src}</code>.</p>
+  </div>
 
   <div class="pointer-events-none absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-(--color-card)/80 backdrop-blur-sm px-2.5 py-1 text-[11px] font-mono text-(--color-muted-foreground) border border-(--color-border)/60">
     <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -50,7 +53,7 @@ const {
       <path d="m3.3 7 8.7 5 8.7-5"/>
       <path d="M12 22V12"/>
     </svg>
-    Drag to rotate
+    Drag to rotate · scroll to zoom
   </div>
 
   {caption && (
@@ -60,4 +63,149 @@ const {
   )}
 </figure>
 
-<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js" is:inline></script>
+<script>
+  import * as THREE from "three";
+  import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
+  import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+
+  type ViewerEl = HTMLElement & { __stlViewer?: { dispose: () => void } };
+
+  const initViewer = (root: ViewerEl) => {
+    if (root.__stlViewer) return; // already mounted
+
+    const canvas = root.querySelector<HTMLElement>("[data-stl-canvas]");
+    const loadingEl = root.querySelector<HTMLElement>("[data-stl-loading]");
+    const errorEl = root.querySelector<HTMLElement>("[data-stl-error]");
+    const src = root.dataset.stlSrc;
+    const color = root.dataset.stlColor || "#5b6371";
+
+    if (!canvas || !src) return;
+
+    const scene = new THREE.Scene();
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setClearColor(0x000000, 0);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    canvas.appendChild(renderer.domElement);
+
+    const setSize = () => {
+      const { clientWidth, clientHeight } = root;
+      renderer.setSize(clientWidth, clientHeight, false);
+      camera.aspect = clientWidth / clientHeight;
+      camera.updateProjectionMatrix();
+    };
+
+    const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 5000);
+
+    // Lighting
+    scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+    const key = new THREE.DirectionalLight(0xffffff, 0.85);
+    key.position.set(80, 120, 100);
+    key.castShadow = true;
+    key.shadow.mapSize.set(1024, 1024);
+    scene.add(key);
+    const fill = new THREE.DirectionalLight(0xffffff, 0.35);
+    fill.position.set(-100, 60, -80);
+    scene.add(fill);
+
+    // Orbit controls
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.enablePan = false;
+    controls.autoRotate = false;
+
+    const loader = new STLLoader();
+    loader.load(
+      src,
+      (geometry) => {
+        loadingEl?.style.setProperty("display", "none");
+        geometry.computeBoundingBox();
+        geometry.computeVertexNormals();
+        geometry.center();
+
+        const material = new THREE.MeshStandardMaterial({
+          color: new THREE.Color(color),
+          metalness: 0.15,
+          roughness: 0.55,
+        });
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        scene.add(mesh);
+
+        // Fit camera to model
+        const bbox = geometry.boundingBox!;
+        const size = new THREE.Vector3();
+        bbox.getSize(size);
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const fitDistance = (maxDim * 1.4) / Math.tan((camera.fov * Math.PI) / 360);
+        camera.position.set(fitDistance * 0.7, fitDistance * 0.5, fitDistance);
+        camera.lookAt(0, 0, 0);
+        controls.target.set(0, 0, 0);
+        controls.maxDistance = fitDistance * 3;
+        controls.minDistance = fitDistance * 0.4;
+        controls.update();
+
+        // Idle auto-rotate after 3s of no interaction
+        let lastInteract = 0;
+        const markInteract = () => (lastInteract = performance.now());
+        renderer.domElement.addEventListener("pointerdown", markInteract);
+        renderer.domElement.addEventListener("wheel", markInteract);
+        markInteract();
+
+        const animate = () => {
+          rafId = requestAnimationFrame(animate);
+          if (performance.now() - lastInteract > 3000) {
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = 0.6;
+          } else {
+            controls.autoRotate = false;
+          }
+          controls.update();
+          renderer.render(scene, camera);
+        };
+        animate();
+      },
+      undefined,
+      (err) => {
+        console.error("STL load failed:", err);
+        loadingEl?.style.setProperty("display", "none");
+        errorEl?.classList.remove("hidden");
+        errorEl?.classList.add("flex");
+      },
+    );
+
+    setSize();
+    let rafId = 0;
+    const resizeObs = new ResizeObserver(setSize);
+    resizeObs.observe(root);
+
+    root.__stlViewer = {
+      dispose: () => {
+        cancelAnimationFrame(rafId);
+        resizeObs.disconnect();
+        controls.dispose();
+        renderer.dispose();
+        renderer.domElement.remove();
+        delete root.__stlViewer;
+      },
+    };
+  };
+
+  const mountAll = () => {
+    document
+      .querySelectorAll<ViewerEl>("[data-stl-viewer]")
+      .forEach(initViewer);
+  };
+  const unmountAll = () => {
+    document
+      .querySelectorAll<ViewerEl>("[data-stl-viewer]")
+      .forEach((el) => el.__stlViewer?.dispose());
+  };
+
+  mountAll();
+  document.addEventListener("astro:page-load", mountAll);
+  document.addEventListener("astro:before-swap", unmountAll);
+</script>
