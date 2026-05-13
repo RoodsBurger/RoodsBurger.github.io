@@ -1,0 +1,22 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import ChatWidget from "@/components/chat/ChatWidget.tsx";
+---
+
+<BaseLayout
+  title="Chat"
+  description="Ask my AI assistant about my projects, work, and background."
+  showChat={false}
+>
+  <section class="container-page pt-28 md:pt-40 pb-16 md:pb-24">
+    <div class="max-w-3xl mx-auto text-center mb-12 md:mb-16">
+      <h1 class="text-4xl md:text-5xl font-semibold tracking-tight text-balance leading-[1.1]">
+        Ask the assistant.
+      </h1>
+    </div>
+
+    <div class="max-w-3xl mx-auto">
+      <ChatWidget mode="embedded" client:load />
+    </div>
+  </section>
+</BaseLayout>

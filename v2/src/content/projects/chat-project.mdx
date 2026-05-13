@@ -1,0 +1,58 @@
+---
+title: "LLM-Based Assistant"
+summary: "A custom AI assistant embedded in this portfolio - RAG over my own documents, served on a free-tier serverless stack."
+tags: ["NLP", "RAG", "Cohere", "Pinecone", "Netlify"]
+category: ["code"]
+order: 4
+cover: "/artifacts/chat_wide.png"
+coverAlt: "Chat interface preview"
+period: "2024 → 2026"
+links:
+  github: "https://github.com/RoodsBurger/RoodsBurger.github.io"
+  demo: "/chat"
+---
+
+import MediaGrid from "@/components/MediaGrid.astro";
+
+<MediaGrid
+  columns={2}
+  items={[
+    { src: "/artifacts/chat_diagram.png", alt: "Chat architecture diagram" },
+    { src: "/artifacts/chat_wide.png", alt: "Chat interface" },
+  ]}
+/>
+
+## Overview
+
+This project integrates a custom AI assistant into my portfolio, giving visitors an interactive way to learn about my work. By leveraging retrieval-augmented generation and a serverless architecture, I built a responsive chatbot that answers questions from my actual portfolio content while running on free-tier infrastructure.
+
+## Key features
+
+- Vector-based knowledge retrieval using Pinecone for accurate information matching
+- Natural language processing powered by Cohere's command-r model
+- Serverless implementation with Netlify Functions for efficient, cost-effective deployment
+- Responsive UI in two flavors: dedicated chat page and floating widget
+
+## Technical details
+
+### Vector database
+
+- Pinecone for efficient semantic search
+- Embeddings generated via Cohere's `embed-english-v3.0` model
+- Cosine similarity matching to find relevant information for each query
+
+### Serverless architecture
+
+- Netlify Functions for backend processing and API integration
+- Stateless design with conversation history maintained client-side
+- Health-check endpoint so future breakage surfaces immediately
+
+## How it works
+
+1. User input is converted to an embedding vector via Cohere's embedding API
+2. The embedding is used to query Pinecone for the most relevant portfolio chunks
+3. Retrieved context is passed to Cohere's chat completion API along with the query
+4. The assistant is instructed to ground every claim in the retrieved context
+5. The response streams back to the UI
+
+[Try the chat](/chat)

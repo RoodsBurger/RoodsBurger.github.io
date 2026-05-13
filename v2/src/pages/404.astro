@@ -1,0 +1,23 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Not found" description="This page doesn't exist." showChat={false}>
+  <section class="container-page py-32 md:py-40 text-center space-y-6">
+    <p class="font-mono text-sm text-(--color-accent) tracking-wider uppercase">404</p>
+    <h1 class="text-4xl md:text-6xl font-semibold tracking-tight text-balance">
+      That page doesn't exist.
+    </h1>
+    <p class="text-lg text-(--color-muted-foreground) max-w-md mx-auto">
+      The link may be broken, or the page may have moved. Try heading back home.
+    </p>
+    <div class="pt-2">
+      <a
+        href="/"
+        class="inline-flex items-center gap-2 rounded-md bg-(--color-foreground) text-(--color-background) px-4 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity"
+      >
+        Back home
+      </a>
+    </div>
+  </section>
+</BaseLayout>

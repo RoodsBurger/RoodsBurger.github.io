@@ -1,0 +1,116 @@
+---
+import "@/styles/globals.css";
+import { ClientRouter } from "astro:transitions";
+import Navbar from "@/components/Navbar.astro";
+import Footer from "@/components/Footer.astro";
+import ChatWidget from "@/components/chat/ChatWidget.tsx";
+import { site } from "@/lib/site";
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  showChat?: boolean;
+  ogType?: "website" | "article";
+}
+
+const {
+  title,
+  description = site.description,
+  image = "/og-default.png",
+  showChat = true,
+  ogType = "website",
+} = Astro.props;
+
+const pageTitle = title ? `${title} · ${site.name}` : site.name;
+const canonical = new URL(Astro.url.pathname, site.url).toString();
+const imageUrl = new URL(image, site.url).toString();
+---
+
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="canonical" href={canonical} />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={imageUrl} />
+    <meta property="og:site_name" content={site.name} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imageUrl} />
+
+    <script is:inline>
+      (() => {
+        const apply = () => {
+          const stored = localStorage.getItem("theme");
+          const theme = stored || "dark";
+          document.documentElement.dataset.theme = theme;
+        };
+        apply();
+        // Re-apply after Astro view transitions swap the document
+        document.addEventListener("astro:after-swap", apply);
+      })();
+    </script>
+
+    <ClientRouter />
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:bg-(--color-accent) focus:text-(--color-accent-foreground) focus:px-4 focus:py-2 focus:rounded-md"
+    >
+      Skip to content
+    </a>
+
+    <Navbar />
+
+    <main id="main" class="flex-1">
+      <slot />
+    </main>
+
+    <Footer />
+
+    {showChat && <ChatWidget mode="floating" client:idle />}
+
+    <script>
+      // Mark JS as ready so CSS can hide [data-reveal] elements safely.
+      // Without this class, no-JS visitors see all content normally.
+      document.documentElement.classList.add("js-reveal");
+
+      const observe = () => {
+        const els = document.querySelectorAll<HTMLElement>(
+          "[data-reveal]:not(.is-visible)",
+        );
+        if (!els.length) return;
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("is-visible");
+                io.unobserve(entry.target);
+              }
+            }
+          },
+          { rootMargin: "0px 0px -10% 0px", threshold: 0.05 },
+        );
+        els.forEach((el) => io.observe(el));
+      };
+
+      observe();
+      document.addEventListener("astro:page-load", observe);
+    </script>
+  </body>
+</html>

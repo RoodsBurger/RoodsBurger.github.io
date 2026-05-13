@@ -1,0 +1,63 @@
+---
+interface Props {
+  src: string;
+  alt: string;
+  poster?: string;
+  caption?: string;
+  /** Auto-rotate the model when idle (default true) */
+  autoRotate?: boolean;
+  /** Camera orbit string, e.g. "0deg 75deg 105%" */
+  cameraOrbit?: string;
+}
+
+const {
+  src,
+  alt,
+  poster,
+  caption,
+  autoRotate = true,
+  cameraOrbit = "30deg 75deg 105%",
+} = Astro.props;
+---
+
+<figure class="not-prose my-8 relative rounded-xl overflow-hidden border border-(--color-border) bg-(--color-muted)">
+  <model-viewer
+    src={src}
+    alt={alt}
+    poster={poster}
+    camera-controls
+    touch-action="pan-y"
+    interaction-prompt="auto"
+    auto-rotate={autoRotate ? "" : undefined}
+    rotation-per-second="20deg"
+    auto-rotate-delay="3000"
+    camera-orbit={cameraOrbit}
+    exposure="0.9"
+    shadow-intensity="0.6"
+    shadow-softness="0.75"
+    environment-image="neutral"
+    style="width: 100%; height: 480px; background: transparent; --poster-color: transparent;"
+  >
+    <div slot="progress-bar" class="hidden"></div>
+    <button slot="ar-button" class="absolute bottom-3 right-3 text-xs font-mono px-3 py-1.5 rounded-full bg-(--color-accent) text-(--color-accent-foreground)">
+      View in AR
+    </button>
+  </model-viewer>
+
+  <div class="pointer-events-none absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-(--color-card)/80 backdrop-blur-sm px-2.5 py-1 text-[11px] font-mono text-(--color-muted-foreground) border border-(--color-border)/60">
+    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+      <path d="m3.3 7 8.7 5 8.7-5"/>
+      <path d="M12 22V12"/>
+    </svg>
+    Drag to rotate
+  </div>
+
+  {caption && (
+    <figcaption class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-4 py-3 text-sm text-white font-medium pointer-events-none">
+      {caption}
+    </figcaption>
+  )}
+</figure>
+
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js" is:inline></script>

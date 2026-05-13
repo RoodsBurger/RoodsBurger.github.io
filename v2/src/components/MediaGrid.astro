@@ -1,0 +1,50 @@
+---
+interface MediaItem {
+  src: string;
+  caption?: string;
+  type?: "image" | "video";
+  alt?: string;
+}
+
+interface Props {
+  items: MediaItem[];
+  columns?: 2 | 3;
+}
+
+const { items, columns = 3 } = Astro.props;
+const gridClass = columns === 2 ? "md:grid-cols-2" : "md:grid-cols-3";
+---
+
+<div class={`not-prose grid gap-3 md:gap-4 ${gridClass} my-8`}>
+  {items.map((item) => {
+    const isVideo = item.type === "video" || item.src.endsWith(".mov") || item.src.endsWith(".mp4");
+    return (
+      <figure class="relative rounded-xl overflow-hidden border border-(--color-border) bg-(--color-muted) aspect-video">
+        {isVideo ? (
+          <video
+            autoplay
+            loop
+            muted
+            playsinline
+            class="w-full h-full object-cover pointer-events-none"
+            aria-label={item.alt || item.caption}
+          >
+            <source src={item.src} />
+          </video>
+        ) : (
+          <img
+            src={item.src}
+            alt={item.alt || item.caption || ""}
+            loading="lazy"
+            class="w-full h-full object-cover"
+          />
+        )}
+        {item.caption && (
+          <figcaption class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-3 py-2 text-xs text-white font-medium">
+            {item.caption}
+          </figcaption>
+        )}
+      </figure>
+    );
+  })}
+</div>

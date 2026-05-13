@@ -1,0 +1,42 @@
+---
+interface Props {
+  src: string;
+  caption?: string;
+  type?: "image" | "video";
+  alt?: string;
+  aspect?: string;
+}
+
+const { src, caption, type, alt, aspect = "16/7" } = Astro.props;
+const isVideo = type === "video" || src.endsWith(".mov") || src.endsWith(".mp4");
+---
+
+<figure
+  class="not-prose relative rounded-xl overflow-hidden border border-(--color-border) bg-(--color-muted) my-8"
+  style={`aspect-ratio: ${aspect};`}
+>
+  {isVideo ? (
+    <video
+      autoplay
+      loop
+      muted
+      playsinline
+      class="w-full h-full object-cover pointer-events-none"
+      aria-label={alt || caption}
+    >
+      <source src={src} />
+    </video>
+  ) : (
+    <img
+      src={src}
+      alt={alt || caption || ""}
+      loading="lazy"
+      class="w-full h-full object-cover"
+    />
+  )}
+  {caption && (
+    <figcaption class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-4 py-3 text-sm text-white font-medium">
+      {caption}
+    </figcaption>
+  )}
+</figure>

@@ -1,0 +1,61 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+
+const hobbies = [
+  {
+    title: "Climbing",
+    image: "/artifacts/climbing1500_1000.png",
+    description:
+      "Bouldering and sport climbing - the cleanest physical analog to algorithmic thinking I've found.",
+  },
+  {
+    title: "Ceramics",
+    image: "/artifacts/ceramics1200_900.png",
+    description:
+      "Wheel-thrown pottery. There's a discipline in accepting that most pieces won't survive the kiln.",
+  },
+  {
+    title: "Hiking",
+    image: "/artifacts/hiking.png",
+    description:
+      "Long-distance hiking. The best ideas show up around mile seven.",
+  },
+  {
+    title: "Korean history",
+    image: "/artifacts/apole.jpg",
+    description:
+      "The Three Kingdoms, the Koryo dynasty, and the diplomacy of the colonial era. Occasionally I still write about it.",
+  },
+];
+---
+
+<BaseLayout title="Hobbies" description="What I get up to outside of code.">
+  <section class="container-page pt-28 md:pt-40 pb-16 md:pb-24">
+    <div class="max-w-3xl mb-16 md:mb-20">
+      <h1 class="text-4xl md:text-6xl font-semibold tracking-tight text-balance leading-[1.05]">
+        Life outside.
+      </h1>
+    </div>
+
+    <div class="grid gap-4 md:gap-5 md:grid-cols-2" data-reveal>
+      {hobbies.map((hobby) => (
+        <article class="group rounded-2xl border border-(--color-border) bg-(--color-card) overflow-hidden hover:border-(--color-foreground)/30 transition-all duration-300 hover:-translate-y-0.5">
+          <div class="aspect-[4/3] overflow-hidden bg-(--color-muted)">
+            <img
+              src={hobby.image}
+              alt={hobby.title}
+              loading="lazy"
+              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+            />
+          </div>
+          <div class="p-5 md:p-6 space-y-1.5">
+            <h2 class="text-base md:text-lg font-semibold tracking-tight">{hobby.title}</h2>
+            <p class="text-sm text-(--color-muted-foreground) leading-relaxed">
+              {hobby.description}
+            </p>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,63 @@
+---
+title: "Tobias"
+summary: "A quadrupedal robot that learns to walk through reinforcement learning, from CAD to simulation to real hardware."
+tags: ["Reinforcement Learning", "PyTorch", "PyBullet", "Fusion 360"]
+category: ["code", "cad"]
+order: 1
+featured: true
+cover: "/artifacts/tobias_render_1.png"
+coverAlt: "Tobias quadrupedal robot render"
+period: "2024"
+links:
+  github: "https://github.com/RoodsBurger/tobias"
+  report: "https://drive.google.com/file/d/123Ex1hVlLkT1aQriTyZ5Ku-S41H_rX_1/view?usp=sharing"
+---
+
+import MediaGrid from "@/components/MediaGrid.astro";
+import MediaWide from "@/components/MediaWide.astro";
+
+<MediaGrid
+  items={[
+    { src: "/artifacts/sac_videos/sac_20000.mov", caption: "10k training steps", type: "video" },
+    { src: "/artifacts/sac_videos/sac_100000.mov", caption: "200k training steps", type: "video" },
+    { src: "/artifacts/sac_videos/sac_final.mov", caption: "1M training steps", type: "video" },
+  ]}
+/>
+
+## Overview
+
+Tobias is a quadrupedal robot project that integrates CAD design, physics simulation, and reinforcement learning to achieve stable walking gaits and straight-line locomotion. By combining RL techniques with detailed physical modeling, it became a platform for exploring autonomous robot movement and control.
+
+## Key features
+
+- End-to-end integration pipeline from CAD design to physical deployment using Fusion 360 and PyBullet
+- Comparison of DQN and SAC reinforcement learning algorithms for optimal gait learning
+- Custom controller class for precise joint movement and physical constraint management
+- Successful sim-to-real transfer through both closed-loop IMU-based control and action replay
+
+## Technical details
+
+### Learning system
+
+- SAC with entropy-based exploration and automatic temperature tuning
+- 28-dimensional state space capturing position, orientation, velocities, and joint angles
+- Continuous 8-dimensional action space controlling joint angles (two per leg)
+- Multi-component reward shaping for stability and efficiency
+
+### Architecture & implementation
+
+- Dual actor-critic networks with 256-neuron hidden layers and ReLU activation
+- Custom controller class handling joint constraints and gear ratios
+- PyBullet physics engine for real-time simulation
+- URDF robot model generated from a Fusion 360 CAD design
+
+## Results & impact
+
+<MediaWide
+  src="/artifacts/tobias_narrow.mov"
+  caption="SAC model: sim-to-real transfer"
+  type="video"
+  aspect="16/6"
+/>
+
+The SAC implementation significantly outperformed both DQN and traditional approaches. The action-replay method proved particularly effective for sim-to-real transfer, producing stable walking gaits in real-world conditions. The framework provides a foundation for future work in quadrupedal robotics and embodied reinforcement learning.

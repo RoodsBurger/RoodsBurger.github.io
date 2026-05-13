@@ -1,0 +1,44 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[dev]
+  command = "npm run dev"
+  port = 8888
+  targetPort = 4321
+
+[[redirects]]
+  from = "/projects/tobias.html"
+  to = "/projects/tobias"
+  status = 301
+
+[[redirects]]
+  from = "/projects/knolling.html"
+  to = "/projects/knolling"
+  status = 301
+
+[[redirects]]
+  from = "/projects/pruning.html"
+  to = "/projects/pruning"
+  status = 301
+
+[[redirects]]
+  from = "/projects/chat-project.html"
+  to = "/projects/chat-project"
+  status = 301
+
+[[redirects]]
+  from = "/projects/wallet.html"
+  to = "/projects/wallet"
+  status = 301
+
+[[redirects]]
+  from = "/hobbies.html"
+  to = "/hobbies"
+  status = 301
+
+[[redirects]]
+  from = "/chat.html"
+  to = "/chat"
+  status = 301

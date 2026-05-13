@@ -1,0 +1,177 @@
+---
+type LogoKind = "image" | "image-with-yc" | "wordmark";
+
+interface ExperienceItem {
+  name: string;
+  href: string;
+  kind: LogoKind;
+  logo?: string;
+  wordmarkText?: string;
+  wordmarkClass?: string;
+  wordmarkColor?: string;
+}
+
+const items: ExperienceItem[] = [
+  {
+    name: "Pindrop",
+    href: "https://www.pindrop.com",
+    kind: "image",
+    logo: "/logos/pindrop.png",
+  },
+  {
+    name: "Columbia University",
+    href: "https://www.columbia.edu",
+    kind: "image",
+    logo: "/logos/columbia.png",
+  },
+  {
+    name: "Next Caller, Y Combinator backed",
+    href: "https://www.ycombinator.com/companies/next-caller",
+    kind: "image-with-yc",
+    logo: "/logos/next-caller.png",
+  },
+  {
+    name: "Stanford University",
+    href: "https://online.stanford.edu/non-degree-options",
+    kind: "image",
+    logo: "/logos/stanford.svg",
+  },
+  {
+    name: "Morgan Stanley",
+    href: "https://www.morganstanley.com",
+    kind: "image",
+    logo: "/logos/morgan-stanley.svg",
+  },
+  {
+    name: "Universidade de São Paulo",
+    href: "https://www5.usp.br",
+    kind: "image",
+    logo: "/logos/usp.svg",
+  },
+  {
+    name: "groupwork Brasil",
+    href: "https://www.linkedin.com/company/groupwork-brasil",
+    kind: "wordmark",
+    wordmarkText: "groupwork",
+    wordmarkClass: "text-xl md:text-2xl font-mono font-medium lowercase tracking-tight",
+  },
+  {
+    name: "nok9",
+    href: "https://www.nok9.com",
+    kind: "wordmark",
+    wordmarkText: "nok9",
+    wordmarkClass: "text-3xl md:text-4xl font-mono font-bold lowercase tracking-tight",
+  },
+  {
+    name: "manroland",
+    href: "https://www.manrolandgoss.com",
+    kind: "wordmark",
+    wordmarkText: "manroland",
+    wordmarkClass: "text-lg md:text-xl font-sans font-bold tracking-tight",
+  },
+];
+---
+
+<section id="experience" class="border-t border-(--color-border)/40 container-page pt-12 md:pt-14 pb-10" data-reveal>
+  <div class="flex items-baseline justify-between gap-4 mb-4">
+    <p class="text-xs font-mono text-(--color-muted-foreground) tracking-wider uppercase">Experience</p>
+    <p class="text-xs text-(--color-muted-foreground)/60 font-mono">scroll →</p>
+  </div>
+
+  <div class="experience-scroll relative">
+    <div class="exp-strip flex gap-3 md:gap-4 overflow-x-auto snap-x snap-mandatory pb-2">
+      {items.map((item) => (
+        <a
+          href={item.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={item.name}
+          title={item.name}
+          class="group exp-card relative flex items-center justify-center rounded-2xl border border-(--color-border) bg-(--color-card) shrink-0 snap-start size-32 md:size-36 hover:border-(--color-foreground)/40 transition-colors duration-300 overflow-hidden"
+        >
+          {item.kind === "image" && (
+            <img
+              src={item.logo}
+              alt={item.name}
+              loading="lazy"
+              class="exp-logo h-10 md:h-12 max-w-[78%] w-auto object-contain transition-all duration-300"
+            />
+          )}
+
+          {item.kind === "image-with-yc" && (
+            <div class="flex flex-col items-center justify-center gap-1 md:gap-1.5 px-3 w-full">
+              <img
+                src={item.logo}
+                alt={item.name}
+                loading="lazy"
+                class="exp-logo h-7 md:h-8 max-w-[80%] w-auto object-contain transition-all duration-300"
+              />
+              <img
+                src="/logos/yc.svg"
+                alt="Y Combinator"
+                loading="lazy"
+                class="exp-logo-yc h-4 md:h-5 w-auto object-contain rounded-sm transition-all duration-300"
+              />
+            </div>
+          )}
+
+          {item.kind === "wordmark" && (
+            <span
+              class:list={["exp-wordmark text-center transition-all duration-300", item.wordmarkClass]}
+              style={`color: ${item.wordmarkColor || "var(--color-foreground)"};`}
+            >
+              {item.wordmarkText || item.name}
+            </span>
+          )}
+        </a>
+      ))}
+      <div class="shrink-0 w-2" aria-hidden="true"></div>
+    </div>
+
+    <div class="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-(--color-background) to-transparent"></div>
+  </div>
+</section>
+
+<style>
+  .exp-strip {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+  }
+  .exp-strip::-webkit-scrollbar {
+    height: 4px;
+  }
+  .exp-strip::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .exp-strip::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 999px;
+  }
+  .exp-strip::-webkit-scrollbar-thumb:hover {
+    background: var(--color-muted-foreground);
+  }
+  /* Stronger dim at rest: brand color stays but heavily desaturated; full color on hover */
+  .exp-logo {
+    filter: grayscale(0.85) brightness(0.9);
+    opacity: 0.5;
+  }
+  .exp-card:hover .exp-logo {
+    filter: none;
+    opacity: 1;
+  }
+  .exp-wordmark {
+    opacity: 0.5;
+  }
+  .exp-card:hover .exp-wordmark {
+    opacity: 1;
+  }
+  /* YC official logo keeps its colors (lighter dim, no grayscale) */
+  .exp-logo-yc {
+    filter: brightness(0.85);
+    opacity: 0.75;
+  }
+  .exp-card:hover .exp-logo-yc {
+    filter: none;
+    opacity: 1;
+  }
+</style>

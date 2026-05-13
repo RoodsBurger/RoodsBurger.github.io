@@ -1,0 +1,55 @@
+---
+title: "TidyNET"
+summary: "An end-to-end deep learning system for robotic workspace organization - diffusion-based visual planning that turns clutter into order."
+tags: ["Deep Learning", "Diffusion", "YOLO", "ROS2"]
+category: ["code"]
+order: 2
+featured: true
+cover: "/artifacts/knolling_main.jpg"
+coverAlt: "TidyNET tidy workspace example"
+period: "2025"
+links:
+  github: "https://github.com/RoodsBurger/TidyNET"
+  report: "https://drive.google.com/file/d/1N_XX6NJ2R8tVoKF5v6dnsRjtxple5Wc6/view?usp=drive_link"
+---
+
+import MediaGrid from "@/components/MediaGrid.astro";
+
+<MediaGrid
+  items={[
+    { src: "/artifacts/knolling_videos/tidy68_front.mov", type: "video", alt: "TidyNET front view" },
+    { src: "/artifacts/knolling_videos/tidy68_top.mov", type: "video", alt: "TidyNET top view" },
+    { src: "/artifacts/knolling_videos/tidy68_virtual.mov", type: "video", alt: "TidyNET virtual planner" },
+  ]}
+/>
+
+## Overview
+
+TidyNET is an end-to-end deep learning system for robotic workspace organization that uses visual planning through diffusion models. Conducted with Professor Hod Lipson at the Creative Machines Lab (Columbia University), the project bridges perception and action - transforming cluttered scenes into tidy layouts. The pipeline processes cluttered scenes to generate tidy arrangements, detects objects with oriented bounding boxes, and executes physical rearrangement on a robotic arm.
+
+## Key features
+
+- Diffusion model that generates tidy target images conditioned on messy inputs, preserving object identity
+- YOLOv11 detector with oriented bounding boxes for precise object pose estimation
+- Color-based object matching via the Hungarian algorithm between messy and tidy states
+- Collision-aware motion planner with 70% task completion on real hardware
+
+## Technical details
+
+### Diffusion model
+
+- U-Net architecture with timestep conditioning and channel-wise attention
+- Cosine noise schedule with 1000 timesteps for stable training
+- Classifier-free guidance for improved generation quality
+
+### Robotic control
+
+- Grid-based occupancy map at 2 cm resolution for collision detection
+- Separating Axis Theorem for oriented-rectangle collision checks
+- Priority-based object placement with temporary relocation when blocked
+
+## Results & performance
+
+The YOLOv11-OBB detector achieves above 93% detection success across various object counts, with angular accuracy within ±3.2°. Robot execution maintains 85.5% grasp success and 74.2% placement success. The diffusion model preserves object identity through transformation, with occasional visual artifacts in complex scenes. End-to-end, the system reaches a 70% task completion rate on the Interbotix WX200 platform.
+
+[Read the related paper](https://arxiv.org/abs/2310.04566) · [Lab GitHub](https://github.com/H-Y-H-Y-H/Knolling)

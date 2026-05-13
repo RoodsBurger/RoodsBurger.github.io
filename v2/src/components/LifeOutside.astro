@@ -1,0 +1,42 @@
+---
+const hobbies = [
+  { title: "Climbing", image: "/artifacts/climbing1500_1000.png" },
+  { title: "Ceramics", image: "/artifacts/ceramics1200_900.png" },
+  { title: "Hiking", image: "/artifacts/hiking.png" },
+];
+---
+
+<section id="life" class="container-page py-16 md:py-20 border-t border-(--color-border)/40" data-reveal>
+  <div class="flex items-baseline justify-between gap-4 mb-8 md:mb-10">
+    <p class="text-xs font-mono text-(--color-muted-foreground) tracking-wider uppercase">Life outside</p>
+    <a
+      href="/hobbies"
+      class="group inline-flex items-center gap-1.5 text-xs font-mono text-(--color-muted-foreground) hover:text-(--color-foreground) transition-colors uppercase tracking-wider"
+    >
+      All hobbies
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform group-hover:translate-x-0.5" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+    </a>
+  </div>
+
+  <div class="grid grid-cols-3 gap-3 md:gap-4">
+    {hobbies.map((hobby) => (
+      <a
+        href="/hobbies"
+        class="group relative rounded-2xl overflow-hidden border border-(--color-border) bg-(--color-muted) aspect-[4/3] hover:border-(--color-foreground)/30 transition-colors"
+      >
+        <img
+          src={hobby.image}
+          alt={hobby.title}
+          loading="lazy"
+          class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+        />
+        <div class="absolute inset-0 bg-gradient-to-t from-(--color-background)/80 via-transparent to-transparent"></div>
+        <div class="absolute inset-x-0 bottom-0 p-3 md:p-4">
+          <span class="text-sm md:text-base font-medium tracking-tight text-white">
+            {hobby.title}
+          </span>
+        </div>
+      </a>
+    ))}
+  </div>
+</section>

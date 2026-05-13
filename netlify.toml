@@ -1,0 +1,48 @@
+# Repo-root Netlify config — points the build at the v2/ directory.
+# The v2/ subfolder is now the live site; the legacy files at the repo
+# root remain only as a fallback / reference and are no longer deployed.
+
+[build]
+  base = "v2"
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# 301 the old v1 URLs to the new v2 routes.
+[[redirects]]
+  from = "/projects/tobias.html"
+  to = "/projects/tobias"
+  status = 301
+
+[[redirects]]
+  from = "/projects/knolling.html"
+  to = "/projects/knolling"
+  status = 301
+
+[[redirects]]
+  from = "/projects/pruning.html"
+  to = "/projects/pruning"
+  status = 301
+
+[[redirects]]
+  from = "/projects/chat-project.html"
+  to = "/projects/chat-project"
+  status = 301
+
+[[redirects]]
+  from = "/projects/wallet.html"
+  to = "/projects/wallet"
+  status = 301
+
+[[redirects]]
+  from = "/hobbies.html"
+  to = "/hobbies"
+  status = 301
+
+[[redirects]]
+  from = "/chat.html"
+  to = "/chat"
+  status = 301
