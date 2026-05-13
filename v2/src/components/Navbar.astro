@@ -32,75 +32,199 @@ import ThemeToggle from "@/components/ThemeToggle.tsx";
       <button
         id="mobile-menu-button"
         type="button"
-        class="md:hidden p-2 rounded-lg text-(--color-muted-foreground) hover:bg-(--color-muted) hover:text-(--color-foreground)"
+        class="burger-btn md:hidden relative size-9 rounded-lg text-(--color-muted-foreground) hover:bg-(--color-muted) hover:text-(--color-foreground) transition-colors"
         aria-label="Toggle menu"
         aria-expanded="false"
         aria-controls="mobile-menu"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <line x1="4" y1="6" x2="20" y2="6"></line>
-          <line x1="4" y1="12" x2="20" y2="12"></line>
-          <line x1="4" y1="18" x2="20" y2="18"></line>
-        </svg>
+        <span class="burger" aria-hidden="true">
+          <span class="burger-line burger-line-1"></span>
+          <span class="burger-line burger-line-2"></span>
+          <span class="burger-line burger-line-3"></span>
+        </span>
       </button>
     </div>
   </div>
 
+  {/* Backdrop (dim + blur the page when menu is open) */}
+  <div
+    id="mobile-menu-backdrop"
+    class="mobile-backdrop md:hidden fixed inset-x-0 top-14 bottom-0 -z-10"
+    aria-hidden="true"
+  ></div>
+
+  {/* Mobile menu panel */}
   <div
     id="mobile-menu"
-    class="md:hidden hidden border-t border-(--color-border)/40 bg-(--color-background)"
+    class="mobile-menu md:hidden absolute inset-x-0 top-full border-b border-(--color-border) bg-(--color-background)/95 backdrop-blur-xl shadow-lg"
   >
-    <nav class="container-page py-3 flex flex-col gap-1" aria-label="Mobile">
-      {site.nav.map((item) => (
+    <nav class="container-page py-4 flex flex-col" aria-label="Mobile">
+      {site.nav.map((item, i) => (
         <a
           href={item.href}
-          class="px-3 py-2 rounded-lg text-(--color-muted-foreground) hover:text-(--color-foreground) hover:bg-(--color-muted) transition-colors"
+          class="mobile-link group flex items-center justify-between px-3 py-3.5 rounded-lg text-base text-(--color-foreground) hover:bg-(--color-muted) transition-colors"
+          style={`--i: ${i};`}
         >
-          {item.label}
+          <span>{item.label}</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="text-(--color-muted-foreground)/50 transition-transform group-hover:translate-x-0.5 group-hover:text-(--color-foreground)"
+            aria-hidden="true"
+          >
+            <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+          </svg>
         </a>
       ))}
     </nav>
   </div>
 </header>
 
+<style>
+  /* Animated burger icon (3 lines that morph into an X) */
+  .burger {
+    display: block;
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 18px;
+    height: 14px;
+  }
+  .burger-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1.75px;
+    background: currentColor;
+    border-radius: 2px;
+    transform-origin: center;
+    transition: transform 260ms cubic-bezier(0.5, 0, 0.2, 1),
+                opacity 160ms ease;
+  }
+  .burger-line-1 { top: 0; }
+  .burger-line-2 { top: 50%; transform: translateY(-50%); }
+  .burger-line-3 { bottom: 0; }
+
+  .burger-btn[aria-expanded="true"] .burger-line-1 {
+    transform: translateY(6px) rotate(45deg);
+  }
+  .burger-btn[aria-expanded="true"] .burger-line-2 {
+    opacity: 0;
+    transform: translateY(-50%) scaleX(0.4);
+  }
+  .burger-btn[aria-expanded="true"] .burger-line-3 {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+
+  /* Menu panel: drops down with fade + slight slide */
+  .mobile-menu {
+    opacity: 0;
+    transform: translateY(-8px);
+    pointer-events: none;
+    visibility: hidden;
+    transition: opacity 220ms cubic-bezier(0.16, 1, 0.3, 1),
+                transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+                visibility 0s linear 220ms;
+  }
+  .mobile-menu.is-open {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+    visibility: visible;
+    transition: opacity 240ms cubic-bezier(0.16, 1, 0.3, 1),
+                transform 240ms cubic-bezier(0.16, 1, 0.3, 1),
+                visibility 0s linear 0s;
+  }
+
+  /* Stagger the menu links in */
+  .mobile-link {
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: opacity 200ms ease, transform 200ms ease, background-color 200ms ease;
+  }
+  .mobile-menu.is-open .mobile-link {
+    opacity: 1;
+    transform: none;
+    transition-delay: calc(80ms + var(--i, 0) * 40ms);
+  }
+
+  /* Dim/blur backdrop behind the menu */
+  .mobile-backdrop {
+    background: color-mix(in oklab, var(--color-background) 70%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 220ms ease;
+  }
+  .mobile-backdrop.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Lock body scroll when menu is open */
+  :global(body:has(.mobile-menu.is-open)) {
+    overflow: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .burger-line, .mobile-menu, .mobile-link, .mobile-backdrop {
+      transition: none;
+    }
+  }
+</style>
+
 <script>
-  // Use event delegation so this works through Astro view transitions
-  // (no need to re-bind on every page-load, no listener pileup).
+  // Single delegated click handler — survives view transitions, no listener pileup
+  const setMenu = (open: boolean) => {
+    const btn = document.getElementById("mobile-menu-button");
+    const menu = document.getElementById("mobile-menu");
+    const backdrop = document.getElementById("mobile-menu-backdrop");
+    if (!btn || !menu || !backdrop) return;
+    btn.setAttribute("aria-expanded", String(open));
+    menu.classList.toggle("is-open", open);
+    backdrop.classList.toggle("is-open", open);
+  };
+
   document.addEventListener("click", (e) => {
     const target = e.target as Element | null;
     if (!target) return;
 
-    const trigger = target.closest("#mobile-menu-button");
-    if (trigger) {
-      const menu = document.getElementById("mobile-menu");
-      if (menu) {
-        const nowHidden = menu.classList.toggle("hidden");
-        trigger.setAttribute("aria-expanded", String(!nowHidden));
-      }
+    if (target.closest("#mobile-menu-button")) {
+      const isOpen = document.getElementById("mobile-menu")?.classList.contains("is-open");
+      setMenu(!isOpen);
       return;
     }
 
+    // Link inside menu → close after click (let nav happen naturally)
     if (target.closest("#mobile-menu a")) {
-      document.getElementById("mobile-menu")?.classList.add("hidden");
-      document
-        .getElementById("mobile-menu-button")
-        ?.setAttribute("aria-expanded", "false");
+      setMenu(false);
+      return;
+    }
+
+    // Click on backdrop → close
+    if (target.closest("#mobile-menu-backdrop")) {
+      setMenu(false);
+      return;
     }
   });
 
-  // Sticky-nav background toggle on scroll, re-applied after each view
-  // transition so the new header element picks up the right state.
+  // Esc closes
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") setMenu(false);
+  });
+
+  // Close on route changes (view transitions)
+  document.addEventListener("astro:before-preparation", () => setMenu(false));
+
+  // Sticky-nav background toggle on scroll
   const applyScrollState = () => {
     const header = document.getElementById("site-header");
     if (!header) return;
@@ -109,9 +233,4 @@ import ThemeToggle from "@/components/ThemeToggle.tsx";
   applyScrollState();
   window.addEventListener("scroll", applyScrollState, { passive: true });
   document.addEventListener("astro:page-load", applyScrollState);
-
-  // Close the mobile menu on hash/route changes so it doesn't linger open.
-  document.addEventListener("astro:before-preparation", () => {
-    document.getElementById("mobile-menu")?.classList.add("hidden");
-  });
 </script>
