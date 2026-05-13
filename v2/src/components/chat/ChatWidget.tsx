@@ -1,7 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { MessageCircle, X, Send, Loader2, Sparkles } from "lucide-react";
+import { marked } from "marked";
 import { sendChatMessage, type ChatMessage } from "@/lib/chat-client";
 import { cn } from "@/lib/cn";
+
+marked.setOptions({ gfm: true, breaks: true });
+
+function renderMarkdown(text: string): string {
+  // marked is sync when no async extensions are configured
+  return marked.parse(text) as string;
+}
 
 interface Props {
   mode?: "floating" | "embedded";
@@ -157,16 +165,16 @@ export default function ChatWidget({ mode = "floating" }: Props) {
               m.role === "user" ? "justify-end" : "justify-start",
             )}
           >
-            <div
-              className={cn(
-                "max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed whitespace-pre-wrap",
-                m.role === "user"
-                  ? "bg-(--color-accent) text-(--color-accent-foreground) rounded-br-sm"
-                  : "bg-(--color-muted) text-(--color-foreground) rounded-bl-sm",
-              )}
-            >
-              {m.content}
-            </div>
+            {m.role === "user" ? (
+              <div className="max-w-[85%] rounded-2xl rounded-br-sm bg-(--color-accent) text-(--color-accent-foreground) px-3.5 py-2.5 text-sm leading-relaxed whitespace-pre-wrap">
+                {m.content}
+              </div>
+            ) : (
+              <div
+                className="chat-md max-w-[85%] rounded-2xl rounded-bl-sm bg-(--color-muted) text-(--color-foreground) px-3.5 py-2.5 text-sm leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: renderMarkdown(m.content) }}
+              />
+            )}
           </div>
         ))}
 
