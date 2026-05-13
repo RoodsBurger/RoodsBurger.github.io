@@ -75,32 +75,43 @@ import ThemeToggle from "@/components/ThemeToggle.tsx";
 </header>
 
 <script>
-  const setup = () => {
-    const btn = document.getElementById("mobile-menu-button");
-    const menu = document.getElementById("mobile-menu");
-    btn?.addEventListener("click", () => {
-      const open = menu?.classList.toggle("hidden") === false;
-      btn.setAttribute("aria-expanded", String(open));
-    });
+  // Use event delegation so this works through Astro view transitions
+  // (no need to re-bind on every page-load, no listener pileup).
+  document.addEventListener("click", (e) => {
+    const target = e.target as Element | null;
+    if (!target) return;
 
-    document
-      .querySelectorAll<HTMLAnchorElement>("#mobile-menu a")
-      .forEach((link) => {
-        link.addEventListener("click", () => {
-          menu?.classList.add("hidden");
-          btn?.setAttribute("aria-expanded", "false");
-        });
-      });
+    const trigger = target.closest("#mobile-menu-button");
+    if (trigger) {
+      const menu = document.getElementById("mobile-menu");
+      if (menu) {
+        const nowHidden = menu.classList.toggle("hidden");
+        trigger.setAttribute("aria-expanded", String(!nowHidden));
+      }
+      return;
+    }
 
+    if (target.closest("#mobile-menu a")) {
+      document.getElementById("mobile-menu")?.classList.add("hidden");
+      document
+        .getElementById("mobile-menu-button")
+        ?.setAttribute("aria-expanded", "false");
+    }
+  });
+
+  // Sticky-nav background toggle on scroll, re-applied after each view
+  // transition so the new header element picks up the right state.
+  const applyScrollState = () => {
     const header = document.getElementById("site-header");
-    const update = () => {
-      if (!header) return;
-      header.dataset.scrolled = String(window.scrollY > 8);
-    };
-    update();
-    window.addEventListener("scroll", update, { passive: true });
+    if (!header) return;
+    header.dataset.scrolled = String(window.scrollY > 8);
   };
+  applyScrollState();
+  window.addEventListener("scroll", applyScrollState, { passive: true });
+  document.addEventListener("astro:page-load", applyScrollState);
 
-  setup();
-  document.addEventListener("astro:page-load", setup);
+  // Close the mobile menu on hash/route changes so it doesn't linger open.
+  document.addEventListener("astro:before-preparation", () => {
+    document.getElementById("mobile-menu")?.classList.add("hidden");
+  });
 </script>
