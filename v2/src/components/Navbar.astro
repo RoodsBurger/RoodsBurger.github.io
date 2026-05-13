@@ -8,9 +8,9 @@ import ThemeToggle from "@/components/ThemeToggle.tsx";
   class="sticky top-0 z-40 w-full transition-all duration-300 data-[scrolled=true]:border-b data-[scrolled=true]:border-(--color-border)/60 data-[scrolled=true]:bg-(--color-background)/80 data-[scrolled=true]:backdrop-blur-xl bg-transparent border-b border-transparent"
 >
   <div class="container-page flex h-14 items-center justify-between gap-4">
-    <a href="/" class="flex items-center gap-2 font-mono text-sm tracking-tight">
+    <a href="/" class="flex items-baseline gap-2 font-mono text-sm tracking-tight leading-none">
       <span
-        class="inline-block size-2 rounded-full bg-(--color-accent) animate-pulse-slow"
+        class="inline-block size-2 rounded-full bg-(--color-accent) animate-pulse-slow translate-y-[-1px]"
         aria-hidden="true"
       ></span>
       <span class="font-semibold">{site.shortName}</span>
