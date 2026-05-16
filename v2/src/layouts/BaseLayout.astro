@@ -105,7 +105,6 @@ const imageUrl = new URL(image, site.url).toString();
       };
 
       observe();
-      document.addEventListener("astro:page-load", observe);
 
       // Esc on a project detail page closes the modal (back to /#projects)
       document.addEventListener("keydown", (e) => {
@@ -114,9 +113,9 @@ const imageUrl = new URL(image, site.url).toString();
         window.location.href = "/#projects";
       });
 
-      // Autoplay videos reliably across browsers (Firefox/Safari ignore the
-      // `autoplay` attribute for elements inserted via client-side
-      // navigation) and pause them while offscreen to save CPU.
+      // Autoplay videos reliably across browsers (Firefox/Safari can
+      // ignore the `autoplay` attribute) and pause them while offscreen
+      // to save CPU.
       let videoIO: IntersectionObserver | null = null;
       const playVideos = () => {
         if (videoIO) videoIO.disconnect();
@@ -142,7 +141,6 @@ const imageUrl = new URL(image, site.url).toString();
           });
       };
       playVideos();
-      document.addEventListener("astro:page-load", playVideos);
     </script>
   </body>
 </html>
