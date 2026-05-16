@@ -16,19 +16,25 @@ interface Props {
 const { items, height = "440px" } = Astro.props;
 ---
 
-{/* Two interactive STL viewers: side by side on desktop, stacked on mobile. */}
+{/* Two interactive STL viewers side by side on desktop; only the first
+    one is shown on mobile. */}
 <div
   class="not-prose my-8 grid grid-cols-1 md:grid-cols-2 gap-4 [&_figure]:my-0"
 >
-  {
-    items.map((it) => (
-      <Model3D
-        src={it.src}
-        alt={it.alt}
-        caption={it.caption}
-        color={it.color}
-        height={height}
-      />
-    ))
-  }
+  <Model3D
+    src={items[0].src}
+    alt={items[0].alt}
+    caption={items[0].caption}
+    color={items[0].color}
+    height={height}
+  />
+  <div class="hidden md:block">
+    <Model3D
+      src={items[1].src}
+      alt={items[1].alt}
+      caption={items[1].caption}
+      color={items[1].color}
+      height={height}
+    />
+  </div>
 </div>

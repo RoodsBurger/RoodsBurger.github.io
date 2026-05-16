@@ -85,8 +85,8 @@ const sequenceId = `mediaseq-${Math.random().toString(36).slice(2, 9)}`;
     </figcaption>
   </figure>
 ) : (
-  <div class={`not-prose md:hidden flex flex-col gap-3 my-8`}>
-    {items.map((item) => {
+  <div class={`not-prose md:hidden my-8`}>
+    {items.slice(0, 1).map((item) => {
       const video = isVideo(item);
       return (
         <figure class="relative rounded-xl overflow-hidden border border-(--color-border) bg-(--color-muted) aspect-[4/3]">
