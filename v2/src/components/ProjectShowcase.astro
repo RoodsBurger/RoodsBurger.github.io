@@ -1,0 +1,86 @@
+---
+import { getCollection } from "astro:content";
+import ProjectSpotlight from "./ProjectSpotlight.tsx";
+
+const projects = (await getCollection("projects"))
+  .sort((a, b) => a.data.order - b.data.order)
+  .map((p) => ({
+    id: p.id,
+    title: p.data.title,
+    summary: p.data.summary,
+    tags: p.data.tags,
+    cover: p.data.cover,
+    coverAlt: p.data.coverAlt,
+  }));
+---
+
+<section
+  id="projects"
+  class="container-page border-t border-(--color-border) py-12 md:py-20"
+  data-reveal
+>
+  <div class="flex items-baseline justify-between gap-4 mb-8 md:mb-10">
+    <p
+      class="text-xs font-mono text-(--color-muted-foreground) tracking-wider uppercase"
+    >
+      Projects
+    </p>
+    <a
+      href="/projects"
+      class="group inline-flex items-center gap-1.5 text-xs font-mono text-(--color-muted-foreground) hover:text-(--color-foreground) transition-colors uppercase tracking-wider"
+    >
+      See all
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="12"
+        height="12"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="transition-transform group-hover:translate-x-0.5"
+        aria-hidden="true"
+        ><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg
+      >
+    </a>
+  </div>
+
+  <ProjectSpotlight client:visible projects={projects} />
+</section>
+
+<style is:global>
+  .spot-rail {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+  }
+  .spot-rail::-webkit-scrollbar {
+    width: 4px;
+  }
+  .spot-rail::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .spot-rail::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 999px;
+  }
+  .spot-rail::-webkit-scrollbar-thumb:hover {
+    background: var(--color-muted-foreground);
+  }
+
+  .proj-strip {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+  }
+  .proj-strip::-webkit-scrollbar {
+    height: 4px;
+  }
+  .proj-strip::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .proj-strip::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 999px;
+  }
+</style>
