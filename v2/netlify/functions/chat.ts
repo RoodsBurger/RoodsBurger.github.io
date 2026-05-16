@@ -27,6 +27,7 @@ const RequestSchema = z.object({
   message: z.string().trim().min(1).max(2000),
   conversationHistory: z.array(MessageSchema).default([]),
   pageContext: z.string().trim().max(400).optional(),
+  pageTopic: z.string().trim().max(120).optional(),
 });
 
 const ACADEMIC_KEYWORDS = new Set([
@@ -184,8 +185,15 @@ export const handler = async (event: {
     return json(400, { error: "Invalid request body", details: (e as Error).message }, origin);
   }
 
-  const { message, conversationHistory, pageContext } = parsed;
+  const { message, conversationHistory, pageContext, pageTopic } = parsed;
   const recentHistory = conversationHistory.slice(-HISTORY_TURN_LIMIT);
+
+  // Steer RAG retrieval toward the page the user is viewing: the page
+  // topic is folded into the embedding query so Pinecone surfaces that
+  // page's indexed chunks, while the user's question stays primary.
+  const retrievalQuery = pageTopic
+    ? `${message}\n\n(In the context of: ${pageTopic})`
+    : message;
 
   if (!process.env.COHERE_API_KEY || !process.env.PINECONE_API_KEY || !process.env.INDEX_NAME) {
     console.error("Missing required environment variables");
@@ -204,7 +212,7 @@ export const handler = async (event: {
   let queryEmbedding: number[];
   try {
     const embedResponse = await cohere.embed({
-      texts: [message],
+      texts: [retrievalQuery],
       model: COHERE_EMBED_MODEL,
       inputType: "search_query",
       embeddingTypes: ["float"],

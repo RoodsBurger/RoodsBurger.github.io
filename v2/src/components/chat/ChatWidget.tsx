@@ -62,6 +62,27 @@ function getPageContext(): string {
     : `The user is on ${path}.`;
 }
 
+// A concise subject for the current page, used to steer RAG retrieval
+// toward this page's indexed content. Empty when there is no specific
+// subject (then retrieval uses the question alone).
+function getPageTopic(): string {
+  if (typeof window === "undefined") return "";
+  const path = window.location.pathname;
+  const lead = (document.title || "").split(" · ")[0]?.trim();
+
+  if (path === "/") return "Rodolfo Raimundo portfolio overview";
+  if (path === "/projects") return "Rodolfo's projects";
+  if (path === "/hobbies")
+    return "Rodolfo's hobbies and life outside work";
+  if (path === "/chat") return "";
+  if (path.startsWith("/projects/")) {
+    return (
+      document.querySelector("h1")?.textContent?.trim() || lead || ""
+    );
+  }
+  return lead || "";
+}
+
 function renderMarkdown(text: string): string {
   // marked is sync when no async extensions are configured
   return marked.parse(text) as string;
@@ -155,6 +176,7 @@ export default function ChatWidget({ mode = "floating" }: Props) {
         trimmed,
         history.slice(0, -1),
         getPageContext(),
+        getPageTopic(),
       );
       setMessages((prev) => [
         ...prev,
