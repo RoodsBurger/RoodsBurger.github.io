@@ -79,13 +79,12 @@ export default function ProjectSpotlight({
           {projects.map((p, i) => {
             const isActive = i === active;
             return (
-              <button
+              <a
                 key={p.id}
-                type="button"
+                href={`/projects/${p.id}`}
                 onMouseEnter={() => setActive(i)}
                 onFocus={() => setActive(i)}
-                onClick={() => setActive(i)}
-                aria-pressed={isActive}
+                aria-current={isActive ? "true" : undefined}
                 className={`group flex items-center gap-3 shrink-0 rounded-xl border p-2.5 text-left transition-colors duration-300 ${
                   isActive
                     ? "border-(--color-foreground)/40 bg-(--color-muted)"
@@ -110,7 +109,7 @@ export default function ProjectSpotlight({
                     {p.summary}
                   </p>
                 </div>
-              </button>
+              </a>
             );
           })}
         </div>
