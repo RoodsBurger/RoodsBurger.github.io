@@ -75,16 +75,16 @@ const items: ExperienceItem[] = [
   },
 ];
 
-const groups = [0, 1];
+const groups = [0, 1, 2];
 ---
 
-<div id="experience" class="exp-marquee relative overflow-hidden">
-  <div class="exp-track flex">
+<div id="experience" class="exp-marquee relative">
+  <div id="exp-scroll" class="exp-scroll flex overflow-x-auto">
     {
       groups.map((g) => (
         <div
           class="exp-group flex gap-3 md:gap-4 pr-3 md:pr-4 shrink-0"
-          aria-hidden={g === 1 ? "true" : undefined}
+          aria-hidden={g === 0 ? undefined : "true"}
         >
           {items.map((item) => (
             <a
@@ -93,14 +93,16 @@ const groups = [0, 1];
               rel="noopener noreferrer"
               aria-label={item.name}
               title={item.name}
-              tabindex={g === 1 ? -1 : undefined}
-              class="group exp-card relative flex items-center justify-center rounded-2xl border border-(--color-border) bg-(--color-card) shrink-0 snap-start size-28 md:size-32 hover:border-(--color-foreground)/40 transition-colors duration-300 overflow-hidden"
+              tabindex={g === 0 ? undefined : -1}
+              draggable={false}
+              class="group exp-card relative flex items-center justify-center rounded-2xl border border-(--color-border) bg-(--color-card) shrink-0 size-28 md:size-32 hover:border-(--color-foreground)/40 transition-colors duration-300 overflow-hidden"
             >
               {item.kind === "image" && (
                 <img
                   src={item.logo}
                   alt={item.name}
                   loading="lazy"
+                  draggable={false}
                   class:list={[
                     "exp-logo w-auto object-contain transition-all duration-300",
                     item.logoClass || "max-h-14 md:max-h-16 max-w-[80%]",
@@ -123,12 +125,14 @@ const groups = [0, 1];
                     src={item.logo}
                     alt={item.name}
                     loading="lazy"
+                    draggable={false}
                     class="exp-logo h-7 md:h-8 max-w-[80%] w-auto object-contain transition-all duration-300"
                   />
                   <img
                     src="/logos/yc.svg"
                     alt="Y Combinator"
                     loading="lazy"
+                    draggable={false}
                     class="exp-logo h-4 md:h-5 w-auto object-contain rounded-sm transition-all duration-300"
                   />
                 </div>
@@ -163,24 +167,22 @@ const groups = [0, 1];
 </div>
 
 <style>
-  .exp-track {
-    width: max-content;
-    animation: exp-scroll 45s linear infinite;
+  /* Hide the scrollbar entirely while keeping the element scrollable */
+  .exp-scroll {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-behavior: auto;
+    cursor: grab;
+    overscroll-behavior-x: contain;
   }
-  .exp-marquee:hover .exp-track {
-    animation-play-state: paused;
+  .exp-scroll::-webkit-scrollbar {
+    display: none;
+  }
+  .exp-scroll.is-dragging {
+    cursor: grabbing;
+    user-select: none;
   }
 
-  @keyframes exp-scroll {
-    from {
-      transform: translateX(0);
-    }
-    to {
-      transform: translateX(-50%);
-    }
-  }
-
-  /* Stronger dim at rest: brand color stays but heavily desaturated; full color on hover */
   .exp-logo {
     filter: grayscale(0.85) brightness(0.9);
     opacity: 0.5;
@@ -195,8 +197,6 @@ const groups = [0, 1];
   .exp-card:hover .exp-wordmark {
     opacity: 1;
   }
-  /* Monochrome logos via CSS mask: the SVG is the shape, color comes
-     from background-color and is theme-aware via CSS variables */
   .exp-logo-mono {
     background-color: var(--color-muted-foreground);
     opacity: 0.7;
@@ -205,10 +205,139 @@ const groups = [0, 1];
     background-color: var(--color-foreground);
     opacity: 1;
   }
-
-  @media (prefers-reduced-motion: reduce) {
-    .exp-track {
-      animation: none;
-    }
-  }
 </style>
+
+<script>
+  const initExperience = () => {
+    const scroller = document.getElementById("exp-scroll");
+    if (!scroller || scroller.dataset.bound === "1") return;
+    scroller.dataset.bound = "1";
+
+    const group = scroller.querySelector(".exp-group") as HTMLElement | null;
+    if (!group) return;
+
+    const reduce = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    let span = group.getBoundingClientRect().width;
+
+    const normalize = () => {
+      if (span <= 0) return 0;
+      // Keep the position within the middle copy so it loops both ways.
+      let shift = 0;
+      while (scroller.scrollLeft >= span * 2) {
+        scroller.scrollLeft -= span;
+        shift -= span;
+      }
+      while (scroller.scrollLeft < span) {
+        scroller.scrollLeft += span;
+        shift += span;
+      }
+      return shift;
+    };
+
+    const recenter = () => {
+      span = group.getBoundingClientRect().width;
+      if (span > 0) scroller.scrollLeft = span;
+    };
+
+    requestAnimationFrame(recenter);
+    window.addEventListener("load", recenter);
+    window.addEventListener("resize", recenter);
+
+    let hovering = false;
+    let lastInteract = 0;
+    const mark = () => {
+      lastInteract = performance.now();
+    };
+
+    scroller.addEventListener("mouseenter", () => {
+      hovering = true;
+    });
+    scroller.addEventListener("mouseleave", () => {
+      hovering = false;
+    });
+    scroller.addEventListener(
+      "wheel",
+      () => {
+        mark();
+        normalize();
+      },
+      { passive: true },
+    );
+    scroller.addEventListener("touchstart", mark, { passive: true });
+    scroller.addEventListener(
+      "touchmove",
+      () => {
+        mark();
+        normalize();
+      },
+      { passive: true },
+    );
+    scroller.addEventListener("scroll", normalize, { passive: true });
+
+    // Pointer drag-to-scroll (desktop)
+    let dragging = false;
+    let moved = false;
+    let startX = 0;
+    let startLeft = 0;
+
+    scroller.addEventListener("pointerdown", (e) => {
+      dragging = true;
+      moved = false;
+      startX = e.clientX;
+      startLeft = scroller.scrollLeft;
+      mark();
+    });
+    scroller.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - startX;
+      if (Math.abs(dx) > 5) {
+        moved = true;
+        scroller.classList.add("is-dragging");
+      }
+      scroller.scrollLeft = startLeft - dx;
+      startLeft += normalize();
+      mark();
+    });
+    const endDrag = () => {
+      if (!dragging) return;
+      dragging = false;
+      scroller.classList.remove("is-dragging");
+      mark();
+    };
+    scroller.addEventListener("pointerup", endDrag);
+    scroller.addEventListener("pointercancel", endDrag);
+    scroller.addEventListener("pointerleave", endDrag);
+    // Suppress the click that follows a real drag so it doesn't navigate.
+    scroller.addEventListener(
+      "click",
+      (e) => {
+        if (moved) {
+          e.preventDefault();
+          e.stopPropagation();
+          moved = false;
+        }
+      },
+      true,
+    );
+
+    let prev = performance.now();
+    const SPEED = 0.04; // px per ms
+    const tick = (t: number) => {
+      const dt = t - prev;
+      prev = t;
+      const idle = t - lastInteract > 1500;
+      if (!reduce && !hovering && !dragging && idle && span > 0) {
+        scroller.scrollLeft += SPEED * dt;
+        normalize();
+      }
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  };
+
+  initExperience();
+  document.addEventListener("astro:page-load", initExperience);
+</script>
