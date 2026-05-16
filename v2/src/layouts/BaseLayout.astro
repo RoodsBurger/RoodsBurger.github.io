@@ -1,6 +1,5 @@
 ---
 import "@/styles/globals.css";
-import { ClientRouter } from "astro:transitions";
 import Navbar from "@/components/Navbar.astro";
 import Footer from "@/components/Footer.astro";
 import ChatWidget from "@/components/chat/ChatWidget.tsx";
@@ -58,18 +57,10 @@ const imageUrl = new URL(image, site.url).toString();
 
     <script is:inline>
       (() => {
-        const apply = () => {
-          const stored = localStorage.getItem("theme");
-          const theme = stored || "light";
-          document.documentElement.dataset.theme = theme;
-        };
-        apply();
-        // Re-apply after Astro view transitions swap the document
-        document.addEventListener("astro:after-swap", apply);
+        const stored = localStorage.getItem("theme");
+        document.documentElement.dataset.theme = stored || "light";
       })();
     </script>
-
-    <ClientRouter />
   </head>
   <body class="min-h-screen flex flex-col">
     <a
