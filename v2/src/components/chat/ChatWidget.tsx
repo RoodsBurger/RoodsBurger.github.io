@@ -1,12 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  MessageCircle,
-  X,
-  Send,
-  Loader2,
-  Sparkles,
-  RotateCcw,
-} from "lucide-react";
+import { MessageCircle, X, Send, Loader2, Sparkles } from "lucide-react";
 import { marked } from "marked";
 import { sendChatMessage, type ChatMessage } from "@/lib/chat-client";
 import { cn } from "@/lib/cn";
@@ -43,15 +36,6 @@ function saveChat(state: PersistedChat): void {
     window.sessionStorage.setItem(STORE_KEY, JSON.stringify(state));
   } catch {
     /* storage full or unavailable — non-fatal */
-  }
-}
-
-function clearChat(): void {
-  if (typeof window === "undefined") return;
-  try {
-    window.sessionStorage.removeItem(STORE_KEY);
-  } catch {
-    /* non-fatal */
   }
 }
 
@@ -114,16 +98,12 @@ export default function ChatWidget({ mode = "floating" }: Props) {
   // useState initializer) so the first client render matches the SSR markup
   // and React hydration stays clean.
   useEffect(() => {
-    // Landing on the home page starts a fresh conversation (the home page
-    // is the "reset" entry point).
-    if (typeof window !== "undefined" && window.location.pathname === "/") {
-      clearChat();
-    } else {
-      const saved = loadChat();
-      if (saved) {
-        if (saved.messages.length) setMessages(saved.messages);
-        if (mode === "floating" && saved.open) setIsOpen(true);
-      }
+    // Restore the conversation on every page. It only resets when the
+    // tab/session ends (the browser clears sessionStorage then).
+    const saved = loadChat();
+    if (saved) {
+      if (saved.messages.length) setMessages(saved.messages);
+      if (mode === "floating" && saved.open) setIsOpen(true);
     }
     hydratedRef.current = true;
   }, [mode]);
@@ -137,15 +117,6 @@ export default function ChatWidget({ mode = "floating" }: Props) {
     });
   }, [messages, isOpen, mode]);
 
-  const resetChat = () => {
-    setMessages([]);
-    setInput("");
-    setError(null);
-    clearChat();
-    if (mode === "floating") {
-      requestAnimationFrame(() => inputRef.current?.focus());
-    }
-  };
 
   useEffect(() => {
     if (mode === "floating" && isOpen) {
@@ -232,29 +203,16 @@ export default function ChatWidget({ mode = "floating" }: Props) {
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-0.5">
-          {messages.length > 0 && (
-            <button
-              type="button"
-              onClick={resetChat}
-              aria-label="New chat"
-              title="New chat"
-              className="p-1.5 rounded-md text-(--color-muted-foreground) hover:bg-(--color-muted) hover:text-(--color-foreground) transition-colors"
-            >
-              <RotateCcw size={15} />
-            </button>
-          )}
-          {mode === "floating" && (
-            <button
-              type="button"
-              onClick={() => setIsOpen(false)}
-              aria-label="Close chat"
-              className="p-1.5 rounded-md text-(--color-muted-foreground) hover:bg-(--color-muted) hover:text-(--color-foreground) transition-colors"
-            >
-              <X size={16} />
-            </button>
-          )}
-        </div>
+        {mode === "floating" && (
+          <button
+            type="button"
+            onClick={() => setIsOpen(false)}
+            aria-label="Close chat"
+            className="p-1.5 rounded-md text-(--color-muted-foreground) hover:bg-(--color-muted) hover:text-(--color-foreground) transition-colors"
+          >
+            <X size={16} />
+          </button>
+        )}
       </header>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
