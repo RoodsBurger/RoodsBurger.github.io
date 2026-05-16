@@ -122,6 +122,36 @@ const imageUrl = new URL(image, site.url).toString();
         if (!document.querySelector(".project-modal")) return;
         window.location.href = "/#projects";
       });
+
+      // Autoplay videos reliably across browsers (Firefox/Safari ignore the
+      // `autoplay` attribute for elements inserted via client-side
+      // navigation) and pause them while offscreen to save CPU.
+      let videoIO: IntersectionObserver | null = null;
+      const playVideos = () => {
+        if (videoIO) videoIO.disconnect();
+        videoIO = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              const v = e.target as HTMLVideoElement;
+              if (e.isIntersecting) v.play?.().catch(() => {});
+              else v.pause?.();
+            }
+          },
+          { threshold: 0.1 },
+        );
+        document
+          .querySelectorAll<HTMLVideoElement>("video[autoplay]")
+          .forEach((v) => {
+            // The mobile media sequence manages its own playback.
+            if (v.closest("[data-mediaseq]")) return;
+            v.muted = true;
+            v.playsInline = true;
+            v.play?.().catch(() => {});
+            videoIO!.observe(v);
+          });
+      };
+      playVideos();
+      document.addEventListener("astro:page-load", playVideos);
     </script>
   </body>
 </html>

@@ -242,9 +242,17 @@ const groups = [0, 1, 2];
       if (span > 0) scroller.scrollLeft = span;
     };
 
+    // All listeners + the rAF loop are torn down the moment this element
+    // leaves the DOM (e.g. an Astro client-side navigation swaps the body).
+    // Without this, every navigation back would stack another forever-running
+    // rAF loop and a fresh set of listeners, slowing the whole site over time.
+    const ac = new AbortController();
+    const signal = ac.signal;
+    const stop = () => ac.abort();
+
     requestAnimationFrame(recenter);
-    window.addEventListener("load", recenter);
-    window.addEventListener("resize", recenter);
+    window.addEventListener("load", recenter, { signal });
+    window.addEventListener("resize", recenter, { signal });
 
     let hovering = false;
     let lastInteract = 0;
@@ -252,30 +260,26 @@ const groups = [0, 1, 2];
       lastInteract = performance.now();
     };
 
-    scroller.addEventListener("mouseenter", () => {
-      hovering = true;
-    });
-    scroller.addEventListener("mouseleave", () => {
-      hovering = false;
-    });
+    scroller.addEventListener("mouseenter", () => { hovering = true; }, { signal });
+    scroller.addEventListener("mouseleave", () => { hovering = false; }, { signal });
     scroller.addEventListener(
       "wheel",
       () => {
         mark();
         normalize();
       },
-      { passive: true },
+      { passive: true, signal },
     );
-    scroller.addEventListener("touchstart", mark, { passive: true });
+    scroller.addEventListener("touchstart", mark, { passive: true, signal });
     scroller.addEventListener(
       "touchmove",
       () => {
         mark();
         normalize();
       },
-      { passive: true },
+      { passive: true, signal },
     );
-    scroller.addEventListener("scroll", normalize, { passive: true });
+    scroller.addEventListener("scroll", normalize, { passive: true, signal });
 
     // Pointer drag-to-scroll (desktop)
     let dragging = false;
@@ -289,7 +293,7 @@ const groups = [0, 1, 2];
       startX = e.clientX;
       startLeft = scroller.scrollLeft;
       mark();
-    });
+    }, { signal });
     scroller.addEventListener("pointermove", (e) => {
       if (!dragging) return;
       const dx = e.clientX - startX;
@@ -300,16 +304,16 @@ const groups = [0, 1, 2];
       scroller.scrollLeft = startLeft - dx;
       startLeft += normalize();
       mark();
-    });
+    }, { signal });
     const endDrag = () => {
       if (!dragging) return;
       dragging = false;
       scroller.classList.remove("is-dragging");
       mark();
     };
-    scroller.addEventListener("pointerup", endDrag);
-    scroller.addEventListener("pointercancel", endDrag);
-    scroller.addEventListener("pointerleave", endDrag);
+    scroller.addEventListener("pointerup", endDrag, { signal });
+    scroller.addEventListener("pointercancel", endDrag, { signal });
+    scroller.addEventListener("pointerleave", endDrag, { signal });
     // Suppress the click that follows a real drag so it doesn't navigate.
     scroller.addEventListener(
       "click",
@@ -320,12 +324,17 @@ const groups = [0, 1, 2];
           moved = false;
         }
       },
-      true,
+      { capture: true, signal },
     );
 
     let prev = performance.now();
     const SPEED = 0.04; // px per ms
     const tick = (t: number) => {
+      // Self-terminate once detached so navigations don't stack loops.
+      if (!scroller.isConnected) {
+        stop();
+        return;
+      }
       const dt = t - prev;
       prev = t;
       const idle = t - lastInteract > 1500;

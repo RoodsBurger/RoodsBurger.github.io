@@ -131,6 +131,10 @@ const sequenceId = `mediaseq-${Math.random().toString(36).slice(2, 9)}`;
       if (!root) return;
       const videos = Array.from(root.querySelectorAll("video"));
       const caption = root.querySelector("[data-mediaseq-caption]");
+      videos.forEach((v) => {
+        v.muted = true;
+        v.playsInline = true;
+      });
       let current = 0;
       const advance = () => {
         const next = (current + 1) % videos.length;
