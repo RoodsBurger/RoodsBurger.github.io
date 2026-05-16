@@ -2,7 +2,7 @@ import { Pinecone } from "@pinecone-database/pinecone";
 import { CohereClientV2 } from "cohere-ai";
 import { z } from "zod";
 
-const COHERE_CHAT_MODEL = process.env.COHERE_CHAT_MODEL || "command-a-03-2025";
+const COHERE_CHAT_MODEL = process.env.COHERE_CHAT_MODEL || "command-r7b-12-2024";
 const COHERE_EMBED_MODEL = process.env.COHERE_EMBED_MODEL || "embed-english-v3.0";
 const HISTORY_TURN_LIMIT = 6;
 
@@ -26,6 +26,7 @@ const MessageSchema = z.object({
 const RequestSchema = z.object({
   message: z.string().trim().min(1).max(2000),
   conversationHistory: z.array(MessageSchema).default([]),
+  pageContext: z.string().trim().max(400).optional(),
 });
 
 const ACADEMIC_KEYWORDS = new Set([
@@ -183,7 +184,7 @@ export const handler = async (event: {
     return json(400, { error: "Invalid request body", details: (e as Error).message }, origin);
   }
 
-  const { message, conversationHistory } = parsed;
+  const { message, conversationHistory, pageContext } = parsed;
   const recentHistory = conversationHistory.slice(-HISTORY_TURN_LIMIT);
 
   if (!process.env.COHERE_API_KEY || !process.env.PINECONE_API_KEY || !process.env.INDEX_NAME) {
@@ -243,9 +244,19 @@ export const handler = async (event: {
 
   const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
     { role: "system", content: SYSTEM_PROMPT },
+  ];
+
+  if (pageContext) {
+    messages.push({
+      role: "system",
+      content: `Current page context: ${pageContext}`,
+    });
+  }
+
+  messages.push(
     ...recentHistory.map((m) => ({ role: m.role, content: m.content })),
     { role: "user", content: message },
-  ];
+  );
 
   if (contextText) {
     messages.push({

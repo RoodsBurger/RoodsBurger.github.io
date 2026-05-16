@@ -55,6 +55,29 @@ function clearChat(): void {
   }
 }
 
+// A short description of where the user currently is, so the assistant can
+// resolve "this" / "tell me more" against the page they're looking at.
+function getPageContext(): string {
+  if (typeof window === "undefined") return "";
+  const path = window.location.pathname;
+  const docTitle = document.title || "";
+  const lead = docTitle.split(" · ")[0]?.trim();
+
+  if (path === "/") return "The user is on the home page of Rodolfo's portfolio.";
+  if (path === "/projects") return "The user is on the Projects listing page.";
+  if (path === "/hobbies")
+    return "The user is on the Personal page, about Rodolfo's hobbies and life outside work.";
+  if (path === "/chat") return "The user is on the dedicated chat page.";
+  if (path.startsWith("/projects/")) {
+    const name =
+      document.querySelector("h1")?.textContent?.trim() || lead || "a project";
+    return `The user is viewing the project page for "${name}" (${path}). If their question is ambiguous (e.g. "this", "it", "tell me more"), assume it refers to this project.`;
+  }
+  return lead
+    ? `The user is on the "${lead}" page (${path}).`
+    : `The user is on ${path}.`;
+}
+
 function renderMarkdown(text: string): string {
   // marked is sync when no async extensions are configured
   return marked.parse(text) as string;
@@ -91,10 +114,16 @@ export default function ChatWidget({ mode = "floating" }: Props) {
   // useState initializer) so the first client render matches the SSR markup
   // and React hydration stays clean.
   useEffect(() => {
-    const saved = loadChat();
-    if (saved) {
-      if (saved.messages.length) setMessages(saved.messages);
-      if (mode === "floating" && saved.open) setIsOpen(true);
+    // Landing on the home page starts a fresh conversation (the home page
+    // is the "reset" entry point).
+    if (typeof window !== "undefined" && window.location.pathname === "/") {
+      clearChat();
+    } else {
+      const saved = loadChat();
+      if (saved) {
+        if (saved.messages.length) setMessages(saved.messages);
+        if (mode === "floating" && saved.open) setIsOpen(true);
+      }
     }
     hydratedRef.current = true;
   }, [mode]);
@@ -151,7 +180,11 @@ export default function ChatWidget({ mode = "floating" }: Props) {
     }));
 
     try {
-      const reply = await sendChatMessage(trimmed, history.slice(0, -1));
+      const reply = await sendChatMessage(
+        trimmed,
+        history.slice(0, -1),
+        getPageContext(),
+      );
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: reply, id: crypto.randomUUID() },

@@ -22,11 +22,12 @@ const FUNCTION_URL = "/.netlify/functions/chat";
 export async function sendChatMessage(
   message: string,
   conversationHistory: ChatMessage[] = [],
+  pageContext?: string,
 ): Promise<string> {
   const response = await fetch(FUNCTION_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message, conversationHistory }),
+    body: JSON.stringify({ message, conversationHistory, pageContext }),
   });
 
   if (!response.ok) {
