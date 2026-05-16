@@ -35,7 +35,7 @@ function saveChat(state: PersistedChat): void {
   try {
     window.sessionStorage.setItem(STORE_KEY, JSON.stringify(state));
   } catch {
-    /* storage full or unavailable — non-fatal */
+    /* storage full or unavailable; non-fatal */
   }
 }
 

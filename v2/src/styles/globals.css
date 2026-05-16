@@ -14,9 +14,10 @@
   --color-border: hsl(240 6% 86%);
   --color-card: hsl(0 0% 100%);
   --color-card-foreground: hsl(240 10% 4%);
-  --color-accent: hsl(221 83% 53%);
-  --color-accent-foreground: hsl(0 0% 100%);
-  --color-ring: hsl(221 83% 53%);
+  /* Monochrome accent: matches foreground/background (no blue) */
+  --color-accent: hsl(240 10% 4%);
+  --color-accent-foreground: hsl(60 12% 97%);
+  --color-ring: hsl(240 10% 4%);
 
   --radius: 0.625rem;
 }
@@ -31,9 +32,10 @@
     --color-border: hsl(240 5% 20%);
     --color-card: hsl(240 7% 11%);
     --color-card-foreground: hsl(0 0% 98%);
-    --color-accent: hsl(217 91% 60%);
-    --color-accent-foreground: hsl(0 0% 100%);
-    --color-ring: hsl(217 91% 60%);
+    /* Monochrome accent: matches foreground/background (no blue) */
+    --color-accent: hsl(0 0% 98%);
+    --color-accent-foreground: hsl(240 8% 8%);
+    --color-ring: hsl(0 0% 98%);
   }
 
   * {
