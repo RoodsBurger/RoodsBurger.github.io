@@ -20,10 +20,13 @@ const hobbies = [
   </div>
 
   <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-    {hobbies.map((hobby) => (
+    {hobbies.map((hobby, i) => (
       <a
         href="/hobbies"
-        class="group relative rounded-xl overflow-hidden border border-(--color-border) bg-(--color-muted) aspect-[3/2] hover:border-(--color-foreground)/30 transition-colors"
+        class:list={[
+          "group relative rounded-xl overflow-hidden border border-(--color-border) bg-(--color-muted) aspect-[3/2] hover:border-(--color-foreground)/30 transition-colors",
+          i >= 2 && "hidden md:block",
+        ]}
       >
         <img
           src={hobby.image}

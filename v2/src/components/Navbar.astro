@@ -182,7 +182,7 @@ import ThemeToggle from "@/components/ThemeToggle.tsx";
 </style>
 
 <script>
-  // Single delegated click handler — survives view transitions, no listener pileup
+  // Single delegated click handler; survives view transitions, no listener pileup
   const setMenu = (open: boolean) => {
     const btn = document.getElementById("mobile-menu-button");
     const menu = document.getElementById("mobile-menu");

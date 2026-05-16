@@ -9,6 +9,7 @@ export default defineConfig({
   site: 'https://rraimundo.me',
   output: 'static',
   adapter: netlify(),
+  prefetch: { prefetchAll: true, defaultStrategy: 'viewport' },
   integrations: [react(), mdx(), sitemap()],
   vite: {
     plugins: [tailwindcss()],

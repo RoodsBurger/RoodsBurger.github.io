@@ -21,17 +21,13 @@ const projects = (await getCollection("projects")).sort(
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
         Back
       </a>
-      <h1 class="text-4xl md:text-6xl font-semibold tracking-tight text-balance leading-[1.05]">
+      <h1 class="text-3xl md:text-5xl font-semibold tracking-tight text-balance leading-[1.05]">
         Projects
       </h1>
-      <p class="mt-4 text-base md:text-lg text-(--color-muted-foreground) text-pretty">
-        A selection of work spanning machine learning, robotics, and industrial
-        design — often at the intersection of code and CAD.
-      </p>
     </div>
   </section>
 
-  <section class="container-page pb-24 md:pb-32" data-reveal>
+  <section class="container-page pb-24 md:pb-32">
     <div class="grid gap-4 md:gap-5 md:grid-cols-2">
       {projects.map((project) => (
         <ProjectCard project={project} />

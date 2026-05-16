@@ -114,7 +114,7 @@ export default function ChatWidget({ mode = "floating" }: Props) {
           <div>
             <div className="text-sm font-semibold leading-tight">Ask about Rodolfo</div>
             <div className="text-[11px] text-(--color-muted-foreground)">
-              AI assistant - answers from his portfolio
+              AI assistant for answers from his portfolio
             </div>
           </div>
         </div>
