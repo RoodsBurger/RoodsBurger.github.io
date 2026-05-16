@@ -1,10 +1,59 @@
 import { useEffect, useRef, useState } from "react";
-import { MessageCircle, X, Send, Loader2, Sparkles } from "lucide-react";
+import {
+  MessageCircle,
+  X,
+  Send,
+  Loader2,
+  Sparkles,
+  RotateCcw,
+} from "lucide-react";
 import { marked } from "marked";
 import { sendChatMessage, type ChatMessage } from "@/lib/chat-client";
 import { cn } from "@/lib/cn";
 
 marked.setOptions({ gfm: true, breaks: true });
+
+// Conversation is kept in sessionStorage so it survives full-page
+// navigations (the site uses normal page loads, no SPA router) and is
+// cleared automatically when the tab/session ends.
+const STORE_KEY = "rr-chat-v1";
+const MAX_PERSIST = 60;
+
+interface PersistedChat {
+  open: boolean;
+  messages: UIMessage[];
+}
+
+function loadChat(): PersistedChat | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.sessionStorage.getItem(STORE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as PersistedChat;
+    if (!parsed || !Array.isArray(parsed.messages)) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function saveChat(state: PersistedChat): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage.setItem(STORE_KEY, JSON.stringify(state));
+  } catch {
+    /* storage full or unavailable — non-fatal */
+  }
+}
+
+function clearChat(): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage.removeItem(STORE_KEY);
+  } catch {
+    /* non-fatal */
+  }
+}
 
 function renderMarkdown(text: string): string {
   // marked is sync when no async extensions are configured
@@ -36,6 +85,38 @@ export default function ChatWidget({ mode = "floating" }: Props) {
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const hydratedRef = useRef(false);
+
+  // Restore a saved conversation after mount. Done in an effect (not a lazy
+  // useState initializer) so the first client render matches the SSR markup
+  // and React hydration stays clean.
+  useEffect(() => {
+    const saved = loadChat();
+    if (saved) {
+      if (saved.messages.length) setMessages(saved.messages);
+      if (mode === "floating" && saved.open) setIsOpen(true);
+    }
+    hydratedRef.current = true;
+  }, [mode]);
+
+  // Persist the conversation (and floating open state) on every change.
+  useEffect(() => {
+    if (!hydratedRef.current) return;
+    saveChat({
+      open: mode === "floating" ? isOpen : true,
+      messages: messages.slice(-MAX_PERSIST),
+    });
+  }, [messages, isOpen, mode]);
+
+  const resetChat = () => {
+    setMessages([]);
+    setInput("");
+    setError(null);
+    clearChat();
+    if (mode === "floating") {
+      requestAnimationFrame(() => inputRef.current?.focus());
+    }
+  };
 
   useEffect(() => {
     if (mode === "floating" && isOpen) {
@@ -118,16 +199,29 @@ export default function ChatWidget({ mode = "floating" }: Props) {
             </div>
           </div>
         </div>
-        {mode === "floating" && (
-          <button
-            type="button"
-            onClick={() => setIsOpen(false)}
-            aria-label="Close chat"
-            className="p-1.5 rounded-md text-(--color-muted-foreground) hover:bg-(--color-muted) hover:text-(--color-foreground) transition-colors"
-          >
-            <X size={16} />
-          </button>
-        )}
+        <div className="flex items-center gap-0.5">
+          {messages.length > 0 && (
+            <button
+              type="button"
+              onClick={resetChat}
+              aria-label="New chat"
+              title="New chat"
+              className="p-1.5 rounded-md text-(--color-muted-foreground) hover:bg-(--color-muted) hover:text-(--color-foreground) transition-colors"
+            >
+              <RotateCcw size={15} />
+            </button>
+          )}
+          {mode === "floating" && (
+            <button
+              type="button"
+              onClick={() => setIsOpen(false)}
+              aria-label="Close chat"
+              className="p-1.5 rounded-md text-(--color-muted-foreground) hover:bg-(--color-muted) hover:text-(--color-foreground) transition-colors"
+            >
+              <X size={16} />
+            </button>
+          )}
+        </div>
       </header>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
