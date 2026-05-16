@@ -1,0 +1,55 @@
+---
+title: "Brushless Lamp"
+summary: "A kinetic smart lamp where a closed-loop BLDC motor raises a lit core to set brightness, with a knob and Matter over WiFi."
+tags: ["ESP32", "BLDC", "SimpleFOC", "Matter", "Arduino"]
+category: ["code", "cad"]
+order: 5
+cover: "/artifacts/lamp_cover.webp"
+coverAlt: "Brushless kinetic lamp"
+model3d: "/artifacts/lamp1.stl"
+links:
+  github: "https://github.com/RoodsBurger/brushless_lamp/tree/c6"
+---
+
+import Model3DPair from "@/components/Model3DPair.astro";
+
+<Model3DPair
+  items={[
+    {
+      src: "/artifacts/lamp1.stl",
+      alt: "Brushless lamp base, interactive 3D model",
+      caption: "Base",
+    },
+    {
+      src: "/artifacts/lamp2.stl",
+      alt: "Brushless lamp core carrier, interactive 3D model",
+      caption: "Core carrier",
+    },
+  ]}
+/>
+
+## Overview
+
+A kinetic smart lamp built around a closed-loop brushless gimbal motor. Instead of dimming electrically, the motor physically raises and lowers a lit core, and dual-channel CCT LEDs ride with it. A single rotary-encoder knob drives everything locally, while Matter over WiFi exposes the lamp to Apple Home, Google Home, and SmartThings.
+
+## Key features
+
+- Field-oriented closed-loop position control of a 4015 BLDC gimbal motor via an MT6701 magnetic encoder
+- Knob interface: turn to set position or brightness, single-click to switch modes, double-click to cycle speed presets, long-hold for a factory reset (with a 5-second pulse warning)
+- Position-gated lamp: as the core travels through a defined zone the LEDs fade in and out, so motion speed is also fade speed
+- Dual-channel warm/cool LED mixing for adjustable color temperature
+- State (position, speed preset, brightness, CCT) persists in flash and is restored on boot without a startup jump
+
+## Technical details
+
+### Motor and firmware
+
+- SimpleFOC running on a Seeed XIAO ESP32-C6, with the FOC commutation moved onto a hardware-timer ISR so the control loop stays locked regardless of WiFi, BLE, or Matter scheduler activity
+- Trapezoidal motion profiling for smooth seeks, plus driver fault and stall recovery
+
+### Matter integration
+
+- Exposed as a Matter ColorTemperatureLight: the Matter brightness slider drives motor position, and color temperature maps to the LED warm/cool mix
+- Motor and FOC initialization is deferred until after commissioning so the control loop never competes with the pairing handshake on the single-core chip
+
+This page documents the ESP32-C6 build (kept as a stable reference); the printable base and core carrier are shown above. Drag to rotate, scroll to zoom.

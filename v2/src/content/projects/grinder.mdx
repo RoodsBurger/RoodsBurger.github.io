@@ -1,0 +1,57 @@
+---
+title: "Precision Coffee Grinder"
+summary: "A Raspberry Pi powered single-dose coffee grinder with a round touchscreen dial and a configurable stepper-motor drive."
+tags: ["Raspberry Pi", "Python", "Stepper Motor", "Touchscreen", "3D Printing"]
+category: ["code", "cad"]
+order: 2
+cover: "/artifacts/grinder_cover.webp"
+coverAlt: "Precision coffee grinder"
+model3d: "/artifacts/grinder1.stl"
+links:
+  github: "https://github.com/RoodsBurger/grinder"
+---
+
+import Model3DPair from "@/components/Model3DPair.astro";
+
+<Model3DPair
+  items={[
+    {
+      src: "/artifacts/grinder1.stl",
+      alt: "Coffee grinder body, interactive 3D model",
+      caption: "Body",
+    },
+    {
+      src: "/artifacts/grinder2.stl",
+      alt: "Coffee grinder hopper, interactive 3D model",
+      caption: "Hopper",
+    },
+  ]}
+/>
+
+## Overview
+
+A single-dose coffee grinder built around a Raspberry Pi, a configurable stepper-motor drive, and a 1.28-inch round touchscreen. The whole interface is one circular dial: drag around the ring to set the speed, tap the center to start or stop. Custom-modeled, 3D-printed parts make up the body and hopper.
+
+## Key features
+
+- Circular touchscreen UI rendered at 2x for crisp anti-aliased graphics, with whole-bean and ground-coffee icons for the start/stop state
+- Speed dial from 0 to 300, displayed at the real burr RPM after the gearbox reduction
+- Configurable motor profiles (drive current, PWM frequency, microstepping, decay mode) selectable from a JSON config library
+- Automatic display standby after ten minutes of inactivity to protect the panel
+- Headless deployment: systemd services for the motor controller and first-boot WiFi setup, installed by a single script
+
+## Technical details
+
+### Motor control
+
+- Stepper drive over Raspberry Pi GPIO with tuned current, blanking, decay, and microstep parameters per profile
+- The grind run is spawned as a separate process so the UI thread stays responsive while the motor is under load
+
+### Interface
+
+- Touch input is mapped from screen coordinates to either the dial angle (speed) or the center button (start/stop), with separate hit radii so the two never conflict
+- Diagnostic and motor-only test utilities for bring-up and tuning
+
+### Hardware
+
+The body, hopper, and mounting are modeled as printable parts (shown above). Drag to rotate, scroll to zoom; each is a binary STL.

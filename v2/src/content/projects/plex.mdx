@@ -1,0 +1,37 @@
+---
+title: "Plex File Manager"
+summary: "A web-based file manager for Plex media servers, with large-file uploads and automatic library refresh after changes."
+tags: ["Node.js", "Express", "Plex", "Web"]
+category: ["code"]
+order: 8
+cover: "/artifacts/plex1.webp"
+coverAlt: "Plex file manager interface"
+links:
+  github: "https://github.com/RoodsBurger/plex_file_manager"
+---
+
+import MediaGrid from "@/components/MediaGrid.astro";
+
+<MediaGrid
+  columns={2}
+  items={[
+    { src: "/artifacts/plex1.webp", alt: "File browser interface" },
+    { src: "/artifacts/plex2.webp", alt: "Upload view" },
+  ]}
+/>
+
+## Overview
+
+A self-hosted web app that makes managing a Plex media library practical from any device. It provides a browser-based file manager for the media directories and triggers a Plex library refresh automatically after files change, so new content shows up without manual rescans.
+
+## Key features
+
+- Browse, upload, download, create, and delete files and folders from a responsive web interface
+- Large-file support, sized for media (uploads up to 10 GB)
+- Automatic Plex library refresh after file operations
+- Operations restricted to designated media directories, with path validation to prevent directory traversal
+- Dark, mobile-friendly UI
+
+## Technical details
+
+A small Node.js server exposes a focused REST API for browsing, folder creation, deletion, upload, download, and a Plex refresh hook. Plex integration is optional and configured through an access token; without it the app still works as a standalone media file manager.

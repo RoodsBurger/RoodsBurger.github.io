@@ -1,0 +1,34 @@
+---
+import Model3D from "./Model3D.astro";
+
+interface Item {
+  src: string;
+  alt: string;
+  caption?: string;
+  color?: string;
+}
+
+interface Props {
+  items: [Item, Item];
+  height?: string;
+}
+
+const { items, height = "440px" } = Astro.props;
+---
+
+{/* Two interactive STL viewers: side by side on desktop, stacked on mobile. */}
+<div
+  class="not-prose my-8 grid grid-cols-1 md:grid-cols-2 gap-4 [&_figure]:my-0"
+>
+  {
+    items.map((it) => (
+      <Model3D
+        src={it.src}
+        alt={it.alt}
+        caption={it.caption}
+        color={it.color}
+        height={height}
+      />
+    ))
+  }
+</div>

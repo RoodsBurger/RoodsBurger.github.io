@@ -1,0 +1,49 @@
+---
+title: "RaiDrive"
+summary: "A lightweight native macOS menu bar app that syncs local folders to Google Drive, built as a fast alternative to the official client."
+tags: ["Swift", "SwiftUI", "macOS", "Google Drive API", "OAuth"]
+category: ["code"]
+order: 9
+cover: "/artifacts/raidrive1.webp"
+coverAlt: "RaiDrive menu bar app"
+links:
+  github: "https://github.com/RoodsBurger/raidrive"
+---
+
+import MediaGrid from "@/components/MediaGrid.astro";
+
+<MediaGrid
+  columns={2}
+  items={[
+    { src: "/artifacts/raidrive1.webp", alt: "RaiDrive menu bar popover" },
+    { src: "/artifacts/raidrive2.webp", alt: "RaiDrive settings" },
+  ]}
+/>
+
+## Overview
+
+RaiDrive is a native macOS menu bar app that keeps local folders in sync with Google Drive, built as a low-overhead alternative to the official desktop client. It treats the local copy as the source of truth, stays out of the way (menu bar only, no Dock icon), and keeps a small memory footprint even with 100K+ files.
+
+## Key features
+
+- One-way-priority two-way sync with a local-wins conflict model: local additions, edits, and deletions propagate to Drive, and files removed on Drive but present locally are re-uploaded
+- Smart skip: files unchanged by modification date and matching the last-synced MD5 are skipped without re-hashing or network calls
+- Incremental remote sync through the Drive Changes API, so repeat syncs only fetch what actually changed
+- Parallel folder traversal (up to 10 concurrent requests) and resumable, chunked uploads for large files, streamed from disk
+- Anti-duplicate uploads plus one-click cleanup of pre-existing Drive duplicates
+
+## Technical details
+
+### Sync engine
+
+- Streaming MD5 hashing and 8 MB chunked uploads keep memory flat on huge folders
+- Exponential-backoff retry on transient failures, automatic OAuth token refresh, and self-write suppression to avoid FSEvents feedback loops
+
+### Power management
+
+- Detects AC vs battery via IOKit Power Sources and schedules work with NSBackgroundActivityScheduler so syncing is thermal and power aware
+- Throttles or pauses on battery, stays armed for Power Nap on AC, and reacts live to plug/unplug and sleep/wake events
+
+### Architecture
+
+Built in Swift and SwiftUI around a MenuBarExtra scene, with focused services for Google auth, the Drive v3 REST client, the FSEvents watcher, Keychain token storage, and power monitoring, coordinated by a single sync manager and an on-disk metadata store.
