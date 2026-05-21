@@ -22,15 +22,20 @@ export default function ProjectSpotlight({
       {/* Desktop: big spotlight + side preview list */}
       <div className="hidden md:grid md:grid-cols-[1fr_300px] lg:grid-cols-[1fr_340px] gap-4 lg:gap-6">
         <a
-          key={current.id}
           href={`/projects/${current.id}`}
-          className="animate-in group relative h-[460px] lg:h-[540px] rounded-2xl overflow-hidden border border-(--color-border) bg-(--color-muted)"
+          className="group relative h-[460px] lg:h-[540px] rounded-2xl overflow-hidden border border-(--color-border) bg-(--color-muted)"
         >
-          <img
-            src={current.cover}
-            alt={current.coverAlt}
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-          />
+          {/* Stack every project's cover so we can crossfade between them
+              without remounting the image (which caused a flash on hover). */}
+          {projects.map((p, i) => (
+            <img
+              key={p.id}
+              src={p.cover}
+              alt={p.coverAlt}
+              loading={i === 0 ? "eager" : "lazy"}
+              className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 ease-out group-hover:scale-[1.03] ${i === active ? "opacity-100" : "opacity-0"}`}
+            />
+          ))}
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
 
           <div className="absolute inset-x-0 bottom-0 p-7 lg:p-9 flex flex-col gap-3 text-white">
