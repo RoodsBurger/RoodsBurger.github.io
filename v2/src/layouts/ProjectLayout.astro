@@ -164,27 +164,29 @@ const { title, summary, tags, links, cover } = project.data;
   }
 </style>
 
-<script>
-  // Esc closes the project page (back to /#projects). Listening on the
-  // capture phase + ignoring typing focus so it works even if a child
-  // (e.g. the 3D viewer or chat) might otherwise consume the keydown.
-  window.addEventListener(
-    "keydown",
-    (e) => {
-      if (e.key !== "Escape") return;
+<script is:inline>
+  // Esc closes the project page (back to /#projects). Inline + capture
+  // phase on window so the listener is attached as soon as the HTML is
+  // parsed and fires before any descendant (3D viewer / chat) can
+  // consume the keydown. Skipped when focus is in a text field so
+  // typing in chat isn't lost.
+  (() => {
+    const onKey = (e) => {
+      if (e.key !== "Escape" && e.keyCode !== 27) return;
       const a = document.activeElement;
       if (
         a &&
         (a.tagName === "TEXTAREA" ||
           a.tagName === "INPUT" ||
-          (a as HTMLElement).isContentEditable)
+          a.isContentEditable)
       ) {
         return;
       }
       window.location.href = "/#projects";
-    },
-    { capture: true },
-  );
+    };
+    window.addEventListener("keydown", onKey, { capture: true });
+    document.addEventListener("keydown", onKey, { capture: true });
+  })();
 </script>
 
 <style is:global>
