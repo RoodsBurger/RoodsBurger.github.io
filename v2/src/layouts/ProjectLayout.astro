@@ -164,8 +164,28 @@ const { title, summary, tags, links, cover } = project.data;
   }
 </style>
 
-<!-- Esc-to-close is wired up in BaseLayout via a single document-level
-     listener so it survives Astro view-transitions. -->
+<script>
+  // Esc closes the project page (back to /#projects). Listening on the
+  // capture phase + ignoring typing focus so it works even if a child
+  // (e.g. the 3D viewer or chat) might otherwise consume the keydown.
+  window.addEventListener(
+    "keydown",
+    (e) => {
+      if (e.key !== "Escape") return;
+      const a = document.activeElement;
+      if (
+        a &&
+        (a.tagName === "TEXTAREA" ||
+          a.tagName === "INPUT" ||
+          (a as HTMLElement).isContentEditable)
+      ) {
+        return;
+      }
+      window.location.href = "/#projects";
+    },
+    { capture: true },
+  );
+</script>
 
 <style is:global>
   .prose-content h2 {

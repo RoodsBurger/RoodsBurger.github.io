@@ -106,13 +106,6 @@ const imageUrl = new URL(image, site.url).toString();
 
       observe();
 
-      // Esc on a project detail page closes the modal (back to /#projects)
-      document.addEventListener("keydown", (e) => {
-        if (e.key !== "Escape") return;
-        if (!document.querySelector(".project-modal")) return;
-        window.location.href = "/#projects";
-      });
-
       // Autoplay videos reliably across browsers (Firefox/Safari can
       // ignore the `autoplay` attribute) and pause them while offscreen
       // to save CPU.
