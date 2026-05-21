@@ -173,15 +173,6 @@ const { title, summary, tags, links, cover } = project.data;
   (() => {
     const onKey = (e) => {
       if (e.key !== "Escape" && e.keyCode !== 27) return;
-      const a = document.activeElement;
-      if (
-        a &&
-        (a.tagName === "TEXTAREA" ||
-          a.tagName === "INPUT" ||
-          a.isContentEditable)
-      ) {
-        return;
-      }
       window.location.href = "/#projects";
     };
     window.addEventListener("keydown", onKey, { capture: true });
