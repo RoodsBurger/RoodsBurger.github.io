@@ -56,20 +56,19 @@ const imageUrl = new URL(image, site.url).toString();
     <meta name="twitter:image" content={imageUrl} />
 
     <script is:inline>
-      (() => {
-        const stored = localStorage.getItem("theme");
+      (function () {
+        // Apply the saved theme before paint so there is no FOUC.
+        var stored = localStorage.getItem("theme");
         document.documentElement.dataset.theme = stored || "light";
 
-        // Remember the page's scroll position when the user clicks into
-        // a project detail link so the project popup can render the
-        // page behind at the exact spot it was opened from.
+        // Save the source page's scroll position when a project link is clicked.
         document.addEventListener(
           "click",
-          (e) => {
-            const t = e.target;
-            const a = t && t.closest && t.closest('a[href^="/projects/"]');
+          function (e) {
+            var t = e.target;
+            var a = t && t.closest && t.closest('a[href^="/projects/"]');
             if (!a) return;
-            const href = a.getAttribute("href") || "";
+            var href = a.getAttribute("href") || "";
             if (href === "/projects" || href === "/projects/") return;
             try {
               sessionStorage.setItem(
@@ -80,6 +79,19 @@ const imageUrl = new URL(image, site.url).toString();
           },
           { capture: true },
         );
+
+        // On a project route, Escape always returns to /#projects.
+        var isProject = function () {
+          return /^\/projects\/[^/]/.test(location.pathname);
+        };
+        var onKey = function (e) {
+          if (!isProject()) return;
+          if (e.key !== "Escape" && e.keyCode !== 27) return;
+          window.location.href = "/#projects";
+        };
+        window.addEventListener("keydown", onKey, true);
+        document.addEventListener("keydown", onKey, true);
+        window.addEventListener("keyup", onKey, true);
       })();
     </script>
   </head>
@@ -102,8 +114,7 @@ const imageUrl = new URL(image, site.url).toString();
     {showChat && <ChatWidget mode="floating" client:idle />}
 
     <script>
-      // Mark JS as ready so CSS can hide [data-reveal] elements safely.
-      // Without this class, no-JS visitors see all content normally.
+      // Flag enables the data-reveal hidden state; no-JS visitors see everything.
       document.documentElement.classList.add("js-reveal");
 
       const observe = () => {
@@ -127,9 +138,7 @@ const imageUrl = new URL(image, site.url).toString();
 
       observe();
 
-      // Autoplay videos reliably across browsers (Firefox/Safari can
-      // ignore the `autoplay` attribute) and pause them while offscreen
-      // to save CPU.
+      // Force autoplay reliably across browsers; pause when offscreen to save CPU.
       let videoIO: IntersectionObserver | null = null;
       const playVideos = () => {
         if (videoIO) videoIO.disconnect();

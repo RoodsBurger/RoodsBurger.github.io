@@ -13,8 +13,7 @@ const projects = (await getCollection("projects"))
     coverAlt: p.data.coverAlt,
   }));
 
-// On a /projects/<slug> route the showcase renders behind the popup,
-// so the spotlight should already highlight the open project.
+// On /projects/<slug> the spotlight starts on the open project.
 const slugMatch = Astro.url.pathname.match(/^\/projects\/([^/]+)/);
 const initialActiveId = slugMatch ? slugMatch[1] : undefined;
 ---

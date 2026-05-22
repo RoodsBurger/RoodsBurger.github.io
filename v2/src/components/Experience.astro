@@ -224,7 +224,7 @@ const groups = [0, 1, 2];
 
     const normalize = () => {
       if (span <= 0) return 0;
-      // Keep the position within the middle copy so it loops both ways.
+      // Keep scrollLeft within the middle group so it loops both ways.
       let shift = 0;
       while (scroller.scrollLeft >= span * 2) {
         scroller.scrollLeft -= span;
@@ -242,10 +242,7 @@ const groups = [0, 1, 2];
       if (span > 0) scroller.scrollLeft = span;
     };
 
-    // All listeners + the rAF loop are torn down the moment this element
-    // leaves the DOM (e.g. an Astro client-side navigation swaps the body).
-    // Without this, every navigation back would stack another forever-running
-    // rAF loop and a fresh set of listeners, slowing the whole site over time.
+    // Listeners and the rAF loop are tied to this AbortController so they tear down when the element leaves the DOM.
     const ac = new AbortController();
     const signal = ac.signal;
     const stop = () => ac.abort();
@@ -314,7 +311,7 @@ const groups = [0, 1, 2];
     scroller.addEventListener("pointerup", endDrag, { signal });
     scroller.addEventListener("pointercancel", endDrag, { signal });
     scroller.addEventListener("pointerleave", endDrag, { signal });
-    // Suppress the click that follows a real drag so it doesn't navigate.
+    // Swallow the click that follows a drag so the link doesn't navigate.
     scroller.addEventListener(
       "click",
       (e) => {
@@ -330,7 +327,7 @@ const groups = [0, 1, 2];
     let prev = performance.now();
     const SPEED = 0.04; // px per ms
     const tick = (t: number) => {
-      // Self-terminate once detached so navigations don't stack loops.
+      // Stop the loop once the element is detached.
       if (!scroller.isConnected) {
         stop();
         return;

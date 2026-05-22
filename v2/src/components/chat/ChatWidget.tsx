@@ -6,9 +6,7 @@ import { cn } from "@/lib/cn";
 
 marked.setOptions({ gfm: true, breaks: true });
 
-// Conversation is kept in sessionStorage so it survives full-page
-// navigations (the site uses normal page loads, no SPA router) and is
-// cleared automatically when the tab/session ends.
+// Conversation is persisted in sessionStorage so it survives page navigations.
 const STORE_KEY = "rr-chat-v1";
 const MAX_PERSIST = 60;
 
@@ -39,8 +37,7 @@ function saveChat(state: PersistedChat): void {
   }
 }
 
-// A short description of where the user currently is, so the assistant can
-// resolve "this" / "tell me more" against the page they're looking at.
+// Short description of the current page; lets the assistant resolve deictic questions.
 function getPageContext(): string {
   if (typeof window === "undefined") return "";
   const path = window.location.pathname;
@@ -62,9 +59,7 @@ function getPageContext(): string {
     : `The user is on ${path}.`;
 }
 
-// A concise subject for the current page, used to steer RAG retrieval
-// toward this page's indexed content. Empty when there is no specific
-// subject (then retrieval uses the question alone).
+// Concise subject for the current page used to steer RAG retrieval.
 function getPageTopic(): string {
   if (typeof window === "undefined") return "";
   const path = window.location.pathname;
@@ -115,12 +110,8 @@ export default function ChatWidget({ mode = "floating" }: Props) {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const hydratedRef = useRef(false);
 
-  // Restore a saved conversation after mount. Done in an effect (not a lazy
-  // useState initializer) so the first client render matches the SSR markup
-  // and React hydration stays clean.
+  // Hydrate the saved conversation after mount to avoid hydration mismatch.
   useEffect(() => {
-    // Restore the conversation on every page. It only resets when the
-    // tab/session ends (the browser clears sessionStorage then).
     const saved = loadChat();
     if (saved) {
       if (saved.messages.length) setMessages(saved.messages);
@@ -129,7 +120,7 @@ export default function ChatWidget({ mode = "floating" }: Props) {
     hydratedRef.current = true;
   }, [mode]);
 
-  // Persist the conversation (and floating open state) on every change.
+  // Persist conversation and open state on every change.
   useEffect(() => {
     if (!hydratedRef.current) return;
     saveChat({
