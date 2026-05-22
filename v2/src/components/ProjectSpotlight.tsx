@@ -11,10 +11,18 @@ interface Project {
 
 export default function ProjectSpotlight({
   projects,
+  initialActiveId,
 }: {
   projects: Project[];
+  initialActiveId?: string;
 }) {
-  const [active, setActive] = useState(0);
+  const initialIndex = initialActiveId
+    ? Math.max(
+        0,
+        projects.findIndex((p) => p.id === initialActiveId),
+      )
+    : 0;
+  const [active, setActive] = useState(initialIndex);
   const current = projects[active];
 
   return (
@@ -32,7 +40,7 @@ export default function ProjectSpotlight({
               key={p.id}
               src={p.cover}
               alt={p.coverAlt}
-              loading={i === 0 ? "eager" : "lazy"}
+              loading={i === initialIndex ? "eager" : "lazy"}
               className={`absolute inset-0 w-full h-full object-cover transition-[opacity,transform] duration-500 ease-out will-change-[opacity,transform] group-hover:scale-[1.03] ${i === active ? "opacity-100" : "opacity-0"}`}
             />
           ))}

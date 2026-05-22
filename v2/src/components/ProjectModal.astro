@@ -21,7 +21,12 @@ const { title, summary, tags, links } = project.data;
     data-project-backdrop
   ></a>
 
-  <article class="project-modal animate-modal-in relative max-w-4xl mx-auto my-12 md:my-20 px-4 md:px-6">
+  <article
+    class="project-modal animate-modal-in relative max-w-4xl mx-auto my-12 md:my-20 px-4 md:px-6"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="project-modal-title"
+  >
     <div class="project-card">
       <header class="relative px-6 md:px-10 pt-6 md:pt-8 pb-8 md:pb-10 border-b border-(--color-border)/60">
         <a
@@ -35,7 +40,10 @@ const { title, summary, tags, links } = project.data;
         </a>
 
         <div class="space-y-6 md:space-y-8">
-          <h1 class="text-4xl md:text-6xl font-semibold tracking-tight text-balance leading-[1.05]">
+          <h1
+            id="project-modal-title"
+            class="text-4xl md:text-6xl font-semibold tracking-tight text-balance leading-[1.05]"
+          >
             {title}
           </h1>
 
