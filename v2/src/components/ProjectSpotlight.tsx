@@ -33,7 +33,7 @@ export default function ProjectSpotlight({
               src={p.cover}
               alt={p.coverAlt}
               loading={i === 0 ? "eager" : "lazy"}
-              className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 ease-out group-hover:scale-[1.03] ${i === active ? "opacity-100" : "opacity-0"}`}
+              className={`absolute inset-0 w-full h-full object-cover transition-[opacity,transform] duration-500 ease-out will-change-[opacity,transform] group-hover:scale-[1.03] ${i === active ? "opacity-100" : "opacity-0"}`}
             />
           ))}
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
