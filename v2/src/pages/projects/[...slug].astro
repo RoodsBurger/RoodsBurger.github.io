@@ -1,6 +1,12 @@
 ---
 import { getCollection, render } from "astro:content";
-import ProjectLayout from "@/layouts/ProjectLayout.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Hero from "@/components/Hero.astro";
+import About from "@/components/About.astro";
+import ProjectShowcase from "@/components/ProjectShowcase.astro";
+import LifeOutside from "@/components/LifeOutside.astro";
+import Contact from "@/components/Contact.astro";
+import ProjectModal from "@/components/ProjectModal.astro";
 
 export async function getStaticPaths() {
   const projects = await getCollection("projects");
@@ -12,8 +18,24 @@ export async function getStaticPaths() {
 
 const { project } = Astro.props;
 const { Content } = await render(project);
+const { title, summary, cover } = project.data;
 ---
 
-<ProjectLayout project={project}>
-  <Content />
-</ProjectLayout>
+<BaseLayout
+  title={title}
+  description={summary}
+  image={cover}
+  ogType="article"
+>
+  {/* The actual home page renders behind, so the modal's blurred
+      backdrop genuinely blurs the page the project was opened from. */}
+  <Hero />
+  <About />
+  <ProjectShowcase />
+  <LifeOutside />
+  <Contact />
+
+  <ProjectModal project={project}>
+    <Content />
+  </ProjectModal>
+</BaseLayout>

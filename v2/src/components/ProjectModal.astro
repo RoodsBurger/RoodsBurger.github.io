@@ -1,5 +1,4 @@
 ---
-import BaseLayout from "@/layouts/BaseLayout.astro";
 import type { CollectionEntry } from "astro:content";
 
 interface Props {
@@ -7,21 +6,22 @@ interface Props {
 }
 
 const { project } = Astro.props;
-const { title, summary, tags, links, cover } = project.data;
+const { title, summary, tags, links } = project.data;
 ---
 
-<BaseLayout title={title} description={summary} image={cover} ogType="article" showNav={false} showFooter={false}>
-  {/* Blurred backdrop simulating the home page behind. Click anywhere
-      outside the card to close (handled by a JS listener below). */}
+{/* True overlay modal — rendered on top of the actual home page so the
+    backdrop blurs the real content beneath it (navbar-style effect). */}
+<div
+  class="project-modal-overlay fixed inset-0 z-[60] overflow-y-auto overscroll-contain"
+>
   <a
     href="/#projects"
-    class="project-backdrop"
+    class="project-backdrop fixed inset-0 -z-10"
     aria-label="Close project"
     data-project-backdrop
   ></a>
 
-  {/* Modal-like card */}
-  <article class="project-modal animate-modal-in">
+  <article class="project-modal animate-modal-in relative max-w-4xl mx-auto my-12 md:my-20 px-4 md:px-6">
     <div class="project-card">
       <header class="relative px-6 md:px-10 pt-6 md:pt-8 pb-8 md:pb-10 border-b border-(--color-border)/60">
         <a
@@ -91,42 +91,21 @@ const { title, summary, tags, links, cover } = project.data;
         </div>
       </header>
 
-      <div class="px-6 md:px-10 py-10 md:py-14" data-reveal>
+      <div class="px-6 md:px-10 py-10 md:py-14">
         <div class="prose-content space-y-6 leading-relaxed text-(--color-foreground)">
           <slot />
         </div>
       </div>
     </div>
   </article>
-</BaseLayout>
+</div>
 
 <style>
-  /* Translucent + blurred backdrop, same recipe as the sticky navbar.
-     The body's grid pattern shows through, giving the modal a floating
-     feel without rendering a separate page beneath it. */
   .project-backdrop {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    display: block;
     cursor: pointer;
     background: color-mix(in oklab, var(--color-background) 55%, transparent);
     backdrop-filter: blur(28px) saturate(1.2);
     -webkit-backdrop-filter: blur(28px) saturate(1.2);
-  }
-
-  .project-modal {
-    position: relative;
-    z-index: 1;
-    max-width: 56rem; /* 4xl */
-    margin: 3rem auto 4rem;
-    padding-inline: 1rem;
-  }
-  @media (min-width: 768px) {
-    .project-modal {
-      margin: 5rem auto 6rem;
-      padding-inline: 1.5rem;
-    }
   }
 
   .project-card {
@@ -140,7 +119,7 @@ const { title, summary, tags, links, cover } = project.data;
   }
 
   .animate-modal-in {
-    animation: modal-in 200ms cubic-bezier(0.16, 1, 0.3, 1);
+    animation: modal-in 220ms cubic-bezier(0.16, 1, 0.3, 1);
   }
   @keyframes modal-in {
     from {
@@ -157,23 +136,13 @@ const { title, summary, tags, links, cover } = project.data;
   }
 </style>
 
-<script is:inline>
-  // Esc closes the project page (back to /#projects). Inline + capture
-  // phase on window so the listener is attached as soon as the HTML is
-  // parsed and fires before any descendant (3D viewer / chat) can
-  // consume the keydown. Skipped when focus is in a text field so
-  // typing in chat isn't lost.
-  (() => {
-    const onKey = (e) => {
-      if (e.key !== "Escape" && e.keyCode !== 27) return;
-      window.location.href = "/#projects";
-    };
-    window.addEventListener("keydown", onKey, { capture: true });
-    document.addEventListener("keydown", onKey, { capture: true });
-  })();
-</script>
-
 <style is:global>
+  /* Lock body scroll while the project modal is open so the page
+     behind stays put. */
+  body:has(.project-modal-overlay) {
+    overflow: hidden;
+  }
+
   .prose-content h2 {
     font-size: 1.5rem;
     font-weight: 600;
@@ -260,3 +229,17 @@ const { title, summary, tags, links, cover } = project.data;
     border-radius: 0;
   }
 </style>
+
+<script is:inline>
+  // Esc closes the project popup (back to /#projects). Inline + capture
+  // phase on window so the listener attaches as the HTML is parsed and
+  // fires before any descendant (3D viewer / chat) can consume it.
+  (() => {
+    const onKey = (e) => {
+      if (e.key !== "Escape" && e.keyCode !== 27) return;
+      window.location.href = "/#projects";
+    };
+    window.addEventListener("keydown", onKey, { capture: true });
+    document.addEventListener("keydown", onKey, { capture: true });
+  })();
+</script>
