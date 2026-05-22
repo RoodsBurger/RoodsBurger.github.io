@@ -231,10 +231,27 @@ const { title, summary, tags, links } = project.data;
 </style>
 
 <script is:inline>
-  // Esc closes the project popup (back to /#projects). Inline + capture
-  // phase on window so the listener attaches as the HTML is parsed and
-  // fires before any descendant (3D viewer / chat) can consume it.
   (() => {
+    // Restore the source scroll position: when the user clicks a
+    // project link the BaseLayout saved window.scrollY. Pin the body
+    // via position:fixed so the page behind shows at exactly that spot
+    // (and so it can't be scrolled while the modal is open).
+    let savedY = 0;
+    try {
+      const raw = sessionStorage.getItem("rr-bg-scroll");
+      sessionStorage.removeItem("rr-bg-scroll");
+      if (raw != null) savedY = parseInt(raw, 10) || 0;
+    } catch (_) {}
+    const b = document.body;
+    b.style.position = "fixed";
+    b.style.top = `-${savedY}px`;
+    b.style.left = "0";
+    b.style.right = "0";
+    b.style.width = "100%";
+
+    // Esc closes the project popup (back to /#projects). Inline + capture
+    // phase on window so the listener attaches as the HTML is parsed and
+    // fires before any descendant (3D viewer / chat) can consume it.
     const onKey = (e) => {
       if (e.key !== "Escape" && e.keyCode !== 27) return;
       window.location.href = "/#projects";

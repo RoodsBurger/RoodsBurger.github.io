@@ -59,6 +59,27 @@ const imageUrl = new URL(image, site.url).toString();
       (() => {
         const stored = localStorage.getItem("theme");
         document.documentElement.dataset.theme = stored || "light";
+
+        // Remember the page's scroll position when the user clicks into
+        // a project detail link so the project popup can render the
+        // page behind at the exact spot it was opened from.
+        document.addEventListener(
+          "click",
+          (e) => {
+            const t = e.target;
+            const a = t && t.closest && t.closest('a[href^="/projects/"]');
+            if (!a) return;
+            const href = a.getAttribute("href") || "";
+            if (href === "/projects" || href === "/projects/") return;
+            try {
+              sessionStorage.setItem(
+                "rr-bg-scroll",
+                String(window.scrollY || 0),
+              );
+            } catch (_) {}
+          },
+          { capture: true },
+        );
       })();
     </script>
   </head>
