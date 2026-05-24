@@ -47,12 +47,20 @@ const PERSONAL_QUESTION_TERMS = new Set([
   "ceramic", "teaching", "personal", "background", "experience",
 ]);
 
-// Matches greetings and short conversational messages that don't need RAG.
-const SMALL_TALK_RE =
-  /^\s*(?:(?:hi+|hello+|hey+|howdy|greetings)(?:\s+there)?|yo|sup|good\s+(?:morning|afternoon|evening|night)|how\s+(?:are|r)\s+(?:you|u)(?:\s+doing(?:\s+today)?)?|how(?:\s|')?s\s+it\s+going|what(?:\s|')?s\s+up|thanks?(?:\s+(?:a\s+lot|so\s+much|much))?|thank\s+you(?:\s+(?:very\s+much|so\s+much))?|thx|ty|cheers|ok(?:ay)?|cool|nice|awesome|bye+|goodbye|see\s+ya|cya|night|lol|haha|👋|🙂|😊)[\s!.,?]*$/i;
-const isSmallTalk = (msg: string) => SMALL_TALK_RE.test(msg);
+// Matches greetings, pleasantries, and meta questions about the assistant itself.
+const FAST_PATH_RE =
+  /^\s*(?:(?:hi+|hello+|hey+|howdy|greetings)(?:\s+there)?|yo|sup|good\s+(?:morning|afternoon|evening|night)|how\s+(?:are|r)\s+(?:you|u)(?:\s+doing(?:\s+today)?)?|how(?:\s|')?s\s+it\s+going|what(?:\s|')?s\s+up|thanks?(?:\s+(?:a\s+lot|so\s+much|much))?|thank\s+you(?:\s+(?:very\s+much|so\s+much))?|thx|ty|cheers|ok(?:ay)?|cool|nice|awesome|bye+|goodbye|see\s+ya|cya|night|lol|haha|👋|🙂|😊|who\s+(?:are|r)\s+(?:you|u)|what\s+(?:are|r)\s+(?:you|u)|are\s+(?:you|u)\s+(?:rodolfo|an?\s+(?:bot|ai|robot|human|person|chatbot|assistant)|real|human)|what\s+(?:can|do)\s+(?:you|u)\s+(?:do|know|help\s+with))[\s!.,?]*$/i;
+const isFastPath = (msg: string) => FAST_PATH_RE.test(msg);
 
-const SMALL_TALK_PROMPT = `You are a friendly chat assistant. Reply naturally and very briefly to greetings and small talk (one short sentence is usually enough). Do not introduce yourself. Do not mention the site or its owner. Do not bring up any topic; just respond to what the user said.`;
+const FAST_PATH_PROMPT = `You are a friendly chat assistant on Rodolfo Raimundo's portfolio site. Reply in one short sentence. Match the user's tone.
+
+- Greetings or pleasantries ("hi", "thanks", "cool"): respond casually. Do not introduce yourself and do not mention Rodolfo.
+- Meta questions about you ("who are you?", "are you Rodolfo?", "what can you do?"): one-sentence self-identification. Examples:
+  - "are you Rodolfo?" -> "No, I'm just the AI assistant on his site. Ask me anything about his work."
+  - "who are you?" -> "I'm an AI assistant here to answer questions about Rodolfo's projects and background."
+  - "what can you do?" -> "I can answer questions about Rodolfo's projects, work, and interests."
+
+Never list his projects, skills, or background unless asked. Never pivot to topics the user didn't bring up.`;
 
 interface PineconeMatch {
   metadata?: { source?: string; text?: string };
@@ -131,10 +139,12 @@ Decide what kind of message this is, then reply accordingly:
 3. General technical or world question that isn't about Rodolfo:
    - Answer from your own knowledge.
 
-Tone for every reply:
-- Match the user's energy. Short message gets a short reply, casual gets casual.
+Length and tone for every reply:
+- Answer only what was asked. Do not append extra facts, bullet lists, or pivots the user didn't request.
+- Length matches the question. A yes/no question gets a sentence. A "what is X" question gets two or three sentences. Use longer answers only when the user asks for detail.
+- Match the user's energy. Casual gets casual.
 - Be direct. Skip filler ("Great question!", "I'd be happy to…") and unnecessary preamble.
-- Plain prose by default; use bullets only when listing several distinct items.`;
+- Plain prose by default; use bullets only when the user explicitly asks for a list or there really are several distinct items.`;
 
 async function healthCheck(origin: string | undefined) {
   const result: Record<string, unknown> = {
@@ -213,7 +223,7 @@ export const handler = async (event: {
 
   const { message, conversationHistory, pageContext, pageTopic } = parsed;
   const recentHistory = conversationHistory.slice(-HISTORY_TURN_LIMIT);
-  const smallTalk = isSmallTalk(message);
+  const fastPath = isFastPath(message);
 
   // Fold the current page topic into the embed query so Pinecone surfaces that page's chunks.
   const retrievalQuery = pageTopic
@@ -235,12 +245,12 @@ export const handler = async (event: {
   const cohere = new CohereClientV2({ token: process.env.COHERE_API_KEY });
 
   // Greetings and pleasantries skip embed + Pinecone and use a Rodolfo-free prompt.
-  if (smallTalk) {
+  if (fastPath) {
     const chatMessages: Array<{
       role: "system" | "user" | "assistant";
       content: string;
     }> = [
-      { role: "system", content: SMALL_TALK_PROMPT },
+      { role: "system", content: FAST_PATH_PROMPT },
       ...recentHistory.map((m) => ({ role: m.role, content: m.content })),
       { role: "user", content: message },
     ];
@@ -265,7 +275,7 @@ export const handler = async (event: {
       );
     } catch (e) {
       const err = e as Error;
-      console.error("Cohere chat failed (small talk):", err.name, err.message);
+      console.error("Cohere chat failed (fast path):", err.name, err.message);
       return json(502, { error: "Chat service failed", details: err.message }, origin);
     }
   }
