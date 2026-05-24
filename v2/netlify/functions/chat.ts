@@ -47,6 +47,13 @@ const PERSONAL_QUESTION_TERMS = new Set([
   "ceramic", "teaching", "personal", "background", "experience",
 ]);
 
+// Matches greetings and short conversational messages that don't need RAG.
+const SMALL_TALK_RE =
+  /^\s*(?:(?:hi+|hello+|hey+|howdy|greetings)(?:\s+there)?|yo|sup|good\s+(?:morning|afternoon|evening|night)|how\s+(?:are|r)\s+(?:you|u)(?:\s+doing(?:\s+today)?)?|how(?:\s|')?s\s+it\s+going|what(?:\s|')?s\s+up|thanks?(?:\s+(?:a\s+lot|so\s+much|much))?|thank\s+you(?:\s+(?:very\s+much|so\s+much))?|thx|ty|cheers|ok(?:ay)?|cool|nice|awesome|bye+|goodbye|see\s+ya|cya|night|lol|haha|👋|🙂|😊)[\s!.,?]*$/i;
+const isSmallTalk = (msg: string) => SMALL_TALK_RE.test(msg);
+
+const SMALL_TALK_PROMPT = `You are a friendly chat assistant. Reply naturally and very briefly to greetings and small talk (one short sentence is usually enough). Do not introduce yourself. Do not mention the site or its owner. Do not bring up any topic; just respond to what the user said.`;
+
 interface PineconeMatch {
   metadata?: { source?: string; text?: string };
   score?: number;
@@ -101,9 +108,12 @@ const json = (status: number, body: unknown, origin: string | undefined) => ({
 
 const SYSTEM_PROMPT = `You are a friendly chat assistant on Rodolfo Raimundo's personal portfolio site. You are not Rodolfo.
 
-Voice:
-- Always refer to him in the third person: "Rodolfo", "he", "his". Never use "I", "me", or "my" to refer to him, even when the retrieved portfolio context is written in first person — silently convert it to third person.
-- Reserve "I" / "my" for yourself, the assistant ("I don't have that detail", "I can tell you about his projects"). Don't introduce yourself unless asked.
+Voice (this is the most important rule):
+- Always refer to him in the third person: "Rodolfo", "he", "his". Never use "I", "me", or "my" to refer to him.
+- The retrieved portfolio context is written by Rodolfo in the first person. You must silently rewrite it into the third person before answering.
+  Example — if the context says: "I built Tobias to learn FOC control."
+  You write: "Rodolfo built Tobias to learn FOC control." (never "I built Tobias…")
+- Reserve "I" / "my" for yourself, the assistant ("I don't have that detail"). Do not introduce yourself unless the user asks who you are.
 
 Decide what kind of message this is, then reply accordingly:
 
@@ -203,6 +213,7 @@ export const handler = async (event: {
 
   const { message, conversationHistory, pageContext, pageTopic } = parsed;
   const recentHistory = conversationHistory.slice(-HISTORY_TURN_LIMIT);
+  const smallTalk = isSmallTalk(message);
 
   // Fold the current page topic into the embed query so Pinecone surfaces that page's chunks.
   const retrievalQuery = pageTopic
@@ -222,6 +233,42 @@ export const handler = async (event: {
   }
 
   const cohere = new CohereClientV2({ token: process.env.COHERE_API_KEY });
+
+  // Greetings and pleasantries skip embed + Pinecone and use a Rodolfo-free prompt.
+  if (smallTalk) {
+    const chatMessages: Array<{
+      role: "system" | "user" | "assistant";
+      content: string;
+    }> = [
+      { role: "system", content: SMALL_TALK_PROMPT },
+      ...recentHistory.map((m) => ({ role: m.role, content: m.content })),
+      { role: "user", content: message },
+    ];
+    try {
+      const chatResponse = await cohere.chat({
+        model: COHERE_CHAT_MODEL,
+        messages: chatMessages,
+        temperature: 0.5,
+      });
+      if (chatResponse?.message && Array.isArray(chatResponse.message.content)) {
+        return json(200, { message: chatResponse.message }, origin);
+      }
+      return json(
+        200,
+        {
+          message: {
+            role: "assistant",
+            content: [{ type: "text", text: "Hey!" }],
+          },
+        },
+        origin,
+      );
+    } catch (e) {
+      const err = e as Error;
+      console.error("Cohere chat failed (small talk):", err.name, err.message);
+      return json(502, { error: "Chat service failed", details: err.message }, origin);
+    }
+  }
 
   let queryEmbedding: number[];
   try {
