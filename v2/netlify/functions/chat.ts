@@ -47,6 +47,11 @@ const PERSONAL_QUESTION_TERMS = new Set([
   "ceramic", "teaching", "personal", "background", "experience",
 ]);
 
+// Matches greetings and short conversational messages that don't need RAG.
+const SMALL_TALK_RE =
+  /^\s*(?:(?:hi+|hello+|hey+|howdy|greetings)(?:\s+there)?|yo|sup|good\s+(?:morning|afternoon|evening|night)|how\s+(?:are|r)\s+(?:you|u)(?:\s+doing(?:\s+today)?)?|how(?:\s|')?s\s+it\s+going|what(?:\s|')?s\s+up|thanks?(?:\s+(?:a\s+lot|so\s+much|much))?|thank\s+you(?:\s+(?:very\s+much|so\s+much))?|thx|ty|cheers|ok(?:ay)?|cool|nice|awesome|bye+|goodbye|see\s+ya|cya|night|lol|haha|👋|🙂|😊)[\s!.,?]*$/i;
+const isSmallTalk = (msg: string) => SMALL_TALK_RE.test(msg);
+
 interface PineconeMatch {
   metadata?: { source?: string; text?: string };
   score?: number;
@@ -99,16 +104,19 @@ const json = (status: number, body: unknown, origin: string | undefined) => ({
   body: JSON.stringify(body),
 });
 
-const SYSTEM_PROMPT = `You are Rodolfo's AI assistant. You provide information about Rodolfo Raimundo's work, projects, education, experiences, and interests.
+const SYSTEM_PROMPT = `You are a friendly assistant on Rodolfo Raimundo's personal portfolio site.
 
-RULES:
-1. Only share factual information about Rodolfo that is explicitly mentioned in the provided context.
-2. If you don't have specific information about Rodolfo in the context, say so — never invent or assume details about his background.
-3. For general technical questions (not specifically about Rodolfo), you may answer from your general knowledge.
-4. Keep responses concise, focused, and well-formatted. Use bullet points or numbered lists for multi-part answers.
-5. Paraphrase context — never copy-paste verbatim.
-6. Maintain a friendly, professional tone.
-7. If the retrieved context is unrelated to the question, acknowledge that you don't have that specific information.`;
+Tone:
+- Match the user's energy. Short message gets a short reply, casual gets casual.
+- For greetings or small talk, respond naturally and briefly. Do not introduce yourself, do not mention Rodolfo, and do not pivot to his work unless they ask.
+- Be direct. Skip filler ("Great question!", "I'd be happy to…") and unnecessary preamble.
+- Use bullet points only when listing several distinct items. For one or two things, write a sentence.
+- Plain prose by default; reach for headings or lists only when the answer truly has parts.
+
+Content:
+- When the user asks about Rodolfo, his projects, background, or interests, ground every claim in the provided portfolio context. If the context doesn't cover it, say you don't have that detail. Never invent.
+- For general technical questions that aren't about Rodolfo, answer from your own knowledge.
+- Paraphrase context; never paste it verbatim.`;
 
 async function healthCheck(origin: string | undefined) {
   const result: Record<string, unknown> = {
@@ -187,10 +195,9 @@ export const handler = async (event: {
 
   const { message, conversationHistory, pageContext, pageTopic } = parsed;
   const recentHistory = conversationHistory.slice(-HISTORY_TURN_LIMIT);
+  const smallTalk = isSmallTalk(message);
 
-  // Steer RAG retrieval toward the page the user is viewing: the page
-  // topic is folded into the embedding query so Pinecone surfaces that
-  // page's indexed chunks, while the user's question stays primary.
+  // Fold the current page topic into the embed query so Pinecone surfaces that page's chunks.
   const retrievalQuery = pageTopic
     ? `${message}\n\n(In the context of: ${pageTopic})`
     : message;
@@ -208,6 +215,43 @@ export const handler = async (event: {
   }
 
   const cohere = new CohereClientV2({ token: process.env.COHERE_API_KEY });
+
+  // Fast path: greetings and short pleasantries skip embed + Pinecone for a clean, natural reply.
+  if (smallTalk) {
+    const chatMessages: Array<{
+      role: "system" | "user" | "assistant";
+      content: string;
+    }> = [
+      { role: "system", content: SYSTEM_PROMPT },
+      ...recentHistory.map((m) => ({ role: m.role, content: m.content })),
+      { role: "user", content: message },
+    ];
+
+    try {
+      const chatResponse = await cohere.chat({
+        model: COHERE_CHAT_MODEL,
+        messages: chatMessages,
+        temperature: 0.5,
+      });
+      if (chatResponse?.message && Array.isArray(chatResponse.message.content)) {
+        return json(200, { message: chatResponse.message }, origin);
+      }
+      return json(
+        200,
+        {
+          message: {
+            role: "assistant",
+            content: [{ type: "text", text: "Hey!" }],
+          },
+        },
+        origin,
+      );
+    } catch (e) {
+      const err = e as Error;
+      console.error("Cohere chat failed (small talk):", err.name, err.message);
+      return json(502, { error: "Chat service failed", details: err.message }, origin);
+    }
+  }
 
   let queryEmbedding: number[];
   try {
