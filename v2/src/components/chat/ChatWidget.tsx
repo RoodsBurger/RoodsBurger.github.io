@@ -37,6 +37,17 @@ function saveChat(state: PersistedChat): void {
   }
 }
 
+// Read the project title from the modal first; falls back to any h1.
+function projectTitle(): string {
+  if (typeof document === "undefined") return "";
+  const t =
+    document.getElementById("project-modal-title")?.textContent ||
+    document.querySelector("article[role='dialog'] h1")?.textContent ||
+    document.querySelector("h1")?.textContent ||
+    "";
+  return t.trim();
+}
+
 // Short description of the current page; lets the assistant resolve deictic questions.
 function getPageContext(): string {
   if (typeof window === "undefined") return "";
@@ -50,8 +61,7 @@ function getPageContext(): string {
     return "The user is on the Personal page, about Rodolfo's hobbies and life outside work.";
   if (path === "/chat") return "The user is on the dedicated chat page.";
   if (path.startsWith("/projects/")) {
-    const name =
-      document.querySelector("h1")?.textContent?.trim() || lead || "a project";
+    const name = projectTitle() || lead || "a project";
     return `The user is viewing the project page for "${name}" (${path}). If their question is ambiguous (e.g. "this", "it", "tell me more"), assume it refers to this project.`;
   }
   return lead
@@ -71,9 +81,7 @@ function getPageTopic(): string {
     return "Rodolfo's hobbies and life outside work";
   if (path === "/chat") return "";
   if (path.startsWith("/projects/")) {
-    return (
-      document.querySelector("h1")?.textContent?.trim() || lead || ""
-    );
+    return projectTitle() || lead || "";
   }
   return lead || "";
 }
@@ -198,7 +206,7 @@ export default function ChatWidget({ mode = "floating" }: Props) {
       className={cn(
         "flex flex-col bg-(--color-card) text-(--color-card-foreground) border border-(--color-border) overflow-hidden",
         mode === "floating"
-          ? "fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-[min(380px,calc(100vw-2rem))] h-[min(560px,calc(100vh-6rem))] rounded-2xl shadow-2xl z-50 origin-bottom-right animate-chat-in"
+          ? "fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-[min(380px,calc(100vw-2rem))] h-[min(560px,calc(100vh-6rem))] rounded-2xl shadow-2xl z-[70] origin-bottom-right animate-chat-in"
           : "w-full h-[min(640px,calc(100vh-12rem))] rounded-2xl shadow-sm",
       )}
       role="dialog"
@@ -306,8 +314,7 @@ export default function ChatWidget({ mode = "floating" }: Props) {
           onKeyDown={handleKeyDown}
           rows={1}
           placeholder="Ask anything..."
-          disabled={isLoading}
-          className="flex-1 resize-none bg-transparent text-sm px-3 py-2 rounded-lg border border-(--color-border) focus:border-(--color-accent) focus:outline-none focus:ring-2 focus:ring-(--color-ring)/30 disabled:opacity-50 max-h-32"
+          className="flex-1 resize-none bg-transparent text-sm px-3 py-2 rounded-lg border border-(--color-border) focus:border-(--color-accent) focus:outline-none focus:ring-2 focus:ring-(--color-ring)/30 max-h-32"
           aria-label="Message"
         />
         <button
@@ -339,7 +346,7 @@ export default function ChatWidget({ mode = "floating" }: Props) {
           type="button"
           onClick={() => setIsOpen(true)}
           aria-label="Open chat"
-          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 group size-12 rounded-full bg-(--color-accent) text-(--color-accent-foreground) shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
+          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[70] group size-12 rounded-full bg-(--color-accent) text-(--color-accent-foreground) shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
         >
           <MessageCircle size={20} />
         </button>
