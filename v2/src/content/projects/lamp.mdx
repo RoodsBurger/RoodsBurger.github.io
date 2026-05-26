@@ -11,11 +11,21 @@ links:
   github: "https://github.com/RoodsBurger/brushless_lamp/tree/c6"
 ---
 
-import Model3D from "@/components/Model3D.astro";
+import Model3DPair from "@/components/Model3DPair.astro";
 
-<Model3D
-  src="/artifacts/lamp_open.glb"
-  alt="Interactive 3D model of the brushless lamp"
+<Model3DPair
+  items={[
+    {
+      src: "/artifacts/lamp1.glb",
+      alt: "Brushless lamp closed view, interactive 3D model",
+      caption: "Closed",
+    },
+    {
+      src: "/artifacts/lamp_open.glb",
+      alt: "Brushless lamp open view, interactive 3D model",
+      caption: "Open",
+    },
+  ]}
 />
 
 ## Overview
