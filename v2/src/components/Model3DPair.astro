@@ -15,22 +15,22 @@ interface Props {
 const { items, height = "440px" } = Astro.props;
 ---
 
-{/* Two 3D viewers side by side on desktop; only the first on mobile. */}
+{/* Two 3D viewers side by side on desktop; only the second one (right) on mobile. */}
 <div
   class="not-prose my-8 grid grid-cols-1 md:grid-cols-2 gap-4 [&_figure]:my-0"
 >
-  <Model3D
-    src={items[0].src}
-    alt={items[0].alt}
-    caption={items[0].caption}
-    height={height}
-  />
   <div class="hidden md:block">
     <Model3D
-      src={items[1].src}
-      alt={items[1].alt}
-      caption={items[1].caption}
+      src={items[0].src}
+      alt={items[0].alt}
+      caption={items[0].caption}
       height={height}
     />
   </div>
+  <Model3D
+    src={items[1].src}
+    alt={items[1].alt}
+    caption={items[1].caption}
+    height={height}
+  />
 </div>
