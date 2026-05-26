@@ -6,26 +6,16 @@ category: ["code", "cad"]
 order: 5
 cover: "/artifacts/lamp_cover.webp"
 coverAlt: "Brushless kinetic lamp"
-model3d: "/artifacts/lamp1.glb"
+model3d: "/artifacts/lamp_open.glb"
 links:
   github: "https://github.com/RoodsBurger/brushless_lamp/tree/c6"
 ---
 
-import Model3DPair from "@/components/Model3DPair.astro";
+import Model3D from "@/components/Model3D.astro";
 
-<Model3DPair
-  items={[
-    {
-      src: "/artifacts/lamp1.glb",
-      alt: "Brushless lamp base, interactive 3D model",
-      caption: "Base",
-    },
-    {
-      src: "/artifacts/lamp2.glb",
-      alt: "Brushless lamp core carrier, interactive 3D model",
-      caption: "Core carrier",
-    },
-  ]}
+<Model3D
+  src="/artifacts/lamp_open.glb"
+  alt="Interactive 3D model of the brushless lamp"
 />
 
 ## Overview
