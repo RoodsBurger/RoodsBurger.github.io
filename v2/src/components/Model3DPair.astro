@@ -5,7 +5,6 @@ interface Item {
   src: string;
   alt: string;
   caption?: string;
-  color?: string;
 }
 
 interface Props {
@@ -16,7 +15,7 @@ interface Props {
 const { items, height = "440px" } = Astro.props;
 ---
 
-{/* Two STL viewers side by side on desktop; only the first on mobile. */}
+{/* Two 3D viewers side by side on desktop; only the first on mobile. */}
 <div
   class="not-prose my-8 grid grid-cols-1 md:grid-cols-2 gap-4 [&_figure]:my-0"
 >
@@ -24,7 +23,6 @@ const { items, height = "440px" } = Astro.props;
     src={items[0].src}
     alt={items[0].alt}
     caption={items[0].caption}
-    color={items[0].color}
     height={height}
   />
   <div class="hidden md:block">
@@ -32,7 +30,6 @@ const { items, height = "440px" } = Astro.props;
       src={items[1].src}
       alt={items[1].alt}
       caption={items[1].caption}
-      color={items[1].color}
       height={height}
     />
   </div>

@@ -1,218 +1,82 @@
 ---
 interface Props {
-  /** Path to a .stl file (Fusion 360 native export) */
+  /** Path to a .glb (or .gltf) file exported from Fusion 360 (via Blender). */
   src: string;
   alt: string;
   caption?: string;
-  /** Hex color for the model surface (default: theme accent) */
-  color?: string;
   height?: string;
 }
 
-const {
-  src,
-  alt,
-  caption,
-  color = "#5b6371",
-  height = "480px",
-} = Astro.props;
-
-const viewerId = `stl-viewer-${Math.random().toString(36).slice(2, 9)}`;
+const { src, alt, caption, height = "480px" } = Astro.props;
 ---
 
 <figure
   class="not-prose my-8 relative rounded-xl overflow-hidden border border-(--color-border) bg-(--color-muted)"
-  data-stl-viewer
-  data-stl-src={src}
-  data-stl-color={color}
-  data-stl-id={viewerId}
   style={`height: ${height};`}
   aria-label={alt}
 >
-  <div data-stl-canvas class="absolute inset-0"></div>
-
-  <div data-stl-loading class="absolute inset-0 flex items-center justify-center text-xs font-mono text-(--color-muted-foreground) tracking-wider uppercase pointer-events-none">
-    Loading model…
-  </div>
+  <model-viewer
+    src={src}
+    alt={alt}
+    camera-controls
+    auto-rotate
+    auto-rotate-delay="2500"
+    rotation-per-second="18deg"
+    interaction-prompt="none"
+    shadow-intensity="0.7"
+    shadow-softness="0.9"
+    exposure="1"
+    tone-mapping="aces"
+    loading="lazy"
+    reveal="auto"
+    style="width: 100%; height: 100%; background: transparent; --poster-color: transparent;"
+  >
+    <div
+      slot="poster"
+      class="absolute inset-0 flex items-center justify-center text-xs font-mono text-(--color-muted-foreground) tracking-wider uppercase"
+    >
+      Loading model…
+    </div>
+    <div
+      slot="progress-bar"
+      class="absolute bottom-0 left-0 h-0.5 bg-(--color-foreground)/30"
+    >
+    </div>
+  </model-viewer>
 
   <div
-    data-stl-error
-    class="absolute inset-0 hidden flex-col items-center justify-center gap-2 text-center px-6 text-(--color-muted-foreground) pointer-events-none"
+    class="pointer-events-none absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-(--color-card)/80 backdrop-blur-sm px-2.5 py-1 text-[11px] font-mono text-(--color-muted-foreground) border border-(--color-border)/60"
   >
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-      <path d="m3.3 7 8.7 5 8.7-5"/>
-      <path d="M12 22V12"/>
-    </svg>
-    <p class="text-sm">3D model not loaded yet. Export an STL from Fusion 360 and drop it at <code class="font-mono text-xs">{src}</code>.</p>
-  </div>
-
-  <div class="pointer-events-none absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-(--color-card)/80 backdrop-blur-sm px-2.5 py-1 text-[11px] font-mono text-(--color-muted-foreground) border border-(--color-border)/60">
-    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-      <path d="m3.3 7 8.7 5 8.7-5"/>
-      <path d="M12 22V12"/>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="11"
+      height="11"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path
+        d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+      ></path>
+      <path d="m3.3 7 8.7 5 8.7-5"></path>
+      <path d="M12 22V12"></path>
     </svg>
     Drag to rotate · scroll to zoom
   </div>
 
-  {caption && (
-    <figcaption class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-4 py-3 text-sm text-white font-medium pointer-events-none">
-      {caption}
-    </figcaption>
-  )}
+  {
+    caption && (
+      <figcaption class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-4 py-3 text-sm text-white font-medium pointer-events-none">
+        {caption}
+      </figcaption>
+    )
+  }
 </figure>
 
 <script>
-  import * as THREE from "three";
-  import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
-  import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-
-  type ViewerEl = HTMLElement & { __stlViewer?: { dispose: () => void } };
-
-  const initViewer = (root: ViewerEl) => {
-    if (root.__stlViewer) return; // already mounted
-
-    const canvas = root.querySelector<HTMLElement>("[data-stl-canvas]");
-    const loadingEl = root.querySelector<HTMLElement>("[data-stl-loading]");
-    const errorEl = root.querySelector<HTMLElement>("[data-stl-error]");
-    const src = root.dataset.stlSrc;
-    const color = root.dataset.stlColor || "#5b6371";
-
-    if (!canvas || !src) return;
-
-    const scene = new THREE.Scene();
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setClearColor(0x000000, 0);
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    renderer.domElement.style.display = "block";
-    renderer.domElement.style.width = "100%";
-    renderer.domElement.style.height = "100%";
-    canvas.appendChild(renderer.domElement);
-
-    const setSize = () => {
-      const { clientWidth, clientHeight } = root;
-      if (clientWidth === 0 || clientHeight === 0) return;
-      renderer.setSize(clientWidth, clientHeight, false);
-      camera.aspect = clientWidth / clientHeight;
-      camera.updateProjectionMatrix();
-    };
-
-    const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 5000);
-
-    // Lighting
-    scene.add(new THREE.AmbientLight(0xffffff, 0.55));
-    const key = new THREE.DirectionalLight(0xffffff, 0.85);
-    key.position.set(80, 120, 100);
-    key.castShadow = true;
-    key.shadow.mapSize.set(1024, 1024);
-    scene.add(key);
-    const fill = new THREE.DirectionalLight(0xffffff, 0.35);
-    fill.position.set(-100, 60, -80);
-    scene.add(fill);
-
-    // Orbit controls
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.08;
-    controls.enablePan = false;
-    controls.autoRotate = false;
-
-    const loader = new STLLoader();
-    loader.load(
-      src,
-      (geometry) => {
-        loadingEl?.style.setProperty("display", "none");
-        geometry.computeBoundingBox();
-        geometry.computeBoundingSphere();
-        geometry.computeVertexNormals();
-
-        const material = new THREE.MeshStandardMaterial({
-          color: new THREE.Color(color),
-          metalness: 0.15,
-          roughness: 0.55,
-        });
-        const mesh = new THREE.Mesh(geometry, material);
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
-        scene.add(mesh);
-
-        // Use the model's actual bounding-sphere center as the orbit target
-        // (no geometry mutation, robust to any local coordinate system).
-        const center = new THREE.Vector3();
-        geometry.boundingBox!.getCenter(center);
-        const radius = geometry.boundingSphere?.radius ?? 1;
-
-        // Fit distance accounts for both vertical and horizontal FOV so the
-        // model is fully visible regardless of viewport aspect ratio.
-        const vFov = (camera.fov * Math.PI) / 180;
-        const hFov = 2 * Math.atan(Math.tan(vFov / 2) * camera.aspect);
-        const fitDistance = (radius * 1.3) / Math.sin(Math.min(vFov, hFov) / 2);
-
-        // 3/4 view, offset from the model's center
-        const offset = new THREE.Vector3(1, 0.6, 1)
-          .normalize()
-          .multiplyScalar(fitDistance);
-        camera.position.copy(center).add(offset);
-        camera.near = fitDistance / 100;
-        camera.far = fitDistance * 10;
-        camera.lookAt(center);
-        camera.updateProjectionMatrix();
-
-        controls.target.copy(center);
-        controls.maxDistance = fitDistance * 3;
-        controls.minDistance = fitDistance * 0.3;
-        controls.update();
-
-        // Idle auto-rotate after 3s of no interaction
-        let lastInteract = 0;
-        const markInteract = () => (lastInteract = performance.now());
-        renderer.domElement.addEventListener("pointerdown", markInteract);
-        renderer.domElement.addEventListener("wheel", markInteract);
-        markInteract();
-
-        const animate = () => {
-          rafId = requestAnimationFrame(animate);
-          if (performance.now() - lastInteract > 3000) {
-            controls.autoRotate = true;
-            controls.autoRotateSpeed = 0.6;
-          } else {
-            controls.autoRotate = false;
-          }
-          controls.update();
-          renderer.render(scene, camera);
-        };
-        animate();
-      },
-      undefined,
-      (err) => {
-        console.error("STL load failed:", err);
-        loadingEl?.style.setProperty("display", "none");
-        errorEl?.classList.remove("hidden");
-        errorEl?.classList.add("flex");
-      },
-    );
-
-    setSize();
-    let rafId = 0;
-    const resizeObs = new ResizeObserver(setSize);
-    resizeObs.observe(root);
-
-    root.__stlViewer = {
-      dispose: () => {
-        cancelAnimationFrame(rafId);
-        resizeObs.disconnect();
-        controls.dispose();
-        renderer.dispose();
-        renderer.domElement.remove();
-        delete root.__stlViewer;
-      },
-    };
-  };
-
-  document
-    .querySelectorAll<ViewerEl>("[data-stl-viewer]")
-    .forEach(initViewer);
+  import "@google/model-viewer";
 </script>

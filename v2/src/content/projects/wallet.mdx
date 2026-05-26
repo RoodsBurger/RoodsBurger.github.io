@@ -7,7 +7,7 @@ order: 8
 cover: "/artifacts/wallet_render.webp"
 coverAlt: "Magnetic wallet render"
 period: "2024"
-model3d: "/artifacts/wallet.stl"
+model3d: "/artifacts/wallet.glb"
 links: {}
 ---
 
@@ -16,12 +16,12 @@ import Model3DPair from "@/components/Model3DPair.astro";
 <Model3DPair
   items={[
     {
-      src: "/artifacts/wallet.stl",
+      src: "/artifacts/wallet.glb",
       alt: "Interactive 3D model of the magnetic wallet",
       caption: "Body",
     },
     {
-      src: "/artifacts/wallet2.stl",
+      src: "/artifacts/wallet2.glb",
       alt: "Interactive 3D model of the magnetic wallet, second part",
       caption: "Clip",
     },
@@ -36,4 +36,4 @@ More detail (and photos of the final piece) coming soon.
 
 ## The interactive model
 
-The viewers above are live 3D models rendered with Three.js. Drag to rotate, scroll to zoom. Each is a binary STL exported straight from Fusion 360 (File → 3D Print → STL, no conversion step needed).
+The viewers above are live 3D models with the original Fusion 360 appearances baked in. Drag to rotate, scroll to zoom. Each is a glTF Binary (.glb) exported from Fusion 360 via Blender so the materials, colors, and finishes carry over.
