@@ -12,6 +12,10 @@ v2/.astro/
 
 # large PDFs (not needed for live site; consumed via Pinecone index)
 v2/public/documents/
+documents/
+
+# backups
+*.backup
 
 # environment variables
 .env
@@ -37,3 +41,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+
+# Claude Code local settings (user-specific)
+.claude/

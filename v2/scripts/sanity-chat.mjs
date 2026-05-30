@@ -89,7 +89,7 @@ res.matches.slice(0, 5).forEach((m, i) => {
 // 3. Chat
 process.stdout.write("\nCohere chat... ");
 const chat = await cohere.chat({
-  model: "command-a-03-2025",
+  model: "command-r7b-12-2024",
   temperature: 0.3,
   messages: [
     {
