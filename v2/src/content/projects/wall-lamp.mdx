@@ -21,21 +21,21 @@ import RenderGallery from "@/components/project/RenderGallery.astro";
 
 ## Knock to move
 
-The wall lamp is a pendulum arm on a brushless gimbal motor, with no buttons or switches anywhere on it. The arm is the only input, so the motor that moves it also has to notice when someone hits it.
+The wall lamp is a pendulum arm on a brushless gimbal motor, with no buttons or switches. The arm is the only input, so the motor that moves it also has to notice when someone hits it.
 
-Knocks come in through the motor's own encoder rather than a separate sensor. One knock steps the arm one position in the direction it was pushed, and a quick second knock on the same side sends it all the way to that side's end position. The motion settles without overshoot. On power-up the lamp restores its last resting position from memory, with no calibration routine. Matter over WiFi exposes on and off, brightness and color temperature to Apple Home, Google Home and SmartThings, for when getting up to knock on a lamp isn't an option.
+Knocks are read through the motor's own encoder. One knock steps the arm one position the way it was pushed, and a quick second knock sends it to that side's end. Matter over WiFi covers the light for when getting up to knock on a lamp isn't an option.
 
 ## The light
 
-The head I'm working on puts a small light at the end of the arm, facing a row of colored plates mounted flush on the wall. The room only sees the light reflected off whichever plate the arm points at, so the plate sets the color, and knocking the arm to a new position changes the plate. A warm and cool LED strip drives the light, with Matter handling on and off and brightness. This part is still a design and hasn't been built into a finished lamp yet.
+The head I'm still designing puts a small light at the end of the arm, facing a row of colored plates on the wall. The room sees only light reflected off the plate the arm points at, so moving the arm changes the color.
 
 ## Why a cycloidal reduction instead of a planetary gearbox?
 
-At rest the motor driver sleeps, and the arm holds its position through the friction of the gear reduction alone, so staying put costs no power. That only works if the reduction gives the motor enough torque to move the arm and enough friction to hold it. I looked at direct drive first, then designed and printed a planetary reduction. The 3D-printed cycloidal reduction, at a higher ratio on the same gimbal motor, is the one that moves the arm and holds it. I documented each option with its printed parts, print settings, assembly steps and the firmware changes it needed.
+At rest the motor driver sleeps and friction in the reduction holds the arm, so staying put costs no power. That needs enough torque to move the arm and enough friction to hold it. Direct drive and a printed planetary reduction came first. The printed cycloidal reduction, at a higher ratio on the same motor, does both.
 
 ## Electronics
 
-The wall lamp reuses the desk lamp's ESP32-S3 control board unchanged. The firmware is a fork of the desk lamp's, with its SimpleFOC motor control, Matter color temperature endpoint and signed over-the-air updates. On top of that it adds knock detection, arm positioning, and a serial console over USB that drives, calibrates and tunes the arm live.
+The lamp reuses the desk lamp's control board and a fork of its firmware, which adds knock detection and a USB serial console for tuning the arm live.
 
 <RenderGallery
   ratio="1/1"
