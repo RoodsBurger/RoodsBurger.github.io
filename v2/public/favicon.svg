@@ -1,13 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
   <style>
-    .ink { fill: #111114; stroke: #111114; }
-    .line { fill: none; stroke: #111114; }
-    .foot { fill: #a3262c; }
-    @media (prefers-color-scheme: dark) {
-      .ink { fill: #f4f4f5; stroke: #f4f4f5; }
-      .line { stroke: #f4f4f5; }
-      .foot { fill: #d8676d; }
-    }
+    /* Mid-tone colors that read on both light and dark tabs */
+    .ink { fill: #9a9aa2; stroke: #9a9aa2; }
+    .line { fill: none; stroke: #9a9aa2; }
+    .foot { fill: #c8424a; }
   </style>
   <mask id="m"><rect width="32" height="32" fill="#fff"/><circle cx="16" cy="11.6" r="2.8" fill="#000"/></mask>
   <g class="line" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
