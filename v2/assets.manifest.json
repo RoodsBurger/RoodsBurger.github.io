@@ -30,5 +30,7 @@
   {"file":"raiapps/budget-investments.webp"},
   {"file":"raiapps/budget-investments-analysis.webp"},
   {"file":"raiapps/budget-investments-charts.webp"},
-  {"file":"chat/cover.webp","slot":"cover"}
+  {"file":"chat/cover.webp","slot":"cover"},
+  {"file":"chat/widget.webp"},
+  {"file":"chat/page.webp"}
 ]
