@@ -86,7 +86,7 @@ const itemsWithDims = items.map((item, i) => ({ ...item, dims: dims[i] }));
         preload="auto"
         width={item.dims.width}
         height={item.dims.height}
-        class="absolute inset-0 w-full h-full object-cover pointer-events-none transition-opacity duration-500"
+        class="absolute inset-0 w-full h-full object-cover pointer-events-none transition-opacity duration-500 [clip-path:inset(0_round_calc(0.75rem-1px))]"
         style={`opacity: ${i === 0 ? 1 : 0};`}
         aria-label={item.alt || item.caption}
       >
