@@ -24,18 +24,12 @@ import MediaGrid from "@/components/MediaGrid.astro";
 
 ## What it is
 
-Artificial Synaptic Pruning is a Fall 2020 experiment in deleting most of a neural network's weights, the way the brain removes under-stimulated synapses, and checking whether the network gets better. The obvious expectation is that it gets worse.
-
-It was my project for COMS E6998, Computation and the Brain, a graduate seminar at Columbia University that I took as an undergraduate. The question was whether pruning, combined with ideas from Hebbian learning, can make artificial networks more efficient and help them generalize. The notebooks went up on GitHub in December 2024, along with a written report.
+Artificial Synaptic Pruning is a Fall 2020 experiment in deleting most of a neural network's weights, the way the brain removes under-stimulated synapses, to see whether the network gets better. The obvious expectation is that it gets worse. It was my project for COMS E6998, Computation and the Brain, a Columbia graduate seminar I took as an undergraduate.
 
 ## Experiment design
 
-The setup is a 2×2×2 factorial experiment in TensorFlow and Keras: two optimizers (Adam and RMSProp), two hidden-layer widths (64 and 128 units), and two metrics for picking which weights to prune (entropy and R²), with one notebook per combination, eight in total. I pruned autoencoders trained on Fashion-MNIST and a convolutional network trained on CIFAR-10, removing from 5% to 95% of the weights in 5% steps. After each pruning pass the network retrained for five epochs, and loss was plotted against the percentage of weights removed.
+The design is a 2×2×2 factorial: Adam or RMSProp, 64 or 128 hidden units, and entropy or R² as the metric for choosing which weights to prune. I pruned autoencoders on Fashion-MNIST and a convolutional network on CIFAR-10, removing 5% to 95% of the weights in 5% steps and retraining for five epochs after each pass.
 
 ## Findings
 
-Removing up to 80% of the weights didn't help. Removing between 80% and 95% improved performance on test data, so networks with most of their connections gone generalized better than the full ones. That's consistent with pruning reducing overfitting. The result comes from one sweep on Fashion-MNIST and CIFAR-10, so I wouldn't read much past those two datasets.
-
-## Where it comes from
-
-I've been interested in how brains learn for a long time, and this was a way to test one biological mechanism on artificial networks. A smaller network also needs less computation and memory to run.
+Pruning up to 80% of the weights didn't help. Pruning between 80% and 95% improved test performance, so the heavily pruned networks generalized better than the full ones, which fits pruning reducing overfitting. It's one sweep on two datasets, so I wouldn't read much past them.
