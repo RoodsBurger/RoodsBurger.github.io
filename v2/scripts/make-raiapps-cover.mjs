@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Composes the RaiApps cover: three complete phone screenshots side by side on a dark neutral background.
+// Composes the RaiApps cover: three phone mockups side by side on a transparent background, so the card behind shows through in either theme.
 import { writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -11,17 +11,18 @@ const outPath = join(artDir, "cover.webp");
 
 const CANVAS_W = 2560;
 const CANVAS_H = 1600;
-const BG = "#18181b";
+const BG = { r: 0, g: 0, b: 0, alpha: 0 };
 const BEZEL = "#0c0c0e";
-const BORDER = "#3f3f46";
+// A mid-grey rim keeps the black bezel visible on dark cards.
+const BORDER = "#5b5b63";
 
 // Screenshot source geometry: full, uncropped 1080x2400 phone screenshots.
 const SOURCE_W = 1080;
 const SOURCE_H = 2400;
 
-// Phone card geometry: a thin bezel, full-height ~82% of the canvas, nothing cropped; the spotlight's gradient may overlap the phones' lower part, which is accepted.
-const BEZEL_PAD = 8;
-const OUTER_RADIUS = 58;
+// Phone mockup geometry: a solid bezel, full-height ~82% of the canvas, nothing cropped; the spotlight's gradient may overlap the phones' lower part, which is accepted.
+const BEZEL_PAD = 16;
+const OUTER_RADIUS = 66;
 const INNER_RADIUS = 50;
 const PHONE_H = Math.round(CANVAS_H * 0.82);
 const INNER_H = PHONE_H - 2 * BEZEL_PAD;
@@ -37,7 +38,7 @@ const roundedRectMask = (w, h, r) =>
 
 const borderOverlay = (w, h, r) =>
   Buffer.from(
-    `<svg width="${w}" height="${h}"><rect x="1" y="1" width="${w - 2}" height="${h - 2}" rx="${r}" ry="${r}" fill="none" stroke="${BORDER}" stroke-width="1.5"/></svg>`,
+    `<svg width="${w}" height="${h}"><rect x="1.5" y="1.5" width="${w - 3}" height="${h - 3}" rx="${r}" ry="${r}" fill="none" stroke="${BORDER}" stroke-width="3"/></svg>`,
   );
 
 async function buildPhone(screenshotPath) {
@@ -73,7 +74,7 @@ const positions = [0, 1, 2].map((i) => startX + i * (PHONE_W + GAP));
 
 const cover = await sharp({ create: { width: CANVAS_W, height: CANVAS_H, channels: 4, background: BG } })
   .composite(phones.map((input, i) => ({ input, left: positions[i], top: TOP_Y })))
-  .webp({ quality: 90 })
+  .webp({ quality: 90, alphaQuality: 100 })
   .toBuffer();
 
 writeFileSync(outPath, cover);

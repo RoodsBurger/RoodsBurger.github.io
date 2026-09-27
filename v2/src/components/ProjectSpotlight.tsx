@@ -242,7 +242,7 @@ export default function ProjectSpotlight({
                 onFocus={() => setNavFrom(p.id)}
                 className="group shrink-0 snap-start w-[min(300px,82vw)] rounded-2xl border border-(--color-border) bg-(--color-card) overflow-hidden"
               >
-                <div className="relative aspect-[16/10] overflow-hidden bg-(--color-muted)">
+                <div className="relative aspect-[16/10] overflow-hidden bg-(--color-card)">
                   <img
                     src={p.cover}
                     alt=""
