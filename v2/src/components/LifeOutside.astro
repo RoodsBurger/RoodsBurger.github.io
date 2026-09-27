@@ -2,7 +2,7 @@
 const hobbies = [
   { title: "Climbing", image: "/artifacts/climbing.webp" },
   { title: "Ceramics", image: "/artifacts/ceramics1200_900.webp" },
-  { title: "Teaching", image: "/artifacts/apole.webp" },
+  { title: "Teaching", image: "/artifacts/apole.webp", contain: true },
   { title: "Hiking", image: "/artifacts/hiking.webp" },
 ];
 ---
@@ -36,7 +36,10 @@ const hobbies = [
           decoding="async"
           width="900"
           height="600"
-          class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+          class:list={[
+            "w-full h-full transition-transform duration-700 group-hover:scale-[1.04]",
+            hobby.contain ? "object-contain bg-white px-[10%] pb-[8%]" : "object-cover",
+          ]}
         />
         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
         <div class="absolute inset-x-0 bottom-0 p-3">

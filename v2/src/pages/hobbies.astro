@@ -19,6 +19,7 @@ const hobbies = [
   {
     title: "Teaching",
     image: "/artifacts/apole.webp",
+    contain: true,
     description:
       "At about 16 I co-founded APOLE, and from 2013 to 2019 we ran free math and physics classes for more than 1,000 public-school students in the state of São Paulo. I also mentor public-school students applying to university.",
     badge: "Volunteering & mentoring",
@@ -59,7 +60,10 @@ const hobbies = [
               decoding="async"
               width="1200"
               height="900"
-              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+              class:list={[
+                "w-full h-full transition-transform duration-700 group-hover:scale-[1.04]",
+                hobby.contain ? "object-contain bg-white px-[10%]" : "object-cover",
+              ]}
             />
           </div>
           <div class="p-5 md:p-6 space-y-2">
