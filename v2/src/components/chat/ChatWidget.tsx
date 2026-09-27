@@ -289,7 +289,7 @@ export default function ChatWidget({ mode = "floating" }: Props) {
     >
       <header className="flex items-center justify-between px-4 py-3 border-b border-(--color-border)/60">
         <div className="flex items-center gap-2">
-          <div className="size-7 rounded-md bg-(--color-accent)/10 text-(--color-accent) flex items-center justify-center">
+          <div className="size-7 rounded-md bg-(--color-signal)/10 text-(--color-signal) flex items-center justify-center">
             <Sparkles size={14} />
           </div>
           <div>
@@ -359,9 +359,9 @@ export default function ChatWidget({ mode = "floating" }: Props) {
           <div className="flex justify-start">
             <div className="rounded-2xl rounded-bl-sm bg-(--color-muted) px-3.5 py-2.5">
               <div className="flex items-center gap-1.5">
-                <span className="size-1.5 rounded-full bg-(--color-muted-foreground)/60 animate-bounce [animation-delay:-0.3s]"></span>
-                <span className="size-1.5 rounded-full bg-(--color-muted-foreground)/60 animate-bounce [animation-delay:-0.15s]"></span>
-                <span className="size-1.5 rounded-full bg-(--color-muted-foreground)/60 animate-bounce"></span>
+                <span className="size-1.5 rounded-full bg-(--color-signal)/70 animate-bounce [animation-delay:-0.3s]"></span>
+                <span className="size-1.5 rounded-full bg-(--color-signal)/70 animate-bounce [animation-delay:-0.15s]"></span>
+                <span className="size-1.5 rounded-full bg-(--color-signal)/70 animate-bounce"></span>
               </div>
             </div>
           </div>
@@ -386,7 +386,7 @@ export default function ChatWidget({ mode = "floating" }: Props) {
           rows={1}
           maxLength={2000}
           placeholder="Ask a question"
-          className="flex-1 resize-none bg-transparent text-sm px-3 py-2 rounded-lg border border-(--color-border) focus:border-(--color-accent) focus:outline-none focus:ring-2 focus:ring-(--color-ring)/30 max-h-32"
+          className="flex-1 resize-none bg-transparent text-sm px-3 py-2 rounded-lg border border-(--color-border) focus:border-(--color-signal)/60 focus:outline-none focus:ring-2 focus:ring-(--color-signal)/20 max-h-32"
           aria-label="Message"
         />
         <button
