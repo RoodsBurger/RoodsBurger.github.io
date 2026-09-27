@@ -44,7 +44,7 @@ const itemsWithDims = items.map((item, i) => ({ ...item, dims: dims[i] }));
             preload="auto"
             width={item.dims.width}
             height={item.dims.height}
-            class="w-full h-full object-cover pointer-events-none"
+            class="w-full h-full object-cover pointer-events-none [clip-path:inset(0_round_calc(0.75rem-1px))]"
             aria-label={item.alt || item.caption}
           >
             <source src={item.src} type="video/mp4" />
@@ -115,7 +115,7 @@ const itemsWithDims = items.map((item, i) => ({ ...item, dims: dims[i] }));
               preload="auto"
               width={item.dims.width}
               height={item.dims.height}
-              class="w-full h-full object-cover pointer-events-none"
+              class="w-full h-full object-cover pointer-events-none [clip-path:inset(0_round_calc(0.75rem-1px))]"
               aria-label={item.alt || item.caption}
             >
               <source src={item.src} type="video/mp4" />

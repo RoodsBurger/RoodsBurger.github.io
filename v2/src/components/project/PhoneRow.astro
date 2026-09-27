@@ -1,0 +1,65 @@
+---
+// Phone screenshots: a three-column grid on desktop, a one-per-swipe carousel with chevrons on mobile.
+---
+
+<div class="not-prose relative my-8" data-phone-row>
+  <div
+    class="phone-track grid grid-flow-col auto-cols-[100%] overflow-x-auto snap-x snap-mandatory md:grid-flow-row md:auto-cols-auto md:grid-cols-3 md:gap-6 md:overflow-visible"
+    data-track
+  >
+    <slot />
+  </div>
+  <button type="button" class="phone-nav left-0" data-dir="-1" aria-label="Previous screenshot" hidden>
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+  </button>
+  <button type="button" class="phone-nav right-0" data-dir="1" aria-label="Next screenshot">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+  </button>
+</div>
+
+<style>
+  .phone-track { scrollbar-width: none; }
+  .phone-track::-webkit-scrollbar { display: none; }
+  .phone-track > :global(*) { scroll-snap-align: center; padding-inline: 12%; }
+  .phone-nav {
+    position: absolute;
+    top: 45%;
+    transform: translateY(-50%);
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 9999px;
+    border: 1px solid var(--color-border);
+    background: color-mix(in oklab, var(--color-background) 88%, transparent);
+    color: var(--color-foreground);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.08);
+    transition: opacity 150ms;
+  }
+  .phone-nav[hidden] { display: grid; opacity: 0; pointer-events: none; }
+  @media (min-width: 768px) {
+    .phone-track > :global(*) { padding-inline: 0; }
+    .phone-nav { display: none !important; }
+  }
+</style>
+
+<script>
+  // Chevrons page the mobile carousel one screenshot at a time and fade out at either end.
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.querySelectorAll<HTMLElement>("[data-phone-row]").forEach((row) => {
+    const track = row.querySelector<HTMLElement>("[data-track]")!;
+    const [prev, next] = row.querySelectorAll<HTMLButtonElement>("button[data-dir]");
+    const update = () => {
+      const max = track.scrollWidth - track.clientWidth - 2;
+      prev.hidden = track.scrollLeft <= 2;
+      next.hidden = track.scrollLeft >= max;
+    };
+    row.querySelectorAll<HTMLButtonElement>("button[data-dir]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        track.scrollBy({ left: Number(btn.dataset.dir) * track.clientWidth, behavior: reduce ? "auto" : "smooth" });
+      });
+    });
+    track.addEventListener("scroll", update, { passive: true });
+    update();
+  });
+</script>

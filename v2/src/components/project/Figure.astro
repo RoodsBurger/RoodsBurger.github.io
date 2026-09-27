@@ -43,7 +43,7 @@ const mp4Src = `${base}.mp4`;
 ---
 
 <figure class={`not-prose my-8 ${sizeClass}`}>
-  <div class={`${aspectClass} rounded-xl overflow-hidden border border-(--color-border) bg-(--color-muted)`}>
+  <div class={`${aspectClass} rounded-xl overflow-hidden isolate border border-(--color-border) bg-(--color-muted)`}>
     {video ? (
       <video
         width={width}
@@ -52,7 +52,7 @@ const mp4Src = `${base}.mp4`;
         playsinline
         preload="none"
         poster={poster}
-        class="w-full h-full object-cover"
+        class="w-full h-full object-cover [clip-path:inset(0_round_calc(0.75rem-1px))]"
         aria-label={alt}
         data-figure-video
       >

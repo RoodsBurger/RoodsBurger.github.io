@@ -9,12 +9,9 @@ coverAlt: "Three phone screens on a dark background: a budgeting dashboard, a cl
 ---
 
 import DeviceFrame from "@/components/project/DeviceFrame.astro";
+import PhoneRow from "@/components/project/PhoneRow.astro";
 import Diagram from "@/components/project/Diagram.astro";
 import RaiBudgetArchitecture from "@/components/diagrams/RaiBudgetArchitecture.astro";
-
-export const phoneRow =
-  "not-prose grid grid-flow-col auto-cols-[70%] gap-4 overflow-x-auto snap-x snap-mandatory pb-2 sm:auto-cols-[45%] md:grid-flow-row md:auto-cols-auto md:grid-cols-3 md:overflow-visible md:gap-6 md:pb-0";
-export const phoneCell = "snap-start";
 
 RaiBudget is a budgeting app fed by bank and card transactions through Plaid, and RaiClimbing is a training tracker for climbing. Both hand part of the work to an LLM, which is risky around money and training loads. So code computes the figures, the model judges what they mean, a server-side validator decides what reaches the screen, and anything binding waits for my approval. I built both in 2026 for my own use.
 
@@ -22,17 +19,17 @@ RaiBudget is a budgeting app fed by bank and card transactions through Plaid, an
 
 RaiBudget runs on macOS, iOS and Android from one Flutter codebase and syncs in real time. Each category gets a monthly limit, and recategorizing a transaction once can save a rule for the next one.
 
-<div class={phoneRow}>
-  <div class={phoneCell}>
+<PhoneRow>
+  <div>
     <DeviceFrame src="/artifacts/raiapps/budget-dashboard.webp" alt="RaiBudget dashboard with monthly spending, income, and a spending trend chart" caption="Dashboard" />
   </div>
-  <div class={phoneCell}>
+  <div>
     <DeviceFrame src="/artifacts/raiapps/budget-budgets.webp" alt="RaiBudget category budgets with progress bars for the current month" caption="Budgets" />
   </div>
-  <div class={phoneCell}>
+  <div>
     <DeviceFrame src="/artifacts/raiapps/budget-analysis.webp" alt="RaiBudget analysis report with spending observations and trends" caption="Analysis" />
   </div>
-</div>
+</PhoneRow>
 
 
 The back end is Postgres with row-level security on every table. The Plaid integration runs in edge functions, and its secrets sit in a table the app can't read. The first version took about three days and 184 commits.
@@ -49,47 +46,47 @@ The Analysis tab is written by a scheduled Claude Code cloud routine, not by the
 
 A portfolio view gets its own read-only report with no buy or sell advice, so nothing happens to an account unless I do it.
 
-<div class={phoneRow}>
-  <div class={phoneCell}>
+<PhoneRow>
+  <div>
     <DeviceFrame src="/artifacts/raiapps/budget-investments.webp" alt="RaiBudget portfolio screen with holdings and allocation" caption="Portfolio" />
   </div>
-  <div class={phoneCell}>
+  <div>
     <DeviceFrame src="/artifacts/raiapps/budget-investments-analysis.webp" alt="RaiBudget investments analysis report" caption="Analysis" />
   </div>
-  <div class={phoneCell}>
+  <div>
     <DeviceFrame src="/artifacts/raiapps/budget-investments-charts.webp" alt="RaiBudget investment allocation and performance charts" caption="Charts" />
   </div>
-</div>
+</PhoneRow>
 
 ## RaiClimbing
 
 RaiClimbing is the training tracker I use on Android. Its plan adjusts to how sessions actually went, which only works if the logging is exact.
 
-<div class={phoneRow}>
-  <div class={phoneCell}>
+<PhoneRow>
+  <div>
     <DeviceFrame src="/artifacts/raiapps/climbing-today.webp" alt="RaiClimbing today screen with the day's session and a pain check-in" caption="Today" />
   </div>
-  <div class={phoneCell}>
+  <div>
     <DeviceFrame src="/artifacts/raiapps/climbing-climbs.webp" alt="RaiClimbing climb log with a grade pyramid" caption="Climbs" />
   </div>
-  <div class={phoneCell}>
+  <div>
     <DeviceFrame src="/artifacts/raiapps/climbing-plan.webp" alt="RaiClimbing week plan editor with day cards" caption="Plan" />
   </div>
-</div>
+</PhoneRow>
 
 Each session type owns a roster of exercises dosed per week, and every logged set records its load, count and whether it was done. A pain check-in before each session is scored for red flags, which trim the next loading session. Climbs come in from the Tension Board API and feed a grade pyramid.
 
-<div class={phoneRow}>
-  <div class={phoneCell}>
+<PhoneRow>
+  <div>
     <DeviceFrame src="/artifacts/raiapps/climbing-report.webp" alt="RaiClimbing analysis report over recent training" caption="Report" />
   </div>
-  <div class={phoneCell}>
+  <div>
     <DeviceFrame src="/artifacts/raiapps/climbing-charts.webp" alt="RaiClimbing progress screen with a training heatmap and send pyramid" caption="Progress" />
   </div>
-  <div class={phoneCell}>
+  <div>
     <DeviceFrame src="/artifacts/raiapps/climbing-recs.webp" alt="RaiClimbing recommendations with proposed changes to the plan" caption="Recs" />
   </div>
-</div>
+</PhoneRow>
 
 History syncs to Supabase as one versioned document, so a reinstall or an older build can't overwrite newer data.
 

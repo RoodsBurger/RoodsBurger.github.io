@@ -33,7 +33,7 @@ const dims = await dimsFor(src, isVideo, { width: FALLBACK_WIDTH, height: FALLBA
       preload="auto"
       width={dims.width}
       height={dims.height}
-      class="w-full h-full object-cover pointer-events-none"
+      class="w-full h-full object-cover pointer-events-none [clip-path:inset(0_round_calc(0.75rem-1px))]"
       aria-label={alt || caption}
     >
       <source src={src} type="video/mp4" />
