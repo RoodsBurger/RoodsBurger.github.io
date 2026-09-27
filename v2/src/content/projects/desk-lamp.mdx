@@ -1,6 +1,6 @@
 ---
 title: "Rising-Core Desk Lamp"
-summary: "A desk lamp that sets brightness by raising a lit core on a lead screw, with a brushless motor, one knob and Matter over WiFi."
+summary: "A desk lamp that sets brightness by raising a lit core on a lead screw, driven by a brushless motor."
 tags: ["ESP32-S3", "BLDC", "SimpleFOC", "Matter"]
 category: ["code", "cad"]
 order: 3
@@ -23,23 +23,19 @@ import Model3DPair from "@/components/Model3DPair.astro";
 
 ## How it works
 
-On this desk lamp, brightness is a position: a brushless gimbal motor turns a lead screw, and a lit core carrying a warm and cool LED strip rides up and down the body. Every brightness change is a mechanical move, so the motor, the light and the smart-home state all have to agree on where the core is.
+The desk lamp sets brightness by position: a brushless gimbal motor turns a lead screw, and a lit core with warm and cool LEDs rides up and down the body. Every brightness change is a mechanical move, so the motor, the light and the smart-home state all have to agree on where the core is.
 
-When a new brightness comes in, from the knob or from Matter, the firmware turns it into a target position. The light fades in over the first part of a rise and out over the last part of a descent, so motion speed is also fade speed. At rest the motor driver sleeps, which means no holding torque and no hum. I use it every day, and I sometimes catch myself distracted, just watching the core go up and down.
+The light fades in at the start of a rise and out at the end of a descent, so motion speed is also fade speed. At rest the motor driver sleeps, so there's no hum. I use it every day and sometimes get distracted just watching the core rise and fall.
 
 ## Controls
 
-The lamp has one knob with a push button. Turning it moves the core. A single click turns the lamp on or off, a double click switches the knob between motor, brightness and color temperature modes, and a triple click steps through motion speed presets. A long hold re-homes the lead screw, and a longer one resets the lamp to factory settings, with a warning pulse before it commits. The lead screw homes once on first boot, and after that the position, brightness and color temperature survive power cycles.
-
-Over Matter the lamp shows up in Apple Home, Google Home and SmartThings as a color temperature light. The brightness slider drives the motor position and the color temperature sets the warm and cool LED mix, so the knob and the slider change the same variable. Each lamp gets its own Matter identity, so several can share one home.
+One knob runs the lamp. Turning it moves the core, a click toggles the light, and a double click switches the knob between motor, brightness and color temperature. Over Matter the lamp is a color temperature light, and its brightness slider drives the same motor position as the knob.
 
 ## Mechanism
 
-The lead screw runs in closed loop, with a magnetic encoder giving the firmware real position feedback instead of counting motor steps and hoping they all landed. If someone stops the core by hand, the motor gives up after about half a second, takes wherever the core ended up as the new target, and reports the matching level back over Matter. The Home app then shows the level the lamp is actually at.
+A magnetic encoder closes the loop, so the firmware knows where the core is instead of counting steps and hoping they all landed. If someone stops the core by hand, the motor gives up after about half a second, takes that spot as the new target and reports the matching level over Matter.
 
-## Electronics and firmware
-
-The lamp runs on an ESP32-S3 control board I designed. The firmware is ESP-IDF with Espressif's Matter SDK and a vendored copy of SimpleFOC. The motor's field-oriented control loop gets one of the chip's two cores to itself, and WiFi, Bluetooth and Matter share the other, so radio traffic doesn't stall the motor. Updates arrive as signed over-the-air releases.
+The firmware is ESP-IDF with SimpleFOC, on an ESP32-S3 control board I designed. The field-oriented control loop gets one of the chip's two cores to itself, so radio traffic doesn't stall the motor.
 
 <Model3DPair
   environment="neutral"
