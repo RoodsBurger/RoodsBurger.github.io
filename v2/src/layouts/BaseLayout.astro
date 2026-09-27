@@ -32,7 +32,7 @@ const imageUrl = new URL(image, site.url).toString();
 ---
 
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -61,9 +61,10 @@ const imageUrl = new URL(image, site.url).toString();
 
     <script is:inline>
       (function () {
-        // Apply the saved theme before paint so there is no FOUC.
-        var stored = localStorage.getItem("theme");
-        document.documentElement.dataset.theme = stored || "light";
+        // Apply the saved theme before paint so there is no FOUC; dark is the default.
+        var stored = null;
+        try { stored = localStorage.getItem("theme"); } catch (e) {}
+        document.documentElement.dataset.theme = stored === "light" ? "light" : "dark";
 
         // Save the source page's scroll position when a project link is clicked.
         document.addEventListener(
