@@ -1,6 +1,6 @@
 ---
 title: "Precision Coffee Grinder"
-summary: "A hand coffee grinder turned into a motorized appliance, with a Raspberry Pi, a stepper-driven burr, an auger doser and a round touchscreen."
+summary: "A hand coffee grinder turned into a motorized appliance, with a Raspberry Pi, a stepper-driven burr, an auger doser and a touchscreen."
 tags: ["Raspberry Pi", "Python", "Stepper Motor", "Custom PCB"]
 category: ["code", "cad"]
 order: 4
@@ -22,33 +22,27 @@ import RenderGallery from "@/components/project/RenderGallery.astro";
 
 ## What it is
 
-The grinder is a hand grinder turned into a motorized appliance, run by a Raspberry Pi and a 1.28-inch round touchscreen. The hard part is that one Pi drives a stepper at a steady rate, feeds beans with a servo and runs a touch UI at once, in Python, with the display and the motor driver sharing one SPI bus.
+The grinder is a hand grinder turned into a motorized appliance, run by a Raspberry Pi with a round touchscreen. The hard part is that one Pi has to step a motor at a steady rate, pulse a servo and run a touch UI at once, with the display and the motor driver sharing one SPI bus.
 
-I make espresso every day, and I built this because I got tired of grinding by hand. A stepper replaces the crank, an auger doser meters beans into the burr, and the Pi boots straight into the grinder interface as a systemd-managed appliance, with no keyboard, mouse or login. I modeled the body and hopper in Fusion 360 and printed them.
+I make espresso every day and got tired of grinding by hand. A stepper replaces the crank, and an auger doser feeds the burr from a printed hopper.
 
 ## Grinding and dosing
 
-Two screens, switched with a horizontal swipe, set the grind speed (30 to 150 RPM at the burr) and the bean feed rate as a percentage. A center button starts and stops everything. Press it and the burr spins up, and 3 seconds later the doser starts feeding, so beans never land on a burr that isn't up to speed yet. The dial locks while grinding so a stray touch can't change the speed.
-
-The doser is a continuous-rotation servo turning a bean auger. Cheap continuous servos stall at low speed, so it runs at full torque in short fixed bursts, and the feed rate comes from the spacing between bursts.
+Two swipeable screens set the burr speed (30 to 150 RPM) and the feed rate. The doser starts 3 seconds after the burr, so beans only land on a burr that's already spinning. Its continuous-rotation servo stalls at low speed, so it runs in short full-torque bursts spaced to set the feed rate.
 
 ## Why three processes instead of threads?
 
-The software runs as a UI process, a motor process and a servo process, for three reasons:
+The UI, motor and servo run as separate processes:
 
-1. Timing. The motor process generates the stepper pulse train with busy-wait timing, and running it as its own process keeps it clear of Python's global interpreter lock.
-2. The shared bus. The display and the DRV8711 sit on the same SPI bus, which two processes can't hold at once. The UI closes its SPI handle before starting the motor process. The motor process opens the bus only to write driver registers, closes it within milliseconds, then steps the motor over plain GPIO. When the grind stops, the UI reopens the bus.
-3. Crashes. If either child process dies, the UI shuts both down cleanly and resets the screen.
-
-## Touch and display
-
-The screen is drawn with Pillow at twice the resolution and downscaled, so arcs and text come out anti-aliased on the small round panel. The start and stop icons, whole beans and ground coffee, are generated procedurally with a fixed random seed so they look the same on every boot. The touch controller goes silent while a finger is held still, so a small state machine infers release by timeout, and a swipe always overrides a pending tap.
+1. Timing. The motor process times its step pulses with busy-waits, clear of Python's global interpreter lock.
+2. The shared bus. Only one process can hold SPI, so the UI releases it before a grind, and the motor process holds it only to write the DRV8711's registers, then steps over plain GPIO.
+3. Crashes. If a child process dies, the UI shuts both down and resets the screen.
 
 ## Hardware
 
-A NEMA 23 stepper drives the burr through a 2:1 gearbox. It runs off a TI DRV8711 on a driver board I designed, which also carries headers for the Pi, the doser servo and the display. The display is a 240×240 round GC9A01 panel over SPI with a CST816T capacitive touch controller over I2C.
+A NEMA 23 stepper turns the burr through a 2:1 gearbox, driven by a DRV8711 on a driver board I designed. The touch controller goes silent while a finger rests, so a state machine infers release by timeout.
 
-Getting the drive quiet took a while. I swept about 90 combinations of current, decay mode, blanking and microstepping, rated the noise of each, and settled on the quiet profile it runs now.
+Getting the drive quiet took a sweep of about 90 combinations of current, decay mode, blanking and microstepping, each rated for noise.
 
 <Model3D
   src="/artifacts/grinder/wide.glb"
