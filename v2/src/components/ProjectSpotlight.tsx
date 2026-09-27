@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ImgHTMLAttributes } from "react";
 
 interface Project {
   id: string;
@@ -6,7 +6,19 @@ interface Project {
   summary: string;
   tags: string[];
   cover: string;
+  coverDark?: string;
   coverAlt: string;
+}
+
+// Renders a cover image, plus its dark-theme variant when there is one; CSS shows the one matching the theme.
+function CoverImg({ p, className, ...rest }: { p: Project; className: string } & ImgHTMLAttributes<HTMLImageElement>) {
+  if (!p.coverDark) return <img src={p.cover} className={className} {...rest} />;
+  return (
+    <>
+      <img src={p.cover} className={`${className} cover-when-light`} {...rest} />
+      <img src={p.coverDark} className={`${className} cover-when-dark`} {...rest} />
+    </>
+  );
 }
 
 // Hover must rest on a rail item this long before the spotlight switches, so skimming does not strobe.
@@ -99,9 +111,9 @@ export default function ProjectSpotlight({
         >
           {/* Every cover stays mounted and stacked; the active one fades in while settling from 1.02 to 1. */}
           {projects.map((p, i) => (
-            <img
+            <CoverImg
               key={p.id}
-              src={p.cover}
+              p={p}
               alt={i === active ? p.coverAlt : ""}
               aria-hidden={i === active ? undefined : true}
               loading={i === initialIndex ? "eager" : "lazy"}
@@ -199,8 +211,8 @@ export default function ProjectSpotlight({
                 }`}
               >
                 <div className="relative size-16 lg:size-[72px] shrink-0 rounded-lg overflow-hidden bg-(--color-muted)">
-                  <img
-                    src={p.cover}
+                  <CoverImg
+                    p={p}
                     alt=""
                     loading="lazy"
                     decoding="async"
@@ -243,8 +255,8 @@ export default function ProjectSpotlight({
                 className="group shrink-0 snap-start w-[min(300px,82vw)] rounded-2xl border border-(--color-border) bg-(--color-card) overflow-hidden"
               >
                 <div className="relative aspect-[16/10] overflow-hidden bg-(--color-card)">
-                  <img
-                    src={p.cover}
+                  <CoverImg
+                    p={p}
                     alt=""
                     loading="lazy"
                     decoding="async"

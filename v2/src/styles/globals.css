@@ -327,3 +327,9 @@
     }
   }
 }
+
+/* Covers with a dark-theme variant render both images; only the one for the current theme shows. */
+:root[data-theme="dark"] .cover-when-light,
+:root:not([data-theme="dark"]) .cover-when-dark {
+  display: none;
+}

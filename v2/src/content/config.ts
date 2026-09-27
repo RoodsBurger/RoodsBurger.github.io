@@ -11,6 +11,7 @@ const projects = defineCollection({
     order: z.number().default(99),
     featured: z.boolean().default(false),
     cover: z.string(),
+    coverDark: z.string().optional(),
     coverAlt: z.string(),
     coverTall: z.string().optional(),
     accent: z.string().optional(),
