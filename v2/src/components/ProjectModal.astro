@@ -21,10 +21,11 @@ const { title, summary, tags, links } = project.data;
   ></a>
 
   <article
-    class="project-modal animate-modal-in relative max-w-[clamp(56rem,57vw,80rem)] mx-auto my-12 md:my-20 px-4 md:px-6"
+    class="project-modal animate-modal-in relative outline-none max-w-[clamp(56rem,57vw,80rem)] mx-auto my-12 md:my-20 px-4 md:px-6"
     role="dialog"
     aria-modal="true"
     aria-labelledby="project-modal-title"
+    tabindex="-1"
   >
     <div class="project-card">
       <span tabindex="0" data-focus-sentinel="start" class="focus-sentinel" aria-hidden="true"></span>
@@ -305,13 +306,13 @@ const { title, summary, tags, links } = project.data;
 
 <script is:inline>
   (function () {
-    // Move focus to the close button; two focus sentinels at the card's edges wrap Tab/Shift+Tab
-    // around the card without intercepting every keystroke, so native tab order still reaches
-    // shadow-DOM controls (model-viewer, video) anywhere in between.
+    // Focus the dialog itself so no control shows a ring on open; two focus sentinels at the card's
+    // edges wrap Tab/Shift+Tab around the card without intercepting every keystroke, so native tab
+    // order still reaches shadow-DOM controls (model-viewer, video) anywhere in between.
+    var dialog = document.querySelector(".project-modal");
     var card = document.querySelector(".project-modal .project-card");
-    if (!card) return;
-    var closeBtn = card.querySelector('a[aria-label="Close"]');
-    if (closeBtn) closeBtn.focus({ preventScroll: true });
+    if (!card || !dialog) return;
+    dialog.focus({ preventScroll: true });
 
     var FOCUSABLE =
       'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -342,7 +343,11 @@ const { title, summary, tags, links } = project.data;
     var start = card.querySelector('[data-focus-sentinel="start"]');
     var end = card.querySelector('[data-focus-sentinel="end"]');
     if (start) {
-      start.addEventListener("focus", redirectTo(function (items) { return items[items.length - 1]; }));
+      // The first Tab from the dialog itself goes to the first control; Shift+Tab from the first control wraps to the last.
+      start.addEventListener("focus", function (e) {
+        var fromDialog = e.relatedTarget === dialog;
+        redirectTo(function (items) { return fromDialog ? items[0] : items[items.length - 1]; })(e);
+      });
     }
     if (end) {
       end.addEventListener("focus", redirectTo(function (items) { return items[0]; }));
