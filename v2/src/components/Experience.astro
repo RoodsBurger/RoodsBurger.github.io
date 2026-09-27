@@ -328,7 +328,10 @@ const groups = [0, 1, 2];
     );
 
     let prev = performance.now();
-    const SPEED = 0.04; // px per ms
+    const SPEED = 0.028; // px per ms
+    const STEP = 1 / (window.devicePixelRatio || 1);
+    // Sub-pixel progress carried between frames, since browsers may round scrollLeft to device pixels.
+    let carry = 0;
     const tick = (t: number) => {
       // Stop the loop once the element is detached.
       if (!scroller.isConnected) {
@@ -339,8 +342,13 @@ const groups = [0, 1, 2];
       prev = t;
       const idle = t - lastInteract > 1500;
       if (!reduce && !hovering && !dragging && idle && span > 0) {
-        scroller.scrollLeft += SPEED * dt;
-        normalize();
+        carry += SPEED * dt;
+        const move = Math.floor(carry / STEP) * STEP;
+        if (move > 0) {
+          scroller.scrollLeft += move;
+          carry -= move;
+          normalize();
+        }
       }
       requestAnimationFrame(tick);
     };
