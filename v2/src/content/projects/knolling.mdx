@@ -1,55 +1,57 @@
 ---
 title: "TidyNET"
-summary: "An end-to-end deep learning system for robotic workspace organization that uses diffusion-based visual planning to turn clutter into order."
+summary: "A robotic tidying system that extends the Creative Machines Lab's knolling work: a diffusion model generates a tidy layout from a photo, and a robot arm rearranges the real objects to match."
 tags: ["Deep Learning", "Diffusion", "YOLO", "ROS2"]
 category: ["code"]
-order: 3
+order: 5
 featured: true
 cover: "/artifacts/knolling_main.webp"
-coverAlt: "TidyNET tidy workspace example"
-period: "2025"
+coverAlt: "Example of a tidy workspace layout from TidyNET"
+period: "2024-2025"
 links:
   github: "https://github.com/RoodsBurger/TidyNET"
   report: "https://drive.google.com/file/d/1c60B7h-zOSqmF4B1YMt4-UjQi6qM9Npm/view?usp=sharing"
+  more:
+    - label: "Read the related paper"
+      url: "https://arxiv.org/abs/2310.04566"
+    - label: "Lab GitHub"
+      url: "https://github.com/H-Y-H-Y-H/Knolling"
 ---
 
 import MediaGrid from "@/components/MediaGrid.astro";
+import Diagram from "@/components/project/Diagram.astro";
+import TidyNetPipeline from "@/components/diagrams/TidyNetPipeline.astro";
 
 <MediaGrid
   items={[
-    { src: "/artifacts/knolling_videos/tidy68_front.mp4", type: "video", alt: "TidyNET front view" },
-    { src: "/artifacts/knolling_videos/tidy68_top.mp4", type: "video", alt: "TidyNET top view" },
-    { src: "/artifacts/knolling_videos/tidy68_virtual.mp4", type: "video", alt: "TidyNET virtual planner" },
+    { src: "/artifacts/knolling_videos/tidy68_front.mp4", type: "video", alt: "Robot arm tidying a workspace, front camera view" },
+    { src: "/artifacts/knolling_videos/tidy68_top.mp4", type: "video", alt: "Robot arm tidying a workspace, top camera view" },
+    { src: "/artifacts/knolling_videos/tidy68_virtual.mp4", type: "video", alt: "TidyNET's virtual planner view of the workspace" },
   ]}
 />
 
-## Overview
+## What it is
 
-TidyNET is an end-to-end deep learning system for robotic workspace organization that uses visual planning through diffusion models. Conducted with Professor Hod Lipson at the Creative Machines Lab (Columbia University), the project bridges perception and action, transforming cluttered scenes into tidy layouts. The pipeline processes cluttered scenes to generate tidy arrangements, detects objects with oriented bounding boxes, and executes physical rearrangement on a robotic arm.
+TidyNET is a system that takes a photo of a cluttered workspace, generates an image of the same objects arranged neatly, and has a robot arm rearrange the real table to match. The plan is a picture, so the generated image has to keep every object recognizable, and the robot has to work out which object goes where and move each one without collisions.
 
-## Key features
+I built it in 2024 and 2025 as a graduate research assistant in Columbia University's Creative Machines Lab. It extends the lab's knolling work, which studies how robots can learn to arrange objects neatly. I'm not an author of the lab's knolling papers; TidyNET is my own system built on top of that line of work.
 
-- Diffusion model that generates tidy target images conditioned on messy inputs, preserving object identity
-- YOLOv11 detector with oriented bounding boxes for precise object pose estimation
-- Color-based object matching via the Hungarian algorithm between messy and tidy states
-- Collision-aware motion planner with 70% task completion on real hardware
+## Planning in image space
 
-## Technical details
+The planner is a conditional denoising diffusion model (DDPM) I wrote by hand: a U-Net encoder and decoder with skip connections, group normalization, time embeddings at several levels, self-attention, and conditioning on the messy input image. It uses a cosine noise schedule and classifier-free guidance, and trains on paired before-and-after images at 256×256 pixels. It keeps each object's identity as it moves things into a tidy layout, though busier scenes still come out with occasional artifacts. The first experiments, in December 2024, used an off-the-shelf DDPM at 128 pixels and briefly tried ControlNet before I moved to my own implementation.
 
-### Diffusion model
+## Reading the scene
 
-- U-Net architecture with timestep conditioning and channel-wise attention
-- Cosine noise schedule with 1000 timesteps for stable training
-- Classifier-free guidance for improved generation quality
+A YOLO model with oriented bounding boxes finds the objects, so each detection carries the object's rotation as well as its position. For training labels, I bootstrapped detections with a pretrained Faster R-CNN, matched them to known object positions with the Hungarian algorithm, assigned orientations, and then trained the oriented-box detector as a multi-task model over two datasets. The same detector runs on the camera photo and on the generated tidy image, and objects are matched between the two by color, again with the Hungarian algorithm.
 
-### Robotic control
+## Executing on the arm
 
-- Grid-based occupancy map at 2 cm resolution for collision detection
-- Separating Axis Theorem for oriented-rectangle collision checks
-- Priority-based object placement with temporary relocation when blocked
+The arm is an Interbotix WidowX 200 with an Intel RealSense camera, under ROS2. Detections are projected into 3D with the camera intrinsics, tracked in a workspace manager and assigned to target slots. A grid occupancy map at 2 cm resolution, plus Separating Axis Theorem checks on oriented rectangles, catches collisions between objects. When a target spot is blocked by another object, the planner moves the blocker first, to a temporary spot if it needs one, then places the rest in priority order and checks the final positions.
 
-## Results & performance
+<Diagram caption="A diffusion model generates the tidy target from the messy photo, a YOLO-OBB detector reads both images, the objects are matched, and a WidowX 200 arm carries out the plan under ROS2.">
+  <TidyNetPipeline />
+</Diagram>
 
-The YOLOv11-OBB detector achieves above 93% detection success across various object counts, with angular accuracy within ±3.2°. Robot execution maintains 85.5% grasp success and 74.2% placement success. The diffusion model preserves object identity through transformation, with occasional visual artifacts in complex scenes. End-to-end, the system reaches a 70% task completion rate on the Interbotix WX200 platform.
+## Results
 
-[Read the related paper](https://arxiv.org/abs/2310.04566) · [Lab GitHub](https://github.com/H-Y-H-Y-H/Knolling)
+On the real arm, TidyNET reaches 74.2% placement success and completes 70% of end-to-end tidying tasks; the other 30% don't finish. The training dataset belongs to the lab and stays private under its data agreement. In April 2025 I also contributed the control, detection and arm calibration code to the lab's Knolling repository.

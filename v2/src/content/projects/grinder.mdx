@@ -1,55 +1,67 @@
 ---
 title: "Precision Coffee Grinder"
-summary: "A Raspberry Pi powered single-dose coffee grinder with a round touchscreen dial and a configurable stepper-motor drive."
-tags: ["Raspberry Pi", "Python", "Stepper Motor", "Touchscreen", "3D Printing"]
+summary: "A hand coffee grinder turned into a motorized appliance, with a Raspberry Pi, a stepper-driven burr, an auger doser and a round touchscreen."
+tags: ["Raspberry Pi", "Python", "Stepper Motor", "Custom PCB"]
 category: ["code", "cad"]
-order: 2
-cover: "/artifacts/grinder_cover.webp"
-coverAlt: "Precision coffee grinder"
-model3d: "/artifacts/grinder1.glb"
+order: 4
+cover: "/artifacts/grinder/cover.webp"
+coverAlt: "Motorized coffee grinder with its auger doser"
 links:
   github: "https://github.com/RoodsBurger/grinder"
 ---
 
-import Model3DPair from "@/components/Model3DPair.astro";
+import Figure from "@/components/project/Figure.astro";
+import Model3D from "@/components/Model3D.astro";
+import RenderGallery from "@/components/project/RenderGallery.astro";
 
-<Model3DPair
-  items={[
-    {
-      src: "/artifacts/grinder1.glb",
-      alt: "Coffee grinder body, interactive 3D model",
-    },
-    {
-      src: "/artifacts/grinder2.glb",
-      alt: "Coffee grinder hopper, interactive 3D model",
-    },
-  ]}
+<Figure
+  src="/artifacts/grinder/hero.webp"
+  alt="Motorized coffee grinder with its auger doser"
+  ratio="3/2"
 />
 
-## Overview
+## What it is
 
-A single-dose coffee grinder built around a Raspberry Pi, a configurable stepper-motor drive, and a 1.28-inch round touchscreen. The whole interface is one circular dial: drag around the ring to set the speed, tap the center to start or stop. Custom-modeled, 3D-printed parts make up the body and hopper.
+The grinder is a hand grinder turned into a motorized appliance, run by a Raspberry Pi and a 1.28-inch round touchscreen. The hard part is that one Pi drives a stepper at a steady rate, feeds beans with a servo and runs a touch UI at once, in Python, with the display and the motor driver sharing one SPI bus.
 
-## Key features
+I make espresso every day, and I built this because I got tired of grinding by hand. A stepper replaces the crank, an auger doser meters beans into the burr, and the Pi boots straight into the grinder interface as a systemd-managed appliance, with no keyboard, mouse or login. I modeled the body and hopper in Fusion 360 and printed them.
 
-- Circular touchscreen UI rendered at 2x for crisp anti-aliased graphics, with whole-bean and ground-coffee icons for the start/stop state
-- Speed dial from 0 to 300, displayed at the real burr RPM after the gearbox reduction
-- Configurable motor profiles (drive current, PWM frequency, microstepping, decay mode) selectable from a JSON config library
-- Automatic display standby after ten minutes of inactivity to protect the panel
-- Headless deployment: systemd services for the motor controller and first-boot WiFi setup, installed by a single script
+## Grinding and dosing
 
-## Technical details
+Two screens, switched with a horizontal swipe, set the grind speed (30 to 150 RPM at the burr) and the bean feed rate as a percentage. A center button starts and stops everything. Press it and the burr spins up, and 3 seconds later the doser starts feeding, so beans never land on a burr that isn't up to speed yet. The dial locks while grinding so a stray touch can't change the speed.
 
-### Motor control
+The doser is a continuous-rotation servo turning a bean auger. Cheap continuous servos stall at low speed, so it runs at full torque in short fixed bursts, and the feed rate comes from the spacing between bursts.
 
-- Stepper drive over Raspberry Pi GPIO with tuned current, blanking, decay, and microstep parameters per profile
-- The grind run is spawned as a separate process so the UI thread stays responsive while the motor is under load
+## Why three processes instead of threads?
 
-### Interface
+The software runs as a UI process, a motor process and a servo process, for three reasons:
 
-- Touch input is mapped from screen coordinates to either the dial angle (speed) or the center button (start/stop), with separate hit radii so the two never conflict
-- Diagnostic and motor-only test utilities for bring-up and tuning
+1. Timing. The motor process generates the stepper pulse train with busy-wait timing, and running it as its own process keeps it clear of Python's global interpreter lock.
+2. The shared bus. The display and the DRV8711 sit on the same SPI bus, which two processes can't hold at once. The UI closes its SPI handle before starting the motor process. The motor process opens the bus only to write driver registers, closes it within milliseconds, then steps the motor over plain GPIO. When the grind stops, the UI reopens the bus.
+3. Crashes. If either child process dies, the UI shuts both down cleanly and resets the screen.
 
-### Hardware
+## Touch and display
 
-The body, hopper, and mounting are modeled as printable parts (shown above). Drag to rotate, scroll to zoom; each is a binary STL.
+The screen is drawn with Pillow at twice the resolution and downscaled, so arcs and text come out anti-aliased on the small round panel. The start and stop icons, whole beans and ground coffee, are generated procedurally with a fixed random seed so they look the same on every boot. The touch controller goes silent while a finger is held still, so a small state machine infers release by timeout, and a swipe always overrides a pending tap.
+
+## Hardware
+
+A NEMA 23 stepper drives the burr through a 2:1 gearbox. It runs off a TI DRV8711 on a driver board I designed, which also carries headers for the Pi, the doser servo and the display. The display is a 240×240 round GC9A01 panel over SPI with a CST816T capacitive touch controller over I2C.
+
+Getting the drive quiet took a while. I swept about 90 combinations of current, decay mode, blanking and microstepping, rated the noise of each, and settled on the quiet profile it runs now.
+
+<Model3D
+  src="/artifacts/grinder/wide.glb"
+  alt="Interactive 3D model of the grinder with its hopper and doser"
+  environment="neutral"
+/>
+
+<RenderGallery
+  ratio="1/1"
+  columns={3}
+  items={[
+    { src: "/artifacts/grinder/angle-1.webp", alt: "Coffee grinder, front angle" },
+    { src: "/artifacts/grinder/angle-2.webp", alt: "Coffee grinder, side angle" },
+    { src: "/artifacts/grinder/angle-3.webp", alt: "Coffee grinder, rear angle" },
+  ]}
+/>

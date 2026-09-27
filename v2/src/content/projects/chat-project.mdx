@@ -1,11 +1,11 @@
 ---
-title: "LLM-Based Assistant"
-summary: "A custom AI assistant embedded in this portfolio, with RAG over my own documents, served on a free-tier serverless stack."
-tags: ["NLP", "RAG", "Cohere", "Pinecone", "Netlify"]
+title: "RAG Chat Assistant"
+summary: "A retrieval-augmented chat assistant for the site: Cohere embeddings and reranking pull passages from the site's own content, and Command A answers from them in a streamed reply."
+tags: ["RAG", "Cohere", "Pinecone", "Netlify"]
 category: ["code"]
-order: 7
-cover: "/artifacts/chat_wide.webp"
-coverAlt: "Chat interface preview"
+order: 8
+cover: "/artifacts/chat/cover.webp"
+coverAlt: "Diagram of the chat's indexing and retrieval pipeline"
 period: "2024 → 2026"
 links:
   github: "https://github.com/RoodsBurger/RoodsBurger.github.io"
@@ -13,46 +13,35 @@ links:
 ---
 
 import MediaGrid from "@/components/MediaGrid.astro";
+import Diagram from "@/components/project/Diagram.astro";
+import ChatRag from "@/components/diagrams/ChatRag.astro";
 
 <MediaGrid
   columns={2}
   items={[
-    { src: "/artifacts/chat_diagram.webp", alt: "Chat architecture diagram" },
-    { src: "/artifacts/chat_wide.webp", alt: "Chat interface" },
+    { src: "/artifacts/chat_narrow.png", alt: "The chat interface on a phone" },
+    { src: "/artifacts/chat_wide.webp", alt: "The chat interface on a desktop browser" },
   ]}
 />
 
-## Overview
+## What it is
 
-This project integrates a custom AI assistant into my portfolio, giving visitors an interactive way to learn about my work. By leveraging retrieval-augmented generation and a serverless architecture, I built a responsive chatbot that answers questions from my actual portfolio content while running on free-tier infrastructure.
+The chat assistant answers questions about my projects, work, education and interests, on the chat page or through a floating widget on the other pages. A language model on its own will happily make things up about a person, so the assistant looks up passages from the site's own content first and answers only from those.
 
-## Key features
-
-- Vector-based knowledge retrieval using Pinecone for accurate information matching
-- Natural language processing powered by Cohere's command-r model
-- Serverless implementation with Netlify Functions for efficient, cost-effective deployment
-- Responsive UI in two flavors: dedicated chat page and floating widget
-
-## Technical details
-
-### Vector database
-
-- Pinecone for efficient semantic search
-- Embeddings generated via Cohere's `embed-english-v3.0` model
-- Cosine similarity matching to find relevant information for each query
-
-### Serverless architecture
-
-- Netlify Functions for backend processing and API integration
-- Stateless design with conversation history maintained client-side
-- Health-check endpoint so future breakage surfaces immediately
+I built the first version in December 2024, alongside the first version of the site. It used Cohere's Command R and embedded the site's pages and documents directly. The 2026 rebuild adds reranking, a curated knowledge base and Command A.
 
 ## How it works
 
-1. User input is converted to an embedding vector via Cohere's embedding API
-2. The embedding is used to query Pinecone for the most relevant portfolio chunks
-3. Retrieved context is passed to Cohere's chat completion API along with the query
-4. The assistant is instructed to ground every claim in the retrieved context
-5. The response streams back to the UI
+A question is embedded with Cohere's embed-v4.0 and matched against a Pinecone index built from the site's content. Cohere's rerank-v4.0-fast reorders the candidates by relevance and keeps the strongest few, and those chunks go to Command A as documents. Command A is told to answer only from them, in the third person, leading with the answer and keeping it short. The reply streams back to the page as it's generated. I picked Command A after benchmarking a few lighter models on speed, conciseness and resistance to prompt injection.
 
-[Try the chat](/chat)
+<Diagram caption="Knowledge files are chunked and embedded ahead of time. At query time the question goes through Pinecone, the reranker and Command A.">
+  <ChatRag />
+</Diagram>
+
+## The knowledge base
+
+The index is built from curated, third-person markdown files covering background, experience, education, skills, hobbies and each project. An indexing script splits each file by heading into self-contained chunks, embeds them, and stores each one with its title, section and page URL, so an answer can point back to the page it came from. Rebuilding the index after a content change is one command.
+
+## Stack and safety
+
+The back end runs on Netlify Functions, and conversation history stays on the client instead of being stored on a server. Requests are checked against the site's origin and rate-limited before any model call, so the assistant can't be driven from another site or hammered by a script. The site is built with Astro, React and Tailwind and hosted on Netlify, and the assistant's code, the indexing script and the knowledge files live in the same public repository.

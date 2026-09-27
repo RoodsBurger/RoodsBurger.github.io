@@ -4,36 +4,36 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 const hobbies = [
   {
     title: "Climbing",
-    image: "/artifacts/climbing1500_1000.webp",
+    image: "/artifacts/climbing.webp",
     description:
-      "When not working with robots, I'm solving boulder problems or hanging off a fingerboard. Always down for a session.",
+      "Climbing is my main hobby, and when I can't get to a wall I'm hanging off a fingerboard. I'm always up for a session.",
     badge: "V8 Boulderer · Sport 5.12b",
   },
   {
     title: "Ceramics",
     image: "/artifacts/ceramics1200_900.webp",
     description:
-      "Pottery is my getaway from the digital world. Always trying new clay bodies and altering shapes on the wheel.",
+      "Pottery is my break from screens. I throw on the wheel, try different clay bodies, and alter the shapes as I go.",
     badge: "Wheel throwing",
   },
   {
     title: "Teaching",
     image: "/artifacts/apole.webp",
     description:
-      "I've taught math and physics to over 1000 underprivileged students in São Paulo and mentor public-school students pursuing higher education.",
+      "At about 16 I co-founded APOLE, and from 2013 to 2019 we ran free math and physics classes for more than 1,000 public-school students in the state of São Paulo. I also mentor public-school students applying to university.",
     badge: "Volunteering & mentoring",
   },
   {
     title: "Hiking",
     image: "/artifacts/hiking.webp",
     description:
-      "On a mission to explore as many US National Parks as possible. Currently planning my first multi-day trek up Kilimanjaro.",
+      "I'm working through as many US National Parks as I can, and planning my first multi-day trek, up Kilimanjaro.",
     badge: "Camping & hiking",
   },
 ];
 ---
 
-<BaseLayout title="Personal" description="What I get up to outside of code.">
+<BaseLayout title="Personal" description="Climbing, ceramics, teaching and hiking.">
   <section class="container-page pt-20 md:pt-32 pb-14 md:pb-24">
     <div class="max-w-3xl mb-12 md:mb-20">
       <a
@@ -54,8 +54,11 @@ const hobbies = [
           <div class="aspect-[4/3] overflow-hidden bg-(--color-muted)">
             <img
               src={hobby.image}
-              alt={hobby.title}
+              alt=""
               loading="lazy"
+              decoding="async"
+              width="1200"
+              height="900"
               class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
             />
           </div>

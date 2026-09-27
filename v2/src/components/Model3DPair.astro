@@ -10,9 +10,10 @@ interface Item {
 interface Props {
   items: [Item, Item];
   height?: string;
+  environment?: string;
 }
 
-const { items, height = "440px" } = Astro.props;
+const { items, height = "440px", environment } = Astro.props;
 ---
 
 {/* Two 3D viewers side by side on desktop; only the second one (right) on mobile. */}
@@ -25,6 +26,7 @@ const { items, height = "440px" } = Astro.props;
       alt={items[0].alt}
       caption={items[0].caption}
       height={height}
+      environment={environment}
     />
   </div>
   <Model3D
@@ -32,5 +34,6 @@ const { items, height = "440px" } = Astro.props;
     alt={items[1].alt}
     caption={items[1].caption}
     height={height}
+    environment={environment}
   />
 </div>

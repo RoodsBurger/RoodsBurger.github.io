@@ -1,4 +1,6 @@
 ---
+import { dimsFor } from "@/lib/media-dims";
+
 interface Props {
   src: string;
   caption?: string;
@@ -9,6 +11,13 @@ interface Props {
 
 const { src, caption, type, alt, aspect = "16/7" } = Astro.props;
 const isVideo = type === "video" || src.endsWith(".mp4") || src.endsWith(".webm");
+
+// The frame's aspect-ratio comes from the `aspect` prop; the fallback intrinsic size follows the same ratio.
+const [aspectW, aspectH] = aspect.split("/").map(Number);
+const FALLBACK_WIDTH = 1600;
+const FALLBACK_HEIGHT = Math.round((FALLBACK_WIDTH * (aspectH || 7)) / (aspectW || 16));
+
+const dims = await dimsFor(src, isVideo, { width: FALLBACK_WIDTH, height: FALLBACK_HEIGHT });
 ---
 
 <figure
@@ -22,6 +31,8 @@ const isVideo = type === "video" || src.endsWith(".mp4") || src.endsWith(".webm"
       muted={true}
       playsinline={true}
       preload="auto"
+      width={dims.width}
+      height={dims.height}
       class="w-full h-full object-cover pointer-events-none"
       aria-label={alt || caption}
     >
@@ -32,6 +43,9 @@ const isVideo = type === "video" || src.endsWith(".mp4") || src.endsWith(".webm"
       src={src}
       alt={alt || caption || ""}
       loading="lazy"
+      decoding="async"
+      width={dims.width}
+      height={dims.height}
       class="w-full h-full object-cover"
     />
   )}

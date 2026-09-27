@@ -9,7 +9,7 @@ Personal portfolio for Rodolfo Raimundo. A complete rewrite of the v1 static sit
 - **Tailwind v4** — design tokens defined in `src/styles/globals.css` via `@theme`
 - **TypeScript** — strict mode
 - **Content collections** — project pages live in `src/content/projects/*.mdx`
-- **Netlify Functions** — TypeScript-based chat backend at `netlify/functions/chat.ts`
+- **Netlify Functions** — TypeScript chat backend (Functions v2, streamed replies) at `netlify/functions/chat.mts`
 - **shadcn/Vercel-style aesthetic** — Geist font, neutral palette, single accent
 
 ## Local development
@@ -49,24 +49,27 @@ For production, set these in the Netlify dashboard → Site settings → Environ
 
 ## Diagnosing the AI chat
 
-The function exposes a health check endpoint. With `netlify dev` running:
+The chat uses Cohere `embed-v4.0` (1024 dimensions) for query embeddings, `rerank-v4.0-fast` to rerank Pinecone matches, and `command-a-03-2025` for replies (override with `COHERE_CHAT_MODEL`). Model names and the Pinecone namespace live in `src/lib/chat/models.ts`, shared with the indexer.
+
+The function exposes a health check. With `netlify dev` running:
 
 ```bash
-curl 'http://localhost:8888/.netlify/functions/chat?healthcheck=1'
+curl "http://localhost:8888/.netlify/functions/chat?healthcheck=$HEALTHCHECK_TOKEN"
 ```
 
-Returns the status of Cohere + Pinecone, plus the record count in the Pinecone index. Use this to confirm:
+When `HEALTHCHECK_TOKEN` is set and `?healthcheck=<HEALTHCHECK_TOKEN>` matches it, the response reports Cohere and Pinecone status, the namespace, the models, and the namespace's record count. Any other value, or no `HEALTHCHECK_TOKEN` at all, returns `{"status":"ok"}` without calling upstream. Use the detailed form to confirm:
 
 - API keys are set and valid
-- Pinecone index exists and has documents (free-tier indexes are auto-deleted after 7 days of inactivity)
+- Pinecone index exists and the namespace has documents (free-tier indexes are auto-deleted after 7 days of inactivity)
 - Model names haven't been deprecated
 
-If the index is empty, repopulate it by running the v1 script:
+If the namespace is empty, rebuild it from `knowledge/*.md`:
 
 ```bash
-cd ..  # back to repo root
-python knowledge_base_setup.py
+npm run index -- --namespace <v2-namespace>
 ```
+
+Then point `NAMESPACE_DEFAULT` in `src/lib/chat/models.ts` (or `PINECONE_NAMESPACE`) at it. `node --env-file=.env scripts/eval-chat.mjs` runs a fixed question set through the handler against the real services.
 
 ## Build
 
@@ -98,7 +101,7 @@ public/
   documents/       PDFs (resume, reports, coursework) — also used by knowledge_base_setup.py
 netlify/
   functions/
-    chat.ts        RAG chat function (Cohere + Pinecone)
+    chat.mts       RAG chat function (Cohere + Pinecone), streams plain text
 ```
 
 ## Adding a new project

@@ -1,0 +1,87 @@
+---
+// TidyNET pipeline: a diffusion model imagines the tidy scene, one detector reads both images, and the arm rearranges the table to match.
+import OrthoDiagram from "./OrthoDiagram.astro";
+import type { DiagramSpec } from "./ortho";
+
+const nodes = {
+  photo: { title: "messy scene", sub: "camera photo" },
+  diffusion: { title: "diffusion model", sub: "conditional DDPM + CFG" },
+  target: { title: "tidy target", sub: "generated image" },
+  match: { title: "match objects", sub: "Hungarian, by color" },
+  plan: { title: "pick-and-place", sub: "blockers moved first" },
+  arm: { title: "WidowX 200", sub: "ROS2 execution", tone: "accent" as const },
+  results: { title: "74.2% placement", sub: "70% end-to-end", tone: "muted" as const },
+};
+
+// Vision stage on top with one detector per image feeding the matcher; robot stage below ending in the reported results.
+const desktop: DiagramSpec = {
+  cols: 3,
+  rows: 3,
+  cell: { h: 56, gapX: 88, gapY: [40, 70] },
+  nodes: [
+    { id: "photo", col: 0, row: 0, ...nodes.photo },
+    { id: "diffusion", col: 1, row: 0, ...nodes.diffusion },
+    { id: "target", col: 2, row: 0, ...nodes.target },
+    { id: "detectPhoto", col: 0, row: 1, title: "YOLO-OBB", sub: "on the photo" },
+    { id: "match", col: 1, row: 1, ...nodes.match },
+    { id: "detectTarget", col: 2, row: 1, title: "YOLO-OBB", sub: "on the target" },
+    { id: "plan", col: 0, row: 2, ...nodes.plan },
+    { id: "arm", col: 1, row: 2, ...nodes.arm },
+    { id: "results", col: 2, row: 2, ...nodes.results },
+  ],
+  groups: [
+    { id: "vision", title: "VISION", nodes: ["photo", "diffusion", "target", "detectPhoto", "match", "detectTarget"] },
+    { id: "robot", title: "ROBOT", nodes: ["plan", "arm"] },
+  ],
+  edges: [
+    { from: "photo", to: "diffusion" },
+    { from: "diffusion", to: "target" },
+    { from: "photo", to: "detectPhoto" },
+    { from: "target", to: "detectTarget" },
+    { from: "detectPhoto", to: "match" },
+    { from: "detectTarget", to: "match" },
+    { from: "match", to: "plan", fromSide: "b", toSide: "t", via: [{ y: 2, dy: -9 }] },
+    { from: "plan", to: "arm" },
+    { from: "arm", to: "results", tone: "secondary", dashed: true },
+  ],
+};
+
+// One column; the photo reaches the shared detector through a lane inside the vision group.
+const mobile: DiagramSpec = {
+  cols: 1,
+  rows: 8,
+  pad: { l: 44, r: 18 },
+  cell: { h: 50, gapX: 0, gapY: [28, 28, 28, 28, 64, 28, 40] },
+  nodes: [
+    { id: "photo", col: 0, row: 0, ...nodes.photo },
+    { id: "diffusion", col: 0, row: 1, ...nodes.diffusion },
+    { id: "target", col: 0, row: 2, ...nodes.target },
+    { id: "detect", col: 0, row: 3, title: "YOLO-OBB", sub: "on both images" },
+    { id: "match", col: 0, row: 4, ...nodes.match },
+    { id: "plan", col: 0, row: 5, ...nodes.plan },
+    { id: "arm", col: 0, row: 6, ...nodes.arm },
+    { id: "results", col: 0, row: 7, ...nodes.results },
+  ],
+  groups: [
+    { id: "vision", title: "VISION", nodes: ["photo", "diffusion", "target", "detect", "match"], pad: { t: 30, r: 12, b: 12, l: 28 } },
+    { id: "robot", title: "ROBOT", nodes: ["plan", "arm"], pad: { t: 30, r: 12, b: 12, l: 28 } },
+  ],
+  edges: [
+    { from: "photo", to: "diffusion" },
+    { from: "diffusion", to: "target" },
+    { from: "target", to: "detect" },
+    { from: "photo", to: "detect", fromSide: "l", toSide: "l", via: [{ x: 0, dx: 4 }] },
+    { from: "detect", to: "match" },
+    { from: "match", to: "plan" },
+    { from: "plan", to: "arm" },
+    { from: "arm", to: "results", tone: "secondary", dashed: true },
+  ],
+};
+---
+
+<OrthoDiagram
+  name="tidynet"
+  label="Rodolfo's TidyNET, which extends the Creative Machines Lab's knolling research: a photo of a messy tabletop conditions a diffusion model with classifier-free guidance that generates a tidy target image, a YOLO oriented-box detector finds the objects in both images, the objects are matched between them, and a pick-and-place plan is executed by a WidowX 200 arm under ROS2, reaching 74.2% placement success and 70% end-to-end task completion."
+  desktop={desktop}
+  mobile={mobile}
+/>

@@ -3,7 +3,7 @@ export const site = {
   shortName: "rraimundo",
   url: "https://rraimundo.me",
   description:
-    "ML engineer, roboticist, and lifelong learner. Building intelligent systems at the intersection of deep learning, robotics, and human-centered design.",
+    "Rodolfo Raimundo is a Research Scientist at Pindrop who builds robots, smart hardware and machine learning projects.",
   email: "rodolfo.c.r1997@gmail.com",
   social: {
     github: "https://github.com/RoodsBurger",

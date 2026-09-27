@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { MessageCircle, X, Send, Loader2, Sparkles } from "lucide-react";
 import { marked } from "marked";
-import { sendChatMessage, type ChatMessage } from "@/lib/chat-client";
+import DOMPurify from "dompurify";
+import { streamChatMessage, type ChatMessage } from "@/lib/chat-client";
 import { cn } from "@/lib/cn";
 
 marked.setOptions({ gfm: true, breaks: true });
@@ -48,27 +49,6 @@ function projectTitle(): string {
   return t.trim();
 }
 
-// Short description of the current page; lets the assistant resolve deictic questions.
-function getPageContext(): string {
-  if (typeof window === "undefined") return "";
-  const path = window.location.pathname;
-  const docTitle = document.title || "";
-  const lead = docTitle.split(" · ")[0]?.trim();
-
-  if (path === "/") return "The user is on the home page of Rodolfo's portfolio.";
-  if (path === "/projects") return "The user is on the Projects listing page.";
-  if (path === "/hobbies")
-    return "The user is on the Personal page, about Rodolfo's hobbies and life outside work.";
-  if (path === "/chat") return "The user is on the dedicated chat page.";
-  if (path.startsWith("/projects/")) {
-    const name = projectTitle() || lead || "a project";
-    return `The user is viewing the project page for "${name}" (${path}). If their question is ambiguous (e.g. "this", "it", "tell me more"), assume it refers to this project.`;
-  }
-  return lead
-    ? `The user is on the "${lead}" page (${path}).`
-    : `The user is on ${path}.`;
-}
-
 // Concise subject for the current page used to steer RAG retrieval.
 function getPageTopic(): string {
   if (typeof window === "undefined") return "";
@@ -86,10 +66,59 @@ function getPageTopic(): string {
   return lead || "";
 }
 
-function renderMarkdown(text: string): string {
-  // marked is sync when no async extensions are configured
-  return marked.parse(text) as string;
+// Slug of the project page being viewed, matching the server's pageSlug pattern.
+function getPageSlug(): string | undefined {
+  if (typeof window === "undefined") return undefined;
+  const match = /^\/projects\/([a-z0-9-]{1,40})\/?$/.exec(window.location.pathname);
+  return match?.[1];
 }
+
+// History sent to the server: the most recent turns, each clipped to the server's length limit.
+const HISTORY_SEND = 12;
+const HISTORY_ITEM_MAX = 2000;
+
+const SANITIZE_CONFIG = {
+  FORBID_TAGS: ["img", "form", "input", "style"],
+  FORBID_ATTR: ["style"],
+};
+
+// External http(s) links open in a new tab without referrer or opener; same-site links are left as they are.
+if (typeof window !== "undefined") {
+  DOMPurify.addHook("afterSanitizeAttributes", (node) => {
+    if (node.tagName !== "A") return;
+    const href = node.getAttribute("href");
+    if (!href) return;
+    let url: URL;
+    try {
+      url = new URL(href, window.location.href);
+    } catch {
+      return;
+    }
+    if (!/^https?:$/.test(url.protocol) || url.origin === window.location.origin) return;
+    node.setAttribute("target", "_blank");
+    node.setAttribute("rel", "noopener noreferrer");
+  });
+}
+
+function renderMarkdown(text: string): string {
+  if (typeof window === "undefined") return "";
+  // marked is sync when no async extensions are configured
+  return DOMPurify.sanitize(marked.parse(text) as string, SANITIZE_CONFIG);
+}
+
+// Re-parses and re-sanitizes only when this bubble's text changes.
+const AssistantBubble = memo(function AssistantBubble({ content }: { content: string }) {
+  const html = useMemo(() => renderMarkdown(content), [content]);
+  return (
+    <div
+      className="chat-md max-w-[85%] rounded-2xl rounded-bl-sm bg-(--color-muted) text-(--color-foreground) px-3.5 py-2.5 text-sm leading-relaxed"
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  );
+});
+
+// Distance from the bottom, in pixels, within which streamed text keeps the view pinned.
+const STICK_THRESHOLD = 40;
 
 interface Props {
   mode?: "floating" | "embedded";
@@ -114,9 +143,17 @@ export default function ChatWidget({ mode = "floating" }: Props) {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [streamingId, setStreamingId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const hydratedRef = useRef(false);
+  // Whether the view is pinned to the bottom; only an upward scroll away from the bottom unpins it.
+  const stickRef = useRef(true);
+  const lastScrollTopRef = useRef(0);
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Abort any in-flight reply when the widget unmounts.
+  useEffect(() => () => abortRef.current?.abort(), []);
 
   // Hydrate the saved conversation after mount to avoid hydration mismatch.
   useEffect(() => {
@@ -144,12 +181,21 @@ export default function ChatWidget({ mode = "floating" }: Props) {
     }
   }, [isOpen, mode]);
 
+  // Follows new content while pinned: instant during streaming, smooth otherwise.
   useEffect(() => {
-    scrollRef.current?.scrollTo({
-      top: scrollRef.current.scrollHeight,
-      behavior: "smooth",
-    });
-  }, [messages, isLoading]);
+    const el = scrollRef.current;
+    if (!el || !stickRef.current) return;
+    el.scrollTo({ top: el.scrollHeight, behavior: streamingId ? "auto" : "smooth" });
+  }, [messages, isLoading, streamingId]);
+
+  const handleScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= STICK_THRESHOLD;
+    if (nearBottom) stickRef.current = true;
+    else if (el.scrollTop < lastScrollTopRef.current) stickRef.current = false;
+    lastScrollTopRef.current = el.scrollTop;
+  };
 
   const submit = async (text: string) => {
     const trimmed = text.trim();
@@ -161,31 +207,60 @@ export default function ChatWidget({ mode = "floating" }: Props) {
       content: trimmed,
       id: crypto.randomUUID(),
     };
+    stickRef.current = true;
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setIsLoading(true);
 
-    const history: ChatMessage[] = [...messages, userMsg].map(({ role, content }) => ({
+    const history: ChatMessage[] = messages.slice(-HISTORY_SEND).map(({ role, content }) => ({
       role,
-      content,
+      content: content.slice(0, HISTORY_ITEM_MAX),
     }));
 
+    // The assistant bubble appears with the first streamed text and grows in place, at most once per frame.
+    const replyId = crypto.randomUUID();
+    let started = false;
+    let latest = "";
+    let frame = 0;
+    const flush = () => {
+      frame = 0;
+      const text = latest;
+      if (!started) {
+        started = true;
+        setStreamingId(replyId);
+        setMessages((prev) => [...prev, { role: "assistant", content: text, id: replyId }]);
+        return;
+      }
+      setMessages((prev) => prev.map((m) => (m.id === replyId ? { ...m, content: text } : m)));
+    };
+    const onDelta = (text: string) => {
+      latest = text;
+      if (!frame) frame = requestAnimationFrame(flush);
+    };
+
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
-      const reply = await sendChatMessage(
-        trimmed,
-        history.slice(0, -1),
-        getPageContext(),
-        getPageTopic(),
-      );
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: reply, id: crypto.randomUUID() },
-      ]);
+      await streamChatMessage(trimmed, history, {
+        pageTopic: getPageTopic(),
+        pageSlug: getPageSlug(),
+        onDelta,
+        signal: controller.signal,
+      });
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Something went wrong.";
-      setError(message);
+      if (controller.signal.aborted) return;
+      // Rate-limit and generic failures both carry a user-facing message.
+      setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
-      setIsLoading(false);
+      if (frame) {
+        cancelAnimationFrame(frame);
+        if (!controller.signal.aborted) flush();
+      }
+      if (abortRef.current === controller) abortRef.current = null;
+      if (!controller.signal.aborted) {
+        setStreamingId(null);
+        setIsLoading(false);
+      }
     }
   };
 
@@ -220,7 +295,7 @@ export default function ChatWidget({ mode = "floating" }: Props) {
           <div>
             <div className="text-sm font-semibold leading-tight">Ask about Rodolfo</div>
             <div className="text-[11px] text-(--color-muted-foreground)">
-              AI assistant for answers from his portfolio
+              Answers from rraimundo.me
             </div>
           </div>
         </div>
@@ -236,12 +311,11 @@ export default function ChatWidget({ mode = "floating" }: Props) {
         )}
       </header>
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+      <div ref={scrollRef} onScroll={handleScroll} className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
         {messages.length === 0 && (
           <div className="space-y-4 animate-in">
             <div className="rounded-xl bg-(--color-muted)/50 p-4 text-sm leading-relaxed">
-              Hi! I'm trained on Rodolfo's portfolio, resume, and research. Ask me
-              anything about his projects, skills, or background.
+              Ask about Rodolfo's projects, work, education or hobbies.
             </div>
             <div className="space-y-2">
               <p className="text-xs font-medium text-(--color-muted-foreground) uppercase tracking-wider">
@@ -276,15 +350,12 @@ export default function ChatWidget({ mode = "floating" }: Props) {
                 {m.content}
               </div>
             ) : (
-              <div
-                className="chat-md max-w-[85%] rounded-2xl rounded-bl-sm bg-(--color-muted) text-(--color-foreground) px-3.5 py-2.5 text-sm leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: renderMarkdown(m.content) }}
-              />
+              <AssistantBubble content={m.content} />
             )}
           </div>
         ))}
 
-        {isLoading && (
+        {isLoading && !streamingId && (
           <div className="flex justify-start">
             <div className="rounded-2xl rounded-bl-sm bg-(--color-muted) px-3.5 py-2.5">
               <div className="flex items-center gap-1.5">
@@ -313,7 +384,8 @@ export default function ChatWidget({ mode = "floating" }: Props) {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           rows={1}
-          placeholder="Ask anything..."
+          maxLength={2000}
+          placeholder="Ask a question"
           className="flex-1 resize-none bg-transparent text-sm px-3 py-2 rounded-lg border border-(--color-border) focus:border-(--color-accent) focus:outline-none focus:ring-2 focus:ring-(--color-ring)/30 max-h-32"
           aria-label="Message"
         />
@@ -332,7 +404,7 @@ export default function ChatWidget({ mode = "floating" }: Props) {
       </form>
 
       <div className="px-3 pb-2 pt-0 text-center text-[10px] font-mono text-(--color-muted-foreground)/50 tracking-wider">
-        Powered by Cohere · RAG over portfolio
+        Cohere Command A · answers from site content
       </div>
     </div>
   );

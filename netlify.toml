@@ -34,7 +34,22 @@
 
 [[redirects]]
   from = "/projects/wallet.html"
-  to = "/projects/wallet"
+  to = "/#projects"
+  status = 301
+
+[[redirects]]
+  from = "/projects/wallet"
+  to = "/#projects"
+  status = 301
+
+[[redirects]]
+  from = "/projects/plex"
+  to = "/#projects"
+  status = 301
+
+[[redirects]]
+  from = "/projects/raidrive"
+  to = "/projects/raiapps"
   status = 301
 
 [[redirects]]
@@ -45,4 +60,9 @@
 [[redirects]]
   from = "/chat.html"
   to = "/chat"
+  status = 301
+
+[[redirects]]
+  from = "/projects/lamp"
+  to = "/projects/desk-lamp"
   status = 301

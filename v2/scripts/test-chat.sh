@@ -42,13 +42,15 @@ sleep 1
 
 echo ""
 echo "── Healthcheck ──────────────────────────────────────"
-curl -s 'http://localhost:8888/.netlify/functions/chat?healthcheck=1' | python3 -m json.tool
+curl -s --max-time 20 "http://localhost:8888/.netlify/functions/chat?healthcheck=${HEALTHCHECK_TOKEN:-none}" | python3 -m json.tool
 
 echo ""
 echo "── End-to-end chat ──────────────────────────────────"
-curl -s -X POST 'http://localhost:8888/.netlify/functions/chat' \
+curl -sN --max-time 30 -X POST 'http://localhost:8888/.netlify/functions/chat' \
   -H 'Content-Type: application/json' \
-  -d '{"message":"What did Rodolfo build for TidyNET?"}' | python3 -m json.tool
+  -H 'Origin: http://localhost:8888' \
+  -d '{"message":"What did Rodolfo build for TidyNET?"}'
+echo
 
 echo ""
 echo "✓ Done. Kill log: /tmp/chat-test-dev.log"

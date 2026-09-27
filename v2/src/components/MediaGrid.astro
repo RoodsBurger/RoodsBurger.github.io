@@ -1,4 +1,6 @@
 ---
+import { dimsFor } from "@/lib/media-dims";
+
 interface MediaItem {
   src: string;
   caption?: string;
@@ -19,11 +21,17 @@ const isVideo = (item: MediaItem) =>
 
 const allVideos = items.every(isVideo);
 const sequenceId = `mediaseq-${Math.random().toString(36).slice(2, 9)}`;
+
+// The frame is a fixed 4:3 box; this is the fallback intrinsic size when a file can't be read.
+const FALLBACK = { width: 1200, height: 900 };
+
+const dims = await Promise.all(items.map((item) => dimsFor(item.src, isVideo(item), FALLBACK)));
+const itemsWithDims = items.map((item, i) => ({ ...item, dims: dims[i] }));
 ---
 
 {/* Desktop: grid */}
 <div class={`not-prose hidden md:grid gap-3 md:gap-4 ${gridClass} my-8`}>
-  {items.map((item) => {
+  {itemsWithDims.map((item) => {
     const video = isVideo(item);
     return (
       <figure class="relative rounded-xl overflow-hidden border border-(--color-border) bg-(--color-muted) aspect-[4/3]">
@@ -34,6 +42,8 @@ const sequenceId = `mediaseq-${Math.random().toString(36).slice(2, 9)}`;
             muted={true}
             playsinline={true}
             preload="auto"
+            width={item.dims.width}
+            height={item.dims.height}
             class="w-full h-full object-cover pointer-events-none"
             aria-label={item.alt || item.caption}
           >
@@ -44,6 +54,9 @@ const sequenceId = `mediaseq-${Math.random().toString(36).slice(2, 9)}`;
             src={item.src}
             alt={item.alt || item.caption || ""}
             loading="lazy"
+            decoding="async"
+            width={item.dims.width}
+            height={item.dims.height}
             class="w-full h-full object-cover"
           />
         )}
@@ -58,18 +71,21 @@ const sequenceId = `mediaseq-${Math.random().toString(36).slice(2, 9)}`;
 </div>
 
 {/* Mobile: cycle through one at a time (videos) or a vertical stack (images) */}
-{allVideos && items.length > 1 ? (
+{allVideos && itemsWithDims.length > 1 ? (
   <figure
     class="not-prose md:hidden relative rounded-xl overflow-hidden border border-(--color-border) bg-(--color-muted) aspect-[4/3] my-8"
     data-mediaseq={sequenceId}
   >
-    {items.map((item, i) => (
+    {itemsWithDims.map((item, i) => (
       <video
         data-mediaseq-idx={i}
+        data-mediaseq-caption-text={item.caption || ""}
         autoplay={i === 0}
         muted={true}
         playsinline={true}
         preload="auto"
+        width={item.dims.width}
+        height={item.dims.height}
         class="absolute inset-0 w-full h-full object-cover pointer-events-none transition-opacity duration-500"
         style={`opacity: ${i === 0 ? 1 : 0};`}
         aria-label={item.alt || item.caption}
@@ -81,12 +97,12 @@ const sequenceId = `mediaseq-${Math.random().toString(36).slice(2, 9)}`;
       data-mediaseq-caption
       class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-3 py-2 text-xs text-white font-medium"
     >
-      {items[0].caption}
+      {itemsWithDims[0].caption}
     </figcaption>
   </figure>
 ) : (
   <div class={`not-prose md:hidden my-8`}>
-    {items.slice(0, 1).map((item) => {
+    {itemsWithDims.slice(0, 1).map((item) => {
       const video = isVideo(item);
       return (
         <figure class="relative rounded-xl overflow-hidden border border-(--color-border) bg-(--color-muted) aspect-[4/3]">
@@ -97,6 +113,8 @@ const sequenceId = `mediaseq-${Math.random().toString(36).slice(2, 9)}`;
               muted={true}
               playsinline={true}
               preload="auto"
+              width={item.dims.width}
+              height={item.dims.height}
               class="w-full h-full object-cover pointer-events-none"
               aria-label={item.alt || item.caption}
             >
@@ -107,6 +125,9 @@ const sequenceId = `mediaseq-${Math.random().toString(36).slice(2, 9)}`;
               src={item.src}
               alt={item.alt || item.caption || ""}
               loading="lazy"
+              decoding="async"
+              width={item.dims.width}
+              height={item.dims.height}
               class="w-full h-full object-cover"
             />
           )}
@@ -121,16 +142,16 @@ const sequenceId = `mediaseq-${Math.random().toString(36).slice(2, 9)}`;
   </div>
 )}
 
-{allVideos && items.length > 1 && (
+{allVideos && itemsWithDims.length > 1 && (
   <script
     is:inline
-    define:vars={{ sequenceId, captions: items.map((it) => it.caption || "") }}
+    define:vars={{ sequenceId }}
   >
     (() => {
       const root = document.querySelector(`[data-mediaseq="${sequenceId}"]`);
       if (!root) return;
       const videos = Array.from(root.querySelectorAll("video"));
-      const caption = root.querySelector("[data-mediaseq-caption]");
+      const captionEl = root.querySelector("[data-mediaseq-caption]");
       videos.forEach((v) => {
         v.muted = true;
         v.playsInline = true;
@@ -142,7 +163,7 @@ const sequenceId = `mediaseq-${Math.random().toString(36).slice(2, 9)}`;
         videos[next].style.opacity = "1";
         videos[next].currentTime = 0;
         videos[next].play().catch(() => {});
-        if (caption) caption.textContent = captions[next];
+        if (captionEl) captionEl.textContent = videos[next].dataset.mediaseqCaptionText || "";
         current = next;
       };
       videos.forEach((v) => v.addEventListener("ended", advance));

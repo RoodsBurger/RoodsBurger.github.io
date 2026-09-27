@@ -1,0 +1,19 @@
+---
+// Frame for an inline-SVG diagram: a bordered card with a slot for the SVG and a mono caption below it.
+interface Props {
+  caption: string;
+  label?: string;
+}
+
+const { caption, label } = Astro.props;
+---
+
+<figure
+  class="not-prose my-8 rounded-xl border border-(--color-border) bg-(--color-card) p-4 md:p-6"
+  aria-label={label ?? caption}
+>
+  <slot />
+  <figcaption class="mt-3 font-mono text-xs text-(--color-muted-foreground)">
+    {caption}
+  </figcaption>
+</figure>

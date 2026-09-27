@@ -22,6 +22,48 @@
   --radius: 0.625rem;
 }
 
+/* Same-origin page loads crossfade; a project title morphs from the spotlight into the modal */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 180ms;
+  animation-timing-function: ease-out;
+}
+
+::view-transition-group(.project-title) {
+  animation-duration: 260ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Keep the text snapshots at their own aspect ratio instead of stretching between line wraps */
+::view-transition-old(.project-title),
+::view-transition-new(.project-title) {
+  height: 100%;
+  width: auto;
+  animation-duration: 260ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* A title with no partner on the other page fades with the root */
+::view-transition-old(.project-title):only-child,
+::view-transition-new(.project-title):only-child {
+  animation-duration: 180ms;
+  animation-timing-function: ease-out;
+}
+
+.vt-project-title {
+  view-transition-class: project-title;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+}
+
 @layer base {
   :root[data-theme="dark"] {
     /* Dark theme: slightly lighter than near-black so the grid texture reads */
@@ -53,7 +95,6 @@
   :target,
   [id="projects"],
   [id="life"],
-  [id="contact"],
   [id="experience"],
   [id="about"] {
     scroll-margin-top: 72px;
@@ -253,8 +294,27 @@
     opacity: 1;
     transform: none;
   }
+
+  /* Sections with marked children stay put and reveal those children in a 60ms stagger (--i from the observer) */
+  .js-reveal [data-reveal]:has([data-reveal-item]) {
+    opacity: 1;
+    transform: none;
+  }
+  .js-reveal [data-reveal] [data-reveal-item] {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 700ms cubic-bezier(0.16, 1, 0.3, 1),
+                transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: calc(var(--i, 0) * 60ms);
+  }
+  .js-reveal [data-reveal].is-visible [data-reveal-item] {
+    opacity: 1;
+    transform: none;
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .js-reveal [data-reveal] {
+    .js-reveal [data-reveal],
+    .js-reveal [data-reveal] [data-reveal-item] {
       opacity: 1;
       transform: none;
       transition: none;

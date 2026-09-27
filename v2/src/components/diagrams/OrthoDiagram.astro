@@ -1,0 +1,129 @@
+---
+// Renders a desktop and a mobile orthogonal diagram from declarative grid specs, toggled at the md breakpoint.
+import { layoutDiagram, type DiagramSpec, type LaidDiagram } from "./ortho";
+
+interface Props {
+  /** Unique per page; namespaces the arrowhead marker ids. */
+  name: string;
+  /** One-sentence description used as the SVG aria-label. */
+  label: string;
+  desktop: DiagramSpec;
+  mobile: DiagramSpec;
+  /** CSS px width at which desktop text renders at its nominal size. */
+  desktopWidth?: number;
+  /** CSS px width at which mobile text renders at its nominal size. */
+  mobileWidth?: number;
+}
+
+const { name, label, desktop, mobile, desktopWidth = 712, mobileWidth = 272 } = Astro.props;
+
+const variants: Array<{ key: string; cls: string; laid: LaidDiagram }> = [
+  { key: "d", cls: "hidden md:block", laid: layoutDiagram(desktop, desktopWidth, `${name}/desktop`) },
+  { key: "m", cls: "block md:hidden", laid: layoutDiagram(mobile, mobileWidth, `${name}/mobile`) },
+];
+
+const r = (n: number) => Number(n.toFixed(2));
+const halo = (kind: "card" | "muted") => (kind === "muted" ? "var(--color-muted)" : "var(--color-card)");
+const colour = (tone: "primary" | "secondary") => (tone === "primary" ? "var(--color-foreground)" : "var(--color-muted-foreground)");
+---
+
+{
+  variants.map(({ key, cls, laid }) => {
+    const id = `od-${name}-${key}`;
+    const { viewBox: vb, sizes } = laid;
+    const a = sizes.arrow;
+    return (
+      <svg
+        viewBox={`${r(vb.x)} ${r(vb.y)} ${r(vb.w)} ${r(vb.h)}`}
+        width="100%"
+        role="img"
+        aria-label={label}
+        class={`${cls} mx-auto h-auto w-full`}
+        style={`max-width:${laid.renderWidth}px`}
+        data-ortho={id}
+        font-family="var(--font-mono)"
+      >
+        <defs>
+          {(["primary", "secondary"] as const).map((tone) => (
+            <marker
+              id={`${id}-arrow-${tone}`}
+              viewBox="0 0 7 7"
+              refX="6"
+              refY="3.5"
+              markerWidth={r(a)}
+              markerHeight={r(a)}
+              markerUnits="userSpaceOnUse"
+              orient="auto-start-reverse"
+            >
+              <path d="M0,0 L7,3.5 L0,7 Z" fill={colour(tone)} />
+            </marker>
+          ))}
+        </defs>
+
+        {laid.groups.map((g) => (
+          <g class="od-group">
+            <rect x={r(g.x)} y={r(g.y)} width={r(g.w)} height={r(g.h)} rx={r(sizes.groupRadius)} fill="var(--color-muted)" stroke="var(--color-border)" stroke-width="1" vector-effect="non-scaling-stroke" />
+            <text x={r(g.title.x)} y={r(g.title.y)} font-size={r(g.title.size)} font-weight="500" letter-spacing="0.06em" dominant-baseline="central" fill="var(--color-muted-foreground)">{g.title.text}</text>
+          </g>
+        ))}
+
+        {laid.edges.map((e) => (
+          <path
+            class="od-edge"
+            d={e.d}
+            data-points={e.points.map(([x, y]) => `${r(x)},${r(y)}`).join(" ")}
+            fill="none"
+            stroke={colour(e.tone)}
+            stroke-width="1"
+            stroke-dasharray={e.dashed ? "4 3" : undefined}
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            vector-effect="non-scaling-stroke"
+            marker-end={`url(#${id}-arrow-${e.tone})`}
+            marker-start={e.bidir ? `url(#${id}-arrow-${e.tone})` : undefined}
+          />
+        ))}
+
+        {laid.nodes.map((n) => (
+          <g class="od-node" data-node={n.id}>
+            <rect
+              x={r(n.x)}
+              y={r(n.y)}
+              width={r(n.w)}
+              height={r(n.h)}
+              rx={r(sizes.nodeRadius)}
+              fill={n.tone === "muted" ? "var(--color-muted)" : "var(--color-card)"}
+              stroke={n.tone === "accent" ? "var(--color-foreground)" : "var(--color-border)"}
+              stroke-width="1"
+              vector-effect="non-scaling-stroke"
+            />
+            <text x={r(n.title.x)} y={r(n.title.y)} font-size={r(n.title.size)} font-weight="600" text-anchor={n.title.anchor} dominant-baseline="central" fill="var(--color-foreground)">{n.title.text}</text>
+            {n.sub && (
+              <text x={r(n.sub.x)} y={r(n.sub.y)} font-size={r(n.sub.size)} text-anchor={n.sub.anchor} dominant-baseline="central" fill="var(--color-muted-foreground)">{n.sub.text}</text>
+            )}
+          </g>
+        ))}
+
+        {laid.edges
+          .filter((e) => e.label.length > 0)
+          .map((e) => (
+            <text
+              class="od-label"
+              text-anchor={e.label[0].anchor}
+              font-size={r(e.label[0].size)}
+              dominant-baseline="central"
+              fill="var(--color-muted-foreground)"
+              stroke={halo(e.labelHalo)}
+              stroke-width={r(sizes.halo)}
+              stroke-linejoin="round"
+              paint-order="stroke"
+            >
+              {e.label.map((t) => (
+                <tspan x={r(t.x)} y={r(t.y)} dominant-baseline="central">{t.text}</tspan>
+              ))}
+            </text>
+          ))}
+      </svg>
+    );
+  })
+}

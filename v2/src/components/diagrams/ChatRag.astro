@@ -1,0 +1,88 @@
+---
+// Chat assistant RAG pipeline: the offline indexer fills a Pinecone namespace that the query-time path retrieves from.
+import OrthoDiagram from "./OrthoDiagram.astro";
+import type { DiagramSpec } from "./ortho";
+
+const nodes = {
+  knowledge: { title: "knowledge/*.md", sub: "curated site content" },
+  chunk: { title: "chunk by heading", sub: "title · section · url" },
+  indexEmbed: { title: "Cohere embed", sub: "embed-v4.0" },
+  question: { title: "question" },
+  queryEmbed: { title: "Cohere embed", sub: "embed-v4.0" },
+  pinecone: { title: "Pinecone", sub: "shared namespace" },
+  rerank: { title: "Cohere rerank", sub: "rerank-v4.0-fast" },
+  command: { title: "Command A", sub: "with documents" },
+  answer: { title: "answer", sub: "streamed" },
+};
+
+const groups = [
+  { id: "index", title: "INDEX TIME", nodes: ["knowledge", "chunk", "indexEmbed"] },
+  { id: "query", title: "QUERY TIME", nodes: ["question", "queryEmbed", "pinecone", "rerank", "command", "answer"] },
+];
+
+// Index row on top feeds Pinecone from above; the query path wraps from Pinecone back to the start of the next row.
+const desktop: DiagramSpec = {
+  cols: 3,
+  rows: 3,
+  cell: { h: 56, gapX: 96, gapY: [74, 56] },
+  nodes: [
+    { id: "knowledge", col: 0, row: 0, ...nodes.knowledge },
+    { id: "chunk", col: 1, row: 0, ...nodes.chunk },
+    { id: "indexEmbed", col: 2, row: 0, ...nodes.indexEmbed },
+    { id: "question", col: 0, row: 1, ...nodes.question },
+    { id: "queryEmbed", col: 1, row: 1, ...nodes.queryEmbed },
+    { id: "pinecone", col: 2, row: 1, ...nodes.pinecone },
+    { id: "rerank", col: 0, row: 2, ...nodes.rerank },
+    { id: "command", col: 1, row: 2, ...nodes.command },
+    { id: "answer", col: 2, row: 2, ...nodes.answer },
+  ],
+  groups,
+  edges: [
+    { from: "knowledge", to: "chunk", tone: "secondary" },
+    { from: "chunk", to: "indexEmbed", tone: "secondary" },
+    { from: "indexEmbed", to: "pinecone", tone: "secondary", label: "upsert", labelAt: 1, labelDy: -9 },
+    { from: "question", to: "queryEmbed" },
+    { from: "queryEmbed", to: "pinecone" },
+    { from: "pinecone", to: "rerank", fromSide: "b", toSide: "t", label: "top 20", labelAt: 2 },
+    { from: "rerank", to: "command", label: "top 4 chunks" },
+    { from: "command", to: "answer" },
+  ],
+};
+
+// One column; the index output reaches Pinecone through a lane on the right.
+const mobile: DiagramSpec = {
+  cols: 1,
+  rows: 9,
+  pad: { l: 18, r: 36 },
+  cell: { h: 50, gapX: 0, gapY: [28, 28, 64, 28, 28, 36, 36, 28] },
+  nodes: [
+    { id: "knowledge", col: 0, row: 0, ...nodes.knowledge },
+    { id: "chunk", col: 0, row: 1, ...nodes.chunk },
+    { id: "indexEmbed", col: 0, row: 2, ...nodes.indexEmbed },
+    { id: "question", col: 0, row: 3, ...nodes.question },
+    { id: "queryEmbed", col: 0, row: 4, ...nodes.queryEmbed },
+    { id: "pinecone", col: 0, row: 5, ...nodes.pinecone },
+    { id: "rerank", col: 0, row: 6, ...nodes.rerank },
+    { id: "command", col: 0, row: 7, ...nodes.command },
+    { id: "answer", col: 0, row: 8, ...nodes.answer },
+  ],
+  groups: groups.map((g) => ({ ...g, pad: { t: 30, r: 12, b: 12, l: 12 } })),
+  edges: [
+    { from: "knowledge", to: "chunk", tone: "secondary" },
+    { from: "chunk", to: "indexEmbed", tone: "secondary" },
+    { from: "indexEmbed", to: "pinecone", fromSide: "r", toSide: "r", via: [{ x: 1, dx: 6 }], tone: "secondary", label: "upsert", labelSide: "left", labelAt: 3, labelDy: -9 },
+    { from: "question", to: "queryEmbed" },
+    { from: "queryEmbed", to: "pinecone" },
+    { from: "pinecone", to: "rerank", label: "top 20" },
+    { from: "rerank", to: "command", label: "top 4 chunks" },
+    { from: "command", to: "answer" },
+  ],
+};
+---
+
+<OrthoDiagram
+  name="chatrag"
+  label="At query time the question is embedded with Cohere embed-v4.0, Pinecone returns the top 20 chunks, rerank-v4.0-fast keeps the top 4, and Command A answers from them as documents in a streamed reply; at index time the knowledge markdown files are chunked by heading, embedded and upserted into the same Pinecone namespace."
+  desktop={desktop}
+  mobile={mobile}
+/>

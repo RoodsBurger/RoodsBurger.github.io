@@ -13,6 +13,7 @@
 import "dotenv/config";
 import { CohereClientV2 } from "cohere-ai";
 import { Pinecone } from "@pinecone-database/pinecone";
+import { EMBED_MODEL, EMBED_DIM, CHAT_MODEL, NAMESPACE } from "../src/lib/chat/models.ts";
 
 const need = ["COHERE_API_KEY", "PINECONE_API_KEY", "INDEX_NAME"];
 const missing = need.filter((k) => !process.env[k]);
@@ -34,9 +35,10 @@ try {
   process.stdout.write("Cohere embed... ");
   const embed = await cohere.embed({
     texts: [query],
-    model: "embed-english-v3.0",
+    model: EMBED_MODEL,
     inputType: "search_query",
     embeddingTypes: ["float"],
+    outputDimension: EMBED_DIM,
   });
   vec = embed.embeddings?.float?.[0];
   if (!vec) throw new Error("no embedding returned");
@@ -50,7 +52,7 @@ try {
 let stats;
 try {
   process.stdout.write("Pinecone stats... ");
-  const idx = pc.index(process.env.INDEX_NAME);
+  const idx = pc.index(process.env.INDEX_NAME).namespace(NAMESPACE);
   stats = await idx.describeIndexStats();
   console.log(`ok (${stats.totalRecordCount ?? 0} records)`);
 } catch (e) {
@@ -63,7 +65,7 @@ if (!vec || !stats) {
   process.exit(1);
 }
 
-const index = pc.index(process.env.INDEX_NAME);
+const index = pc.index(process.env.INDEX_NAME).namespace(NAMESPACE);
 
 process.stdout.write("Pinecone query... ");
 const res = await index.query({ vector: vec, topK: 5, includeMetadata: true });
@@ -89,7 +91,7 @@ res.matches.slice(0, 5).forEach((m, i) => {
 // 3. Chat
 process.stdout.write("\nCohere chat... ");
 const chat = await cohere.chat({
-  model: "command-r7b-12-2024",
+  model: CHAT_MODEL,
   temperature: 0.3,
   messages: [
     {

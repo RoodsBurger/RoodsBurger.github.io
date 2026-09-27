@@ -1,0 +1,70 @@
+---
+// RaiBudget architecture: the app talks only to Postgres, while Plaid, pg_cron and the analysis routine all go through edge functions.
+import OrthoDiagram from "./OrthoDiagram.astro";
+import type { DiagramSpec } from "./ortho";
+
+const nodes = {
+  app: { title: "Flutter app", sub: "iOS · Android · macOS", tone: "accent" as const },
+  postgres: { title: "Postgres", sub: "RLS on every table" },
+  edge: { title: "edge functions", sub: "server-side only" },
+  cron: { title: "pg_cron", sub: "scheduled jobs" },
+  plaid: { title: "Plaid", sub: "banks + cards", tone: "muted" as const },
+  routine: { title: "Claude Code routine", sub: "LLM · every few hours", tone: "muted" as const },
+};
+
+const supabase = { id: "supabase", title: "SUPABASE", nodes: ["postgres", "edge", "cron"] };
+
+// Supabase is the middle column; the app sits on its left and every outside service on its right.
+const desktop: DiagramSpec = {
+  cols: 3,
+  rows: 3,
+  cell: { h: 56, gapX: [104, 64], gapY: 56 },
+  nodes: [
+    { id: "app", col: 0, row: 0, ...nodes.app },
+    { id: "postgres", col: 1, row: 0, ...nodes.postgres },
+    { id: "edge", col: 1, row: 1, ...nodes.edge },
+    { id: "cron", col: 1, row: 2, ...nodes.cron },
+    { id: "plaid", col: 2, row: 0, ...nodes.plaid },
+    { id: "routine", col: 2, row: 2, ...nodes.routine },
+  ],
+  groups: [supabase],
+  edges: [
+    { from: "app", to: "postgres", bidir: true, label: "realtime" },
+    { from: "edge", to: "postgres", label: "writes" },
+    { from: "cron", to: "edge", tone: "secondary", dashed: true, label: "nightly sync" },
+    { from: "plaid", to: "edge", fromSide: "b", toSide: "r", label: "transactions", labelSeg: 0, labelSide: "left" },
+    { from: "routine", to: "edge", fromSide: "t", toSide: "r", bidir: true, label: ["reads data", "writes reports"], labelSeg: 0, labelSide: "left" },
+  ],
+};
+
+// One column; Plaid and the routine reach edge functions through lanes on either side.
+const mobile: DiagramSpec = {
+  cols: 1,
+  rows: 6,
+  pad: { l: 36, r: 36 },
+  cell: { h: 50, gapX: 0, gapY: [60, 36, 36, 44, 40] },
+  nodes: [
+    { id: "app", col: 0, row: 0, ...nodes.app },
+    { id: "postgres", col: 0, row: 1, ...nodes.postgres },
+    { id: "edge", col: 0, row: 2, ...nodes.edge },
+    { id: "cron", col: 0, row: 3, ...nodes.cron },
+    { id: "plaid", col: 0, row: 4, ...nodes.plaid },
+    { id: "routine", col: 0, row: 5, ...nodes.routine },
+  ],
+  groups: [{ ...supabase, pad: { t: 30, r: 12, b: 12, l: 12 } }],
+  edges: [
+    { from: "app", to: "postgres", bidir: true, label: "realtime", labelAt: 1, labelDy: -15 },
+    { from: "edge", to: "postgres", label: "writes" },
+    { from: "cron", to: "edge", tone: "secondary", dashed: true, label: "nightly sync" },
+    { from: "plaid", to: "edge", fromSide: "r", toSide: "r", via: [{ x: 1, dx: 6 }], label: "transactions", labelSide: "left", labelAt: 4, labelDy: 6 },
+    { from: "routine", to: "edge", fromSide: "l", toSide: "l", via: [{ x: 0, dx: -6 }], bidir: true, label: ["reads data", "writes reports"], labelAt: 5 },
+  ],
+};
+---
+
+<OrthoDiagram
+  name="raibudget"
+  label="The Flutter app on iOS, Android and macOS talks only to Postgres, which enforces row-level security and syncs in realtime; Plaid transactions arrive only through edge functions, which write them to Postgres, pg_cron runs a nightly fallback sync, and a Claude Code routine reads data and writes its reports through edge functions every few hours."
+  desktop={desktop}
+  mobile={mobile}
+/>

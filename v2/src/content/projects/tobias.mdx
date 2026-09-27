@@ -1,12 +1,12 @@
 ---
 title: "Tobias"
-summary: "A quadrupedal robot that learns to walk through reinforcement learning, from CAD to simulation to real hardware."
+summary: "A four-legged robot that walks on a policy trained in simulation and runs on a Raspberry Pi 4 driving eight bus servos."
 tags: ["Reinforcement Learning", "PyTorch", "PyBullet", "Fusion 360"]
 category: ["code", "cad"]
 order: 1
 featured: true
 cover: "/artifacts/tobias_render_1.webp"
-coverAlt: "Tobias quadrupedal robot render"
+coverAlt: "Render of Tobias, a 3D-printed four-legged robot"
 period: "2024"
 links:
   github: "https://github.com/RoodsBurger/tobias"
@@ -18,46 +18,39 @@ import MediaWide from "@/components/MediaWide.astro";
 
 <MediaGrid
   items={[
-    { src: "/artifacts/sac_videos/sac_20000.mp4", caption: "10k training steps", type: "video" },
-    { src: "/artifacts/sac_videos/sac_100000.mp4", caption: "200k training steps", type: "video" },
-    { src: "/artifacts/sac_videos/sac_final.mp4", caption: "1M training steps", type: "video" },
+    { src: "/artifacts/sac_videos/sac_20000.mp4", caption: "20k training steps", type: "video" },
+    { src: "/artifacts/sac_videos/sac_100000.mp4", caption: "100k training steps", type: "video" },
+    { src: "/artifacts/sac_videos/sac_final.mp4", caption: "Final policy", type: "video" },
   ]}
 />
 
 ## Overview
 
-Tobias is a quadrupedal robot project that integrates CAD design, physics simulation, and reinforcement learning to achieve stable walking gaits and straight-line locomotion. By combining RL techniques with detailed physical modeling, it became a platform for exploring autonomous robot movement and control.
+Tobias is a four-legged robot, designed in Fusion 360 and 3D-printed, that walks with a policy trained by reinforcement learning. The policy learns inside a physics simulator, and a gait that works there doesn't automatically work on real servos on a real floor. The public repository holds both halves: the simulation and training code, and everything that runs on the robot.
 
-## Key features
+## Hardware
 
-- End-to-end integration pipeline from CAD design to physical deployment using Fusion 360 and PyBullet
-- Comparison of DQN and SAC reinforcement learning algorithms for optimal gait learning
-- Custom controller class for precise joint movement and physical constraint management
-- Successful sim-to-real transfer through both closed-loop IMU-based control and action replay
+A Raspberry Pi 4 drives eight LX-16A serial bus servos, two per leg, one at the hip and one at the knee. Orientation comes from an IMU made of an LSM6DSOX accelerometer and gyroscope plus an LIS3MDL magnetometer. A 1.28-inch round GC9A01 touchscreen on the back shows a small control interface and plays an idle eye animation. The CAD model that got printed was also exported as STL meshes to build the URDF used in simulation, so the simulated robot has the same geometry as the real one.
 
-## Technical details
+Control runs from a phone on the local network. A Flask REST API on the Pi exposes stand, sit, walk and stop, and manages the walking thread. A React app built with MUI calls that API, with a button for each gait and sliders for step size and height. A leg controller interpolates positions over time, so the legs move continuously instead of jumping between setpoints, and separate scripts handle single steps, double steps, turning and three speed profiles.
 
-### Learning system
+## Learning in simulation
 
-- SAC with entropy-based exploration and automatic temperature tuning
-- 28-dimensional state space capturing position, orientation, velocities, and joint angles
-- Continuous 8-dimensional action space controlling joint angles (two per leg)
-- Multi-component reward shaping for stability and efficiency
+Training ran in PyBullet with Gymnasium environments, Stable-Baselines3 and PyTorch. The reward pays for forward velocity and penalizes falling. The state has 28 dimensions covering position, orientation, velocities and joint angles, and the actor and critic networks use 256-unit hidden layers with ReLU activations.
 
-### Architecture & implementation
+## Why SAC instead of DQN?
 
-- Dual actor-critic networks with 256-neuron hidden layers and ReLU activation
-- Custom controller class handling joint constraints and gear ratios
-- PyBullet physics engine for real-time simulation
-- URDF robot model generated from a Fusion 360 CAD design
+I tried both. DQN needs a discrete action space, so the joint commands had to be cut into bins. Soft Actor-Critic works in a continuous 8-dimensional action space, one angle per joint, with entropy-based exploration and automatic temperature tuning. SAC outperformed DQN and learned smoother gaits, which is about what you'd expect from eight joints that don't move in steps.
 
-## Results & impact
+## Getting it onto the robot
 
 <MediaWide
   src="/artifacts/tobias_narrow.mp4"
-  caption="SAC model: sim-to-real transfer"
+  caption="The SAC gait on the physical robot"
   type="video"
   aspect="16/6"
 />
 
-The SAC implementation significantly outperformed both DQN and traditional approaches. The action-replay method proved particularly effective for sim-to-real transfer, producing stable walking gaits in real-world conditions. The framework provides a foundation for future work in quadrupedal robotics and embodied reinforcement learning.
+There are two routes from simulation to hardware. The first is replay: training saves the best runs as JSON files of joint angles per leg per frame, and a script on the Pi plays them back on the servos frame by frame. The second runs the trained SAC policy live on the robot, reading the IMU, feeding the policy network and sending joint commands straight to the servos.
+
+Replay is the one that produced a stable gait in real conditions. The live policy was less consistent. It still showed that the network trained in simulation could drive the hardware directly, with no recorded path behind it.

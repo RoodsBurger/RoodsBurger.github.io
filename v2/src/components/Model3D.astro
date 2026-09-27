@@ -5,9 +5,13 @@ interface Props {
   alt: string;
   caption?: string;
   height?: string;
+  environment?: string;
 }
 
-const { src, alt, caption, height = "480px" } = Astro.props;
+const DEFAULT_ENVIRONMENT =
+  "https://modelviewer.dev/shared-assets/environments/whipple_creek_regional_park_04_1k.hdr";
+
+const { src, alt, caption, height = "480px", environment = DEFAULT_ENVIRONMENT } = Astro.props;
 ---
 
 <figure
@@ -23,7 +27,7 @@ const { src, alt, caption, height = "480px" } = Astro.props;
     auto-rotate-delay="2500"
     rotation-per-second="18deg"
     interaction-prompt="none"
-    environment-image="https://modelviewer.dev/shared-assets/environments/whipple_creek_regional_park_04_1k.hdr"
+    environment-image={environment}
     shadow-intensity="0.85"
     shadow-softness="0.95"
     exposure="1.1"
@@ -79,5 +83,27 @@ const { src, alt, caption, height = "480px" } = Astro.props;
 </figure>
 
 <script>
-  import "@google/model-viewer";
+  // Defines <model-viewer> only once a viewer is within 200px of the viewport; the poster stays visible until then.
+  let importStarted = false;
+  const ensureModelViewer = () => {
+    if (importStarted) return;
+    importStarted = true;
+    import("@google/model-viewer");
+  };
+
+  const viewers = document.querySelectorAll("model-viewer");
+  if (!("IntersectionObserver" in window)) {
+    ensureModelViewer();
+  } else {
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          ensureModelViewer();
+          io.disconnect();
+        }
+      },
+      { rootMargin: "200px" },
+    );
+    viewers.forEach((el) => io.observe(el));
+  }
 </script>

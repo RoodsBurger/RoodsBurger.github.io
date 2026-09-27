@@ -1,0 +1,31 @@
+---
+// A phone-only device frame: rounded shell with a solid bezel around a status-bar-included screenshot.
+interface Props {
+  src: string;
+  alt: string;
+  caption?: string;
+}
+
+const { src, alt, caption } = Astro.props;
+---
+
+<figure class="not-prose my-8 mx-auto w-full max-w-xs">
+  <div class="rounded-[2.25rem] bg-(--color-foreground)/90 p-[4px] md:p-[6px]">
+    <div class="rounded-[2rem] md:rounded-[1.875rem] overflow-hidden bg-(--color-muted)">
+      <img
+        src={src}
+        alt={alt}
+        width="1080"
+        height="2400"
+        loading="lazy"
+        decoding="async"
+        class="w-full h-auto block"
+      />
+    </div>
+  </div>
+  {caption && (
+    <figcaption class="mt-3 text-center font-mono text-xs text-(--color-muted-foreground)">
+      {caption}
+    </figcaption>
+  )}
+</figure>

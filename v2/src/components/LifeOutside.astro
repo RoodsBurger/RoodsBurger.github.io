@@ -1,6 +1,6 @@
 ---
 const hobbies = [
-  { title: "Climbing", image: "/artifacts/climbing1500_1000.webp" },
+  { title: "Climbing", image: "/artifacts/climbing.webp" },
   { title: "Ceramics", image: "/artifacts/ceramics1200_900.webp" },
   { title: "Teaching", image: "/artifacts/apole.webp" },
   { title: "Hiking", image: "/artifacts/hiking.webp" },
@@ -8,8 +8,8 @@ const hobbies = [
 ---
 
 <section id="life" class="container-page py-10 md:py-14 border-t border-(--color-border)" data-reveal>
-  <div class="flex items-baseline justify-between gap-4 mb-5 md:mb-6">
-    <p class="text-xs font-mono text-(--color-muted-foreground) tracking-wider uppercase">Personal</p>
+  <div class="flex items-baseline justify-between gap-4 mb-5 md:mb-6" data-reveal-item>
+    <h2 class="text-xs font-mono text-(--color-muted-foreground) tracking-wider uppercase">Personal</h2>
     <a
       href="/hobbies"
       class="group inline-flex items-center gap-1.5 text-xs font-mono text-(--color-muted-foreground) hover:text-(--color-foreground) transition-colors uppercase tracking-wider"
@@ -27,11 +27,15 @@ const hobbies = [
           "group relative rounded-xl overflow-hidden border border-(--color-border) bg-(--color-muted) aspect-[3/2] hover:border-(--color-foreground)/30 transition-colors",
           i >= 2 && "hidden md:block",
         ]}
+        data-reveal-item
       >
         <img
           src={hobby.image}
-          alt={hobby.title}
+          alt=""
           loading="lazy"
+          decoding="async"
+          width="900"
+          height="600"
           class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
         />
         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>

@@ -26,3 +26,11 @@ Icon?
 .vscode/
 .idea/
 *.swp
+
+# local Pinecone backups (contain indexed personal text)
+.pinecone-backup/
+
+# plain-text banned-term list, never committed to the public repo
+.banned-terms.local
+# local HMAC key for hashing banned terms, never committed to the public repo
+.banned-key.local
