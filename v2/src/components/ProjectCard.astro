@@ -12,7 +12,7 @@ const href = `/projects/${project.id}`;
 
 <a
   href={href}
-  class="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-(--color-border) bg-(--color-card) transition-all duration-300 hover:border-(--color-foreground)/30 hover:-translate-y-0.5"
+  class="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-(--color-border) bg-(--color-card) transition-all duration-300 hover:border-(--color-signal)/55 hover:-translate-y-0.5"
 >
   <div class="relative aspect-[16/10] overflow-hidden bg-(--color-muted)">
     <img
@@ -59,7 +59,7 @@ const href = `/projects/${project.id}`;
     <div class="mt-auto flex flex-wrap gap-1.5 pt-2">
       {
         tags.map((tag) => (
-          <span class="text-[11px] font-mono px-2 py-0.5 rounded-full border border-(--color-border)/60 text-(--color-muted-foreground)">
+          <span class="text-[11px] font-mono px-2 py-0.5 rounded-full border border-(--color-signal)/20 bg-(--color-signal)/[0.07] text-(--color-signal)">
             {tag}
           </span>
         ))
