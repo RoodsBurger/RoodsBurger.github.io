@@ -1,6 +1,6 @@
 ---
 title: "TidyNET"
-summary: "A robotic tidying system that extends the Creative Machines Lab's knolling work: a diffusion model generates a tidy layout from a photo, and a robot arm rearranges the real objects to match."
+summary: "A diffusion model plans a tidy layout from a photo of clutter, and a robot arm rearranges the real objects to match."
 tags: ["Deep Learning", "Diffusion", "YOLO", "ROS2"]
 category: ["code"]
 order: 5
@@ -32,26 +32,22 @@ import TidyNetPipeline from "@/components/diagrams/TidyNetPipeline.astro";
 
 ## What it is
 
-TidyNET is a system that takes a photo of a cluttered workspace, generates an image of the same objects arranged neatly, and has a robot arm rearrange the real table to match. The plan is a picture, so the generated image has to keep every object recognizable, and the robot has to work out which object goes where and move each one without collisions.
+TidyNET takes a photo of a cluttered workspace, generates an image of the same objects arranged neatly, and has a robot arm rearrange the real table to match. Because the plan is a picture, the generated image has to keep every object recognizable, and the robot has to work out which object goes where.
 
-I built it in 2024 and 2025 as a graduate research assistant in Columbia University's Creative Machines Lab. It extends the lab's knolling work, which studies how robots can learn to arrange objects neatly. I'm not an author of the lab's knolling papers; TidyNET is my own system built on top of that line of work.
+I built it in 2024 and 2025 as a graduate research assistant in Columbia's Creative Machines Lab, on top of the lab's knolling work. I'm not an author of the lab's knolling papers.
 
 ## Planning in image space
 
-The planner is a conditional denoising diffusion model (DDPM) I wrote by hand: a U-Net encoder and decoder with skip connections, group normalization, time embeddings at several levels, self-attention, and conditioning on the messy input image. It uses a cosine noise schedule and classifier-free guidance, and trains on paired before-and-after images at 256×256 pixels. It keeps each object's identity as it moves things into a tidy layout, though busier scenes still come out with occasional artifacts. The first experiments, in December 2024, used an off-the-shelf DDPM at 128 pixels and briefly tried ControlNet before I moved to my own implementation.
+The planner is a conditional diffusion model (DDPM) I implemented myself: a U-Net with self-attention and time embeddings, conditioned on the messy image, with a cosine noise schedule and classifier-free guidance, trained on before-and-after pairs at 256×256. It keeps each object's identity, though busier scenes still come out with occasional artifacts.
 
-## Reading the scene
+## From images to the arm
 
-A YOLO model with oriented bounding boxes finds the objects, so each detection carries the object's rotation as well as its position. For training labels, I bootstrapped detections with a pretrained Faster R-CNN, matched them to known object positions with the Hungarian algorithm, assigned orientations, and then trained the oriented-box detector as a multi-task model over two datasets. The same detector runs on the camera photo and on the generated tidy image, and objects are matched between the two by color, again with the Hungarian algorithm.
+A YOLO detector with oriented bounding boxes reads both the camera photo and the generated image, so each detection carries a rotation as well as a position. Objects are matched between the two by color with the Hungarian algorithm. The arm is a WidowX 200 under ROS2. A 2 cm occupancy grid and Separating Axis Theorem checks catch collisions, and the planner first moves any object sitting on another's target spot.
 
-## Executing on the arm
-
-The arm is an Interbotix WidowX 200 with an Intel RealSense camera, under ROS2. Detections are projected into 3D with the camera intrinsics, tracked in a workspace manager and assigned to target slots. A grid occupancy map at 2 cm resolution, plus Separating Axis Theorem checks on oriented rectangles, catches collisions between objects. When a target spot is blocked by another object, the planner moves the blocker first, to a temporary spot if it needs one, then places the rest in priority order and checks the final positions.
-
-<Diagram caption="A diffusion model generates the tidy target from the messy photo, a YOLO-OBB detector reads both images, the objects are matched, and a WidowX 200 arm carries out the plan under ROS2.">
+<Diagram caption="The diffusion model generates the tidy target, a YOLO-OBB detector reads both images, and a WidowX 200 arm carries out the plan.">
   <TidyNetPipeline />
 </Diagram>
 
 ## Results
 
-On the real arm, TidyNET reaches 74.2% placement success and completes 70% of end-to-end tidying tasks; the other 30% don't finish. The training dataset belongs to the lab and stays private under its data agreement. In April 2025 I also contributed the control, detection and arm calibration code to the lab's Knolling repository.
+On the real arm, TidyNET reaches 74.2% placement success and finishes 70% of end-to-end tidying tasks. The training dataset belongs to the lab and stays private. I also contributed the control, detection and calibration code to the lab's Knolling repository.
