@@ -18,6 +18,9 @@
   --color-accent: hsl(240 10% 4%);
   --color-accent-foreground: hsl(60 12% 97%);
   --color-ring: hsl(240 10% 4%);
+  /* Garnet: the one color accent, used sparingly */
+  --color-signal: #7a1e22;
+  --color-signal-foreground: hsl(60 12% 97%);
 
   --radius: 0.625rem;
 }
@@ -78,6 +81,9 @@
     --color-accent: hsl(0 0% 98%);
     --color-accent-foreground: hsl(240 8% 8%);
     --color-ring: hsl(0 0% 98%);
+    /* Garnet lifted for contrast on dark grounds */
+    --color-signal: hsl(357 50% 62%);
+    --color-signal-foreground: hsl(240 8% 8%);
   }
 
   * {
@@ -149,8 +155,8 @@
   }
 
   ::selection {
-    background-color: var(--color-accent);
-    color: var(--color-accent-foreground);
+    background-color: var(--color-signal);
+    color: var(--color-signal-foreground);
   }
 
   @media (prefers-reduced-motion: reduce) {

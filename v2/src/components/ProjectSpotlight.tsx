@@ -194,7 +194,7 @@ export default function ProjectSpotlight({
                 aria-current={isActive ? "true" : undefined}
                 className={`group flex items-center gap-3 shrink-0 rounded-xl border p-2.5 text-left transition-colors duration-300 ${
                   isActive
-                    ? "border-(--color-foreground)/40 bg-(--color-muted)"
+                    ? "border-(--color-signal)/55 bg-(--color-muted)"
                     : "border-(--color-border) hover:border-(--color-foreground)/25"
                 }`}
               >
@@ -294,7 +294,7 @@ export default function ProjectSpotlight({
                 <span
                   aria-hidden="true"
                   className={`block h-1.5 rounded-full transition-[width,background-color] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                    isOn ? "w-4 bg-(--color-foreground)" : "w-1.5 bg-(--color-muted-foreground)/35"
+                    isOn ? "w-4 bg-(--color-signal)" : "w-1.5 bg-(--color-muted-foreground)/35"
                   }`}
                 />
               </button>
