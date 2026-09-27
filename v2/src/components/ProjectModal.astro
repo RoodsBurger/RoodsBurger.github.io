@@ -208,11 +208,6 @@ const { title, summary, tags, links } = project.data;
   .prose-content > p:has(+ p) {
     margin-bottom: 1rem;
   }
-  .prose-content > p,
-  .prose-content > ul,
-  .prose-content > ol {
-    max-width: 78ch;
-  }
   /* In-flow captions only; overlay captions and .not-prose figures (DeviceFrame, Figure, Diagram) keep their own styling */
   .prose-content figure:not(.not-prose):not(.not-prose *) > figcaption:not(.absolute) {
     font-family: var(--font-mono);
