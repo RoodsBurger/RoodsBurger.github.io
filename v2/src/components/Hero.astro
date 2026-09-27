@@ -79,7 +79,7 @@ const links = [
   /* Mobile: photo with icons beside it, then name and body full width. */
   .intro {
     display: grid;
-    grid-template-columns: 120px 1fr;
+    grid-template-columns: 144px 1fr;
     grid-template-areas:
       "photo links"
       "name name"
@@ -94,7 +94,7 @@ const links = [
   /* Desktop: photo spans the block; flexible outer rows keep the text centred beside it. */
   @media (min-width: 768px) {
     .intro {
-      grid-template-columns: 200px minmax(0, 1fr) auto;
+      grid-template-columns: 232px minmax(0, 1fr) auto;
       grid-template-rows: 1fr auto auto 1fr;
       grid-template-areas:
         "photo . ."
@@ -108,6 +108,6 @@ const links = [
     .intro-body { margin-top: 1rem; }
   }
   @media (min-width: 1024px) {
-    .intro { grid-template-columns: 224px minmax(0, 1fr) auto; column-gap: 3rem; }
+    .intro { grid-template-columns: 272px minmax(0, 1fr) auto; column-gap: 3rem; }
   }
 </style>
