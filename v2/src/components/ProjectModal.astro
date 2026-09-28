@@ -64,7 +64,7 @@ const { title, summary, tags, links } = project.data;
         </div>
       </header>
 
-      <div class="px-6 md:px-10 py-10 md:py-14">
+      <div class="px-6 md:px-10 pt-4 pb-10 md:pb-14">
         <div class="prose-content space-y-6 leading-relaxed text-(--color-foreground)">
           <slot />
         </div>
@@ -195,6 +195,11 @@ const { title, summary, tags, links } = project.data;
     margin-top: 0;
     padding-top: 0;
     border-top: 0;
+  }
+  /* Media opens with its own 2rem margin; text-first prose gets the same space below the header */
+  .prose-content > p:first-child,
+  .prose-content > h2:first-child {
+    margin-top: 2rem;
   }
   .prose-content h3 {
     font-size: 1.125rem;
