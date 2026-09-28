@@ -15,7 +15,7 @@ const { src, alt, caption, height = "480px", environment = DEFAULT_ENVIRONMENT }
 ---
 
 <figure
-  class="not-prose my-8 relative rounded-xl overflow-hidden border border-(--color-border) bg-(--color-muted)"
+  class="viewer-grid not-prose my-8 relative rounded-xl overflow-hidden border border-(--color-border) bg-(--color-muted)"
   style={`height: ${height};`}
   aria-label={alt}
 >
@@ -107,3 +107,14 @@ const { src, alt, caption, height = "480px", environment = DEFAULT_ENVIRONMENT }
     viewers.forEach((el) => io.observe(el));
   }
 </script>
+
+<style>
+  /* A finer, stronger grid than the page texture, behind the transparent 3D canvas */
+  .viewer-grid {
+    background-image:
+      linear-gradient(to right, color-mix(in oklab, var(--color-border) 45%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in oklab, var(--color-border) 45%, transparent) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-position: center center;
+  }
+</style>
