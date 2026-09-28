@@ -1,7 +1,8 @@
 [
   {"file":"wall-lamp/cover.webp","slot":"cover","subjectMask":"wall-lamp/cover.mask.png","fillMin":0.66,"fillMax":0.7},
   {"file":"wall-lamp/cover-dark.webp","slot":"cover","subjectMask":"wall-lamp/cover.mask.png","fillMin":0.66,"fillMax":0.7},
-  {"file":"wall-lamp/hero.webp","slot":"tall","subjectMask":"wall-lamp/hero.mask.png"},
+  {"file":"wall-lamp/hero-tall.webp","slot":"tall","subjectMask":"wall-lamp/hero.mask.png"},
+  {"file":"wall-lamp/hero.webp"},
   {"file":"wall-lamp/pose-left.webp","slot":"tile","subjectMask":"wall-lamp/pose-left.mask.png"},
   {"file":"wall-lamp/pose-center.webp","slot":"tile","subjectMask":"wall-lamp/pose-center.mask.png"},
   {"file":"wall-lamp/pose-right.webp","slot":"tile","subjectMask":"wall-lamp/pose-right.mask.png"},
@@ -37,6 +38,8 @@
   {"file":"knolling/cover.webp"},
   {"file":"knolling/cover-dark.webp"},
   {"file":"pruning/cover-dark.webp"},
+  {"file":"pruning/network.webp"},
+  {"file":"pruning/network-dark.webp"},
   {"file":"chat/cover.webp","slot":"cover"},
   {"file":"chat/cover-dark.webp","slot":"cover"},
   {"file":"chat/widget.webp"},

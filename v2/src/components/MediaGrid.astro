@@ -3,6 +3,8 @@ import { dimsFor } from "@/lib/media-dims";
 
 interface MediaItem {
   src: string;
+  // Optional dark-theme variant of an image; CSS shows the one matching the theme.
+  srcDark?: string;
   caption?: string;
   type?: "image" | "video";
   alt?: string;
@@ -50,15 +52,28 @@ const itemsWithDims = items.map((item, i) => ({ ...item, dims: dims[i] }));
             <source src={item.src} type="video/mp4" />
           </video>
         ) : (
-          <img
-            src={item.src}
-            alt={item.alt || item.caption || ""}
-            loading="lazy"
-            decoding="async"
-            width={item.dims.width}
-            height={item.dims.height}
-            class="w-full h-full object-cover"
-          />
+          <>
+            <img
+              src={item.src}
+              alt={item.alt || item.caption || ""}
+              loading="lazy"
+              decoding="async"
+              width={item.dims.width}
+              height={item.dims.height}
+              class:list={["w-full h-full object-cover", item.srcDark && "cover-when-light"]}
+            />
+            {item.srcDark && (
+              <img
+                src={item.srcDark}
+                alt={item.alt || item.caption || ""}
+                loading="lazy"
+                decoding="async"
+                width={item.dims.width}
+                height={item.dims.height}
+                class="w-full h-full object-cover cover-when-dark"
+              />
+            )}
+          </>
         )}
         {item.caption && (
           <figcaption class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-3 py-2 text-xs text-white font-medium">
@@ -121,15 +136,28 @@ const itemsWithDims = items.map((item, i) => ({ ...item, dims: dims[i] }));
               <source src={item.src} type="video/mp4" />
             </video>
           ) : (
-            <img
-              src={item.src}
-              alt={item.alt || item.caption || ""}
-              loading="lazy"
-              decoding="async"
-              width={item.dims.width}
-              height={item.dims.height}
-              class="w-full h-full object-cover"
-            />
+            <>
+              <img
+                src={item.src}
+                alt={item.alt || item.caption || ""}
+                loading="lazy"
+                decoding="async"
+                width={item.dims.width}
+                height={item.dims.height}
+                class:list={["w-full h-full object-cover", item.srcDark && "cover-when-light"]}
+              />
+              {item.srcDark && (
+                <img
+                  src={item.srcDark}
+                  alt={item.alt || item.caption || ""}
+                  loading="lazy"
+                  decoding="async"
+                  width={item.dims.width}
+                  height={item.dims.height}
+                  class="w-full h-full object-cover cover-when-dark"
+                />
+              )}
+            </>
           )}
           {item.caption && (
             <figcaption class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-3 py-2 text-xs text-white font-medium">
