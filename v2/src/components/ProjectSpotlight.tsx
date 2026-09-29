@@ -21,6 +21,9 @@ function CoverImg({ p, className, ...rest }: { p: Project; className: string } &
   );
 }
 
+// Session key holding the slug of the project modal most recently open.
+const LAST_PROJECT_KEY = "rr-last-project";
+
 // Hover must rest on a rail item this long before the spotlight switches, so skimming does not strobe.
 const HOVER_INTENT_MS = 60;
 
@@ -89,15 +92,30 @@ export default function ProjectSpotlight({
     return () => io.disconnect();
   }, []);
 
-  const scrollStripTo = (i: number) => {
+  const scrollStripTo = (i: number, instant = false) => {
     const strip = stripRef.current;
     const card = cardRefs.current[i];
     if (!strip || !card) return;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduce = instant || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const pad = parseFloat(getComputedStyle(strip).scrollPaddingLeft) || 0;
     strip.scrollTo({ left: card.offsetLeft - pad, behavior: reduce ? "auto" : "smooth" });
     setStripActive(i);
   };
+
+  // Returning to /#projects from a closed modal highlights the project that was open.
+  useEffect(() => {
+    if (initialActiveId) return;
+    let slug: string | null = null;
+    try {
+      slug = sessionStorage.getItem(LAST_PROJECT_KEY);
+      sessionStorage.removeItem(LAST_PROJECT_KEY);
+    } catch {}
+    if (!slug || location.hash !== "#projects") return;
+    const i = projects.findIndex((p) => p.id === slug);
+    if (i < 0) return;
+    setActiveIndex(i);
+    scrollStripTo(i, true);
+  }, []);
 
   return (
     <div>
