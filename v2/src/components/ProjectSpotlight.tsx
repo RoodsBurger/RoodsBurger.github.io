@@ -21,7 +21,7 @@ function CoverImg({ p, className, ...rest }: { p: Project; className: string } &
   );
 }
 
-// Session key holding the slug of the project modal most recently open.
+// Session key holding the slug of the project modal most recently closed.
 const LAST_PROJECT_KEY = "rr-last-project";
 
 // Hover must rest on a rail item this long before the spotlight switches, so skimming does not strobe.
@@ -61,6 +61,8 @@ export default function ProjectSpotlight({
   const preloaded = useRef(new Set<string>());
   const stripRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+  const railRef = useRef<HTMLDivElement>(null);
+  const railItemRefs = useRef<(HTMLAnchorElement | null)[]>([]);
 
   // Warms the cover so it is decoded before its crossfade starts.
   const preload = (src: string) => {
@@ -102,18 +104,32 @@ export default function ProjectSpotlight({
     setStripActive(i);
   };
 
-  // Returning to /#projects from a closed modal highlights the project that was open.
+  // Centers a rail item within the rail without moving the page.
+  const scrollRailTo = (i: number) => {
+    const rail = railRef.current;
+    const item = railItemRefs.current[i];
+    if (!rail || !item || !rail.clientHeight) return;
+    const railBox = rail.getBoundingClientRect();
+    const itemBox = item.getBoundingClientRect();
+    rail.scrollTop += itemBox.top - railBox.top - (railBox.height - itemBox.height) / 2;
+  };
+
+  // Opens with the active project visible in the rail; after a modal closes, that project is active.
   useEffect(() => {
-    if (initialActiveId) return;
+    if (initialActiveId) {
+      scrollRailTo(initialIndex);
+      return;
+    }
     let slug: string | null = null;
     try {
       slug = sessionStorage.getItem(LAST_PROJECT_KEY);
       sessionStorage.removeItem(LAST_PROJECT_KEY);
     } catch {}
-    if (!slug || location.hash !== "#projects") return;
+    if (!slug) return;
     const i = projects.findIndex((p) => p.id === slug);
     if (i < 0) return;
     setActiveIndex(i);
+    scrollRailTo(i);
     scrollStripTo(i, true);
   }, []);
 
@@ -197,12 +213,16 @@ export default function ProjectSpotlight({
         </a>
 
         <div
+          ref={railRef}
           className="flex flex-col gap-3 h-[460px] lg:h-[540px] overflow-y-auto pr-1 spot-rail">
           {projects.map((p, i) => {
             const isActive = i === active;
             return (
               <a
                 key={p.id}
+                ref={(el) => {
+                  railItemRefs.current[i] = el;
+                }}
                 href={`/projects/${p.id}`}
                 onMouseEnter={() => {
                   preload(p.cover);

@@ -296,10 +296,14 @@ const { title, summary, tags, links } = project.data;
   (function () {
     // Pin the body so the page behind shows at the source scroll position.
     var savedY = 0;
+    var hasSaved = false;
     try {
       var raw = sessionStorage.getItem("rr-bg-scroll");
       sessionStorage.removeItem("rr-bg-scroll");
-      if (raw != null) savedY = parseInt(raw, 10) || 0;
+      if (raw != null) {
+        savedY = parseInt(raw, 10) || 0;
+        hasSaved = true;
+      }
     } catch (_) {}
     var b = document.body;
     b.style.position = "fixed";
@@ -308,11 +312,24 @@ const { title, summary, tags, links } = project.data;
     b.style.right = "0";
     b.style.width = "100%";
 
-    // Remember the open project so the home spotlight highlights it after the modal closes.
+    // Closing records the project for the home spotlight and, when the source scroll is known,
+    // returns to "/" at that scroll instead of jumping to the #projects anchor.
+    var overlay = document.querySelector(".project-modal-overlay");
     var modal = document.querySelector(".project-modal");
-    try {
-      if (modal) sessionStorage.setItem("rr-last-project", modal.getAttribute("data-project-id") || "");
-    } catch (_) {}
+    if (!overlay || !modal) return;
+    overlay.addEventListener("click", function (e) {
+      var a = e.target && e.target.closest && e.target.closest('a[href="/#projects"]');
+      if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button > 0) return;
+      try {
+        sessionStorage.setItem("rr-last-project", modal.getAttribute("data-project-id") || "");
+        if (!hasSaved) return;
+        sessionStorage.setItem("rr-return-scroll", String(savedY));
+      } catch (_) {
+        return;
+      }
+      e.preventDefault();
+      window.location.href = "/";
+    });
   })();
 </script>
 
