@@ -21,9 +21,6 @@ function CoverImg({ p, className, ...rest }: { p: Project; className: string } &
   );
 }
 
-// Session key holding the slug of the project modal most recently closed.
-const LAST_PROJECT_KEY = "rr-last-project";
-
 // Hover must rest on a rail item this long before the spotlight switches, so skimming does not strobe.
 const HOVER_INTENT_MS = 60;
 
@@ -47,15 +44,8 @@ export default function ProjectSpotlight({
     if (i !== active) setSwitched(true);
     setActiveIndex(i);
   };
-  // Project whose title carries the view-transition name; set only on the link being navigated from.
-  const [navFrom, setNavFrom] = useState<string | null>(null);
   const [stripActive, setStripActive] = useState(initialIndex);
   const current = projects[active];
-  // initialActiveId's open modal <h1> already owns that view-transition name; never duplicate it here.
-  const titleVT = (id: string) =>
-    navFrom === id && id !== initialActiveId
-      ? { viewTransitionName: `project-title-${id}` }
-      : undefined;
 
   const hoverTimer = useRef<number | undefined>(undefined);
   const preloaded = useRef(new Set<string>());
@@ -88,7 +78,7 @@ export default function ProjectSpotlight({
           }
         }
       },
-      { root: strip, rootMargin: "0px -48% 0px -48%", threshold: 0 },
+      { root: strip, rootMargin: "0px -49% 0px -49%", threshold: 0 },
     );
     cardRefs.current.forEach((card) => card && io.observe(card));
     return () => io.disconnect();
@@ -99,8 +89,8 @@ export default function ProjectSpotlight({
     const card = cardRefs.current[i];
     if (!strip || !card) return;
     const reduce = instant || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const pad = parseFloat(getComputedStyle(strip).scrollPaddingLeft) || 0;
-    strip.scrollTo({ left: card.offsetLeft - pad, behavior: reduce ? "auto" : "smooth" });
+    const left = card.offsetLeft - (strip.clientWidth - card.offsetWidth) / 2;
+    strip.scrollTo({ left, behavior: reduce ? "instant" : "smooth" });
     setStripActive(i);
   };
 
@@ -114,23 +104,21 @@ export default function ProjectSpotlight({
     rail.scrollTop += itemBox.top - railBox.top - (railBox.height - itemBox.height) / 2;
   };
 
-  // Opens with the active project visible in the rail; after a modal closes, that project is active.
+  // Opens with the active project in view; when a project modal closes, that project becomes active.
   useEffect(() => {
-    if (initialActiveId) {
+    if (initialIndex) {
       scrollRailTo(initialIndex);
-      return;
+      scrollStripTo(initialIndex, true);
     }
-    let slug: string | null = null;
-    try {
-      slug = sessionStorage.getItem(LAST_PROJECT_KEY);
-      sessionStorage.removeItem(LAST_PROJECT_KEY);
-    } catch {}
-    if (!slug) return;
-    const i = projects.findIndex((p) => p.id === slug);
-    if (i < 0) return;
-    setActiveIndex(i);
-    scrollRailTo(i);
-    scrollStripTo(i, true);
+    const onClosed = (e: Event) => {
+      const i = projects.findIndex((p) => p.id === (e as CustomEvent<string>).detail);
+      if (i < 0) return;
+      setActiveIndex(i);
+      scrollRailTo(i);
+      scrollStripTo(i, true);
+    };
+    document.addEventListener("rr:project-closed", onClosed);
+    return () => document.removeEventListener("rr:project-closed", onClosed);
   }, []);
 
   return (
@@ -139,8 +127,6 @@ export default function ProjectSpotlight({
       <div className="hidden md:grid md:grid-cols-[1fr_300px] lg:grid-cols-[1fr_340px] gap-4 lg:gap-6">
         <a
           href={`/projects/${current.id}`}
-          onPointerDown={() => setNavFrom(current.id)}
-          onFocus={() => setNavFrom(current.id)}
           className="group relative h-[460px] lg:h-[540px] rounded-2xl overflow-hidden border border-(--color-border) bg-(--color-muted)"
         >
           {/* Every cover stays mounted and stacked; the active one fades in while settling from 1.02 to 1. */}
@@ -178,10 +164,7 @@ export default function ProjectSpotlight({
                 ))}
               </div>
 
-              <h3
-                className="vt-project-title text-3xl lg:text-4xl font-semibold tracking-tight text-balance"
-                style={titleVT(current.id)}
-              >
+              <h3 className="vt-project-title text-3xl lg:text-4xl font-semibold tracking-tight text-balance">
                 {current.title}
               </h3>
 
@@ -234,12 +217,10 @@ export default function ProjectSpotlight({
                   preload(p.cover);
                   cancelHover();
                   setActive(i);
-                  setNavFrom(p.id);
                 }}
                 onPointerDown={() => {
                   cancelHover();
                   setActive(i);
-                  setNavFrom(p.id);
                 }}
                 aria-current={isActive ? "true" : undefined}
                 className={`group flex items-center gap-3 shrink-0 rounded-xl border p-2.5 text-left transition-colors duration-300 ${
@@ -273,12 +254,12 @@ export default function ProjectSpotlight({
         </div>
       </div>
 
-      {/* Mobile: full-bleed scroll-snap strip aligned to the page gutter, one project at a time */}
+      {/* Mobile: full-bleed strip with the active card centered and its neighbours peeking in on both sides */}
       <div className="md:hidden -mx-6">
         <div className="relative">
           <div
             ref={stripRef}
-            className="proj-strip relative flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-px-6 px-6 pb-1"
+            className="proj-strip relative flex gap-3 overflow-x-auto snap-x snap-mandatory overscroll-x-contain px-[calc(50%-min(150px,39vw))] pb-1"
           >
             {projects.map((p, i) => (
               <a
@@ -288,9 +269,15 @@ export default function ProjectSpotlight({
                 }}
                 data-index={i}
                 href={`/projects/${p.id}`}
-                onPointerDown={() => setNavFrom(p.id)}
-                onFocus={() => setNavFrom(p.id)}
-                className="group shrink-0 snap-start w-[min(300px,82vw)] rounded-2xl border border-(--color-border) bg-(--color-card) overflow-hidden"
+                onClick={(e) => {
+                  // Tapping a peeking card brings it to the center first instead of opening it.
+                  if (i === stripActive) return;
+                  e.preventDefault();
+                  scrollStripTo(i);
+                }}
+                className={`group shrink-0 snap-center snap-always w-[min(300px,78vw)] rounded-2xl border border-(--color-border) bg-(--color-card) overflow-hidden transition-[scale,opacity] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                  i === stripActive ? "" : "scale-[0.94] opacity-55"
+                }`}
               >
                 <div className="relative aspect-[16/10] overflow-hidden bg-(--color-card)">
                   <CoverImg
@@ -302,10 +289,7 @@ export default function ProjectSpotlight({
                   />
                 </div>
                 <div className="px-5 py-4">
-                  <h3
-                    className="vt-project-title text-base font-semibold tracking-tight"
-                    style={titleVT(p.id)}
-                  >
+                  <h3 className="vt-project-title text-base font-semibold tracking-tight">
                     {p.title}
                   </h3>
                   <p className="mt-1.5 text-sm text-(--color-muted-foreground) line-clamp-2 leading-snug">
@@ -325,7 +309,6 @@ export default function ProjectSpotlight({
               </a>
             ))}
           </div>
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-(--color-background) to-transparent" />
         </div>
 
         {/* Pagination: each dot is a 44px tap target that scrolls its card into place */}
