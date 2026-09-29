@@ -129,6 +129,8 @@ const imageUrl = new URL(image, site.url).toString();
         window.addEventListener("keydown", onKey, true);
         document.addEventListener("keydown", onKey, true);
         window.addEventListener("keyup", onKey, true);
+        // A page restored from the back/forward cache can close again.
+        window.addEventListener("pageshow", function () { leaving = false; });
       })();
     </script>
   </head>
