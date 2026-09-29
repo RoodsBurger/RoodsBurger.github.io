@@ -147,6 +147,28 @@ const { title, summary, tags, links } = project.data;
   .animate-modal-in {
     animation: modal-in 220ms cubic-bezier(0.16, 1, 0.3, 1);
   }
+  .project-backdrop {
+    animation: backdrop-in 220ms ease-out;
+  }
+  /* Closing without view transitions: the card sinks and the backdrop fades before removal */
+  .project-modal-overlay.is-closing .project-modal {
+    animation: modal-out 180ms cubic-bezier(0.4, 0, 1, 1) forwards;
+  }
+  .project-modal-overlay.is-closing .project-backdrop {
+    animation: backdrop-out 180ms ease-in forwards;
+  }
+  @keyframes backdrop-in {
+    from { opacity: 0; }
+  }
+  @keyframes backdrop-out {
+    to { opacity: 0; }
+  }
+  @keyframes modal-out {
+    to {
+      opacity: 0;
+      transform: translateY(10px) scale(0.99);
+    }
+  }
   @keyframes modal-in {
     from {
       opacity: 0;
@@ -158,7 +180,8 @@ const { title, summary, tags, links } = project.data;
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .animate-modal-in { animation: none; }
+    .animate-modal-in,
+    .project-backdrop { animation: none; }
   }
 
   .focus-sentinel {
@@ -175,8 +198,8 @@ const { title, summary, tags, links } = project.data;
 </style>
 
 <style is:global>
-  /* Lock body scroll while the modal is open. */
-  body:has(.project-modal-overlay) {
+  /* The page behind keeps its scroll position and cannot scroll while a modal is open. */
+  html:has(.project-modal-overlay) {
     overflow: hidden;
   }
 
@@ -291,95 +314,3 @@ const { title, summary, tags, links } = project.data;
     border-radius: 0;
   }
 </style>
-
-<script is:inline>
-  (function () {
-    // Pin the body so the page behind shows at the source scroll position.
-    var savedY = 0;
-    var hasSaved = false;
-    try {
-      var raw = sessionStorage.getItem("rr-bg-scroll");
-      sessionStorage.removeItem("rr-bg-scroll");
-      if (raw != null) {
-        savedY = parseInt(raw, 10) || 0;
-        hasSaved = true;
-      }
-    } catch (_) {}
-    var b = document.body;
-    b.style.position = "fixed";
-    b.style.top = "-" + savedY + "px";
-    b.style.left = "0";
-    b.style.right = "0";
-    b.style.width = "100%";
-
-    // Closing records the project for the home spotlight and, when the source scroll is known,
-    // returns to "/" at that scroll instead of jumping to the #projects anchor.
-    var overlay = document.querySelector(".project-modal-overlay");
-    var modal = document.querySelector(".project-modal");
-    if (!overlay || !modal) return;
-    overlay.addEventListener("click", function (e) {
-      var a = e.target && e.target.closest && e.target.closest('a[href="/#projects"]');
-      if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button > 0) return;
-      try {
-        sessionStorage.setItem("rr-last-project", modal.getAttribute("data-project-id") || "");
-        if (!hasSaved) return;
-        sessionStorage.setItem("rr-return-scroll", String(savedY));
-      } catch (_) {
-        return;
-      }
-      e.preventDefault();
-      window.location.href = "/";
-    });
-  })();
-</script>
-
-<script is:inline>
-  (function () {
-    // Focus the dialog itself so no control shows a ring on open; two focus sentinels at the card's
-    // edges wrap Tab/Shift+Tab around the card without intercepting every keystroke, so native tab
-    // order still reaches shadow-DOM controls (model-viewer, video) anywhere in between.
-    var dialog = document.querySelector(".project-modal");
-    var card = document.querySelector(".project-modal .project-card");
-    if (!card || !dialog) return;
-    dialog.focus({ preventScroll: true });
-
-    var FOCUSABLE =
-      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
-
-    function focusables() {
-      return Array.prototype.filter.call(card.querySelectorAll(FOCUSABLE), function (el) {
-        return !el.hasAttribute("data-focus-sentinel") && (el.offsetParent !== null || el === document.activeElement);
-      });
-    }
-
-    function inChat(el) {
-      var chat = document.querySelector('[aria-label="AI assistant"]');
-      return !!(chat && el && chat.contains(el));
-    }
-
-    function redirectTo(pick) {
-      return function (e) {
-        // Focus arriving from the floating chat widget is intentional; leave it alone.
-        if (inChat(e.relatedTarget)) return;
-        // A native <dialog> (the RenderGallery lightbox) already manages its own focus.
-        if (document.querySelector("dialog[open]")) return;
-        var items = focusables();
-        if (!items.length) return;
-        pick(items).focus();
-      };
-    }
-
-    var start = card.querySelector('[data-focus-sentinel="start"]');
-    var end = card.querySelector('[data-focus-sentinel="end"]');
-    if (start) {
-      // The first Tab from the dialog itself goes to the first control; Shift+Tab from the first control wraps to the last.
-      start.addEventListener("focus", function (e) {
-        var fromDialog = e.relatedTarget === dialog;
-        redirectTo(function (items) { return fromDialog ? items[0] : items[items.length - 1]; })(e);
-      });
-    }
-    if (end) {
-      end.addEventListener("focus", redirectTo(function (items) { return items[0]; }));
-    }
-  })();
-</script>
