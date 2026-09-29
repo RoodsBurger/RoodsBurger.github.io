@@ -26,6 +26,7 @@ const { title, summary, tags, links } = project.data;
     aria-modal="true"
     aria-labelledby="project-modal-title"
     tabindex="-1"
+    data-project-id={project.id}
   >
     <div class="project-card">
       <span tabindex="0" data-focus-sentinel="start" class="focus-sentinel" aria-hidden="true"></span>
@@ -306,6 +307,12 @@ const { title, summary, tags, links } = project.data;
     b.style.left = "0";
     b.style.right = "0";
     b.style.width = "100%";
+
+    // Remember the open project so the home spotlight highlights it after the modal closes.
+    var modal = document.querySelector(".project-modal");
+    try {
+      if (modal) sessionStorage.setItem("rr-last-project", modal.getAttribute("data-project-id") || "");
+    } catch (_) {}
   })();
 </script>
 
