@@ -13,9 +13,11 @@ interface MediaItem {
 interface Props {
   items: MediaItem[];
   columns?: 2 | 3;
+  // Plays the desktop videos as one group: shared start, restart together once the longest ends.
+  sync?: boolean;
 }
 
-const { items, columns = 3 } = Astro.props;
+const { items, columns = 3, sync = false } = Astro.props;
 const gridClass = columns === 2 ? "md:grid-cols-2" : "md:grid-cols-3";
 
 const isVideo = (item: MediaItem) =>
@@ -23,6 +25,8 @@ const isVideo = (item: MediaItem) =>
 
 const allVideos = items.every(isVideo);
 const sequenceId = `mediaseq-${Math.random().toString(36).slice(2, 9)}`;
+const syncGroup = sync && allVideos && items.length > 1;
+const syncId = `mediasync-${Math.random().toString(36).slice(2, 9)}`;
 
 // The frame is a fixed 4:3 box; this is the fallback intrinsic size when a file can't be read.
 const FALLBACK = { width: 1200, height: 900 };
@@ -32,15 +36,15 @@ const itemsWithDims = items.map((item, i) => ({ ...item, dims: dims[i] }));
 ---
 
 {/* Desktop: grid */}
-<div class={`not-prose hidden md:grid gap-3 md:gap-4 ${gridClass} my-8`}>
+<div class={`not-prose hidden md:grid gap-3 md:gap-4 ${gridClass} my-8`} data-mediasync={syncGroup ? syncId : undefined}>
   {itemsWithDims.map((item) => {
     const video = isVideo(item);
     return (
       <figure class="relative rounded-xl overflow-hidden border border-(--color-border) bg-(--color-muted) aspect-[4/3]">
         {video ? (
           <video
-            autoplay={true}
-            loop={true}
+            autoplay={!syncGroup}
+            loop={!syncGroup}
             muted={true}
             playsinline={true}
             preload="auto"
@@ -196,6 +200,41 @@ const itemsWithDims = items.map((item, i) => ({ ...item, dims: dims[i] }));
       };
       videos.forEach((v) => v.addEventListener("ended", advance));
       videos[0].play().catch(() => {});
+    })();
+  </script>
+)}
+
+{syncGroup && (
+  <script
+    is:inline
+    define:vars={{ syncId }}
+  >
+    (() => {
+      const root = document.querySelector(`[data-mediasync="${syncId}"]`);
+      if (!root) return;
+      const videos = Array.from(root.querySelectorAll("video"));
+      videos.forEach((v) => {
+        v.muted = true;
+        v.playsInline = true;
+      });
+      let ended = 0;
+      const restart = () => {
+        ended = 0;
+        videos.forEach((v) => {
+          v.currentTime = 0;
+          v.play().catch(() => {});
+        });
+      };
+      // Shorter clips hold their last frame until every clip has ended, then all restart from zero.
+      videos.forEach((v) =>
+        v.addEventListener("ended", () => {
+          ended += 1;
+          if (ended === videos.length) restart();
+        }),
+      );
+      const ready = (v) =>
+        v.readyState >= 3 ? Promise.resolve() : new Promise((r) => v.addEventListener("canplay", r, { once: true }));
+      Promise.all(videos.map(ready)).then(restart);
     })();
   </script>
 )}
