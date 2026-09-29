@@ -13,7 +13,7 @@ interface MediaItem {
 interface Props {
   items: MediaItem[];
   columns?: 2 | 3;
-  // Plays the desktop videos as one group: shared start, restart together once the longest ends.
+  // Plays the desktop videos as one clock: shared start, held while any clip buffers, restarted together once the longest ends.
   sync?: boolean;
 }
 
@@ -47,7 +47,7 @@ const itemsWithDims = items.map((item, i) => ({ ...item, dims: dims[i] }));
             loop={!syncGroup}
             muted={true}
             playsinline={true}
-            preload="auto"
+            preload={syncGroup ? "none" : "auto"}
             width={item.dims.width}
             height={item.dims.height}
             class="w-full h-full object-cover pointer-events-none [clip-path:inset(0_round_calc(0.75rem-1px))]"
@@ -99,10 +99,9 @@ const itemsWithDims = items.map((item, i) => ({ ...item, dims: dims[i] }));
       <video
         data-mediaseq-idx={i}
         data-mediaseq-caption-text={item.caption || ""}
-        autoplay={i === 0}
         muted={true}
         playsinline={true}
-        preload="auto"
+        preload="none"
         width={item.dims.width}
         height={item.dims.height}
         class="absolute inset-0 w-full h-full object-cover pointer-events-none transition-opacity duration-500 [clip-path:inset(0_round_calc(0.75rem-1px))]"
@@ -199,7 +198,18 @@ const itemsWithDims = items.map((item, i) => ({ ...item, dims: dims[i] }));
         current = next;
       };
       videos.forEach((v) => v.addEventListener("ended", advance));
-      videos[0].play().catch(() => {});
+      // The sequence only loads and plays on narrow screens, where it is the visible copy.
+      const mobile = window.matchMedia("(max-width: 767.98px)");
+      const start = () => {
+        if (!mobile.matches) {
+          videos.forEach((v) => v.pause());
+          return;
+        }
+        videos.forEach((v) => (v.preload = "auto"));
+        videos[current].play().catch(() => {});
+      };
+      mobile.addEventListener("change", start);
+      start();
     })();
   </script>
 )}
@@ -213,28 +223,92 @@ const itemsWithDims = items.map((item, i) => ({ ...item, dims: dims[i] }));
       const root = document.querySelector(`[data-mediasync="${syncId}"]`);
       if (!root) return;
       const videos = Array.from(root.querySelectorAll("video"));
+      const desktop = window.matchMedia("(min-width: 768px)");
       videos.forEach((v) => {
         v.muted = true;
         v.playsInline = true;
       });
-      let ended = 0;
+
+      // The longest clip is the group clock; shorter clips hold their last frame until it ends.
+      let lead = videos[0];
+      let running = false;
+      let visible = false;
+      let timer = 0;
+      const done = (v) => v.ended || v.currentTime >= v.duration - 0.05;
+      const ready = (v) => v.readyState >= 3 || done(v);
+      const playAll = () => videos.forEach((v) => !done(v) && v.paused && v.play().catch(() => {}));
+      const pauseAll = () => videos.forEach((v) => !v.paused && v.pause());
+
       const restart = () => {
-        ended = 0;
         videos.forEach((v) => {
+          v.playbackRate = 1;
           v.currentTime = 0;
-          v.play().catch(() => {});
         });
       };
-      // Shorter clips hold their last frame until every clip has ended, then all restart from zero.
-      videos.forEach((v) =>
-        v.addEventListener("ended", () => {
-          ended += 1;
-          if (ended === videos.length) restart();
-        }),
-      );
-      const ready = (v) =>
-        v.readyState >= 3 ? Promise.resolve() : new Promise((r) => v.addEventListener("canplay", r, { once: true }));
-      Promise.all(videos.map(ready)).then(restart);
+
+      // Every 200ms: hold the group while any clip is buffering, then nudge each clip's rate (or seek when far off) toward the clock.
+      const tick = () => {
+        if (!running || !visible) return;
+        // Under an open project modal the group stays paused.
+        if (root.closest("[inert]")) {
+          pauseAll();
+          return;
+        }
+        if (lead.ended) {
+          restart();
+          return;
+        }
+        if (!videos.every(ready)) {
+          pauseAll();
+          return;
+        }
+        playAll();
+        const t = lead.currentTime;
+        videos.forEach((v) => {
+          if (v === lead || done(v)) return;
+          const drift = Math.min(t, v.duration) - v.currentTime;
+          if (Math.abs(drift) > 0.5) {
+            v.currentTime = Math.min(t, v.duration);
+            v.playbackRate = 1;
+          } else if (Math.abs(drift) > 0.04) {
+            v.playbackRate = 1 + Math.max(-0.1, Math.min(0.1, drift * 0.5));
+          } else {
+            v.playbackRate = 1;
+          }
+        });
+      };
+
+      const start = () => {
+        if (running || !desktop.matches) return;
+        running = true;
+        videos.forEach((v) => {
+          v.preload = "auto";
+          if (v.readyState === 0) v.load();
+        });
+        const meta = (v) =>
+          v.readyState >= 1 ? Promise.resolve() : new Promise((r) => v.addEventListener("loadedmetadata", r, { once: true }));
+        Promise.all(videos.map(meta)).then(() => {
+          lead = videos.reduce((a, b) => (b.duration > a.duration ? b : a));
+          restart();
+          timer = window.setInterval(tick, 200);
+          tick();
+        });
+      };
+
+      // Offscreen or hidden groups pause together and resume in step.
+      new IntersectionObserver(
+        (entries) => {
+          visible = entries.some((e) => e.isIntersecting);
+          if (visible) {
+            start();
+            tick();
+          } else {
+            pauseAll();
+          }
+        },
+        { threshold: 0.1 },
+      ).observe(root);
+      desktop.addEventListener("change", () => (desktop.matches ? start() : pauseAll()));
     })();
   </script>
 )}
