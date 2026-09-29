@@ -86,17 +86,45 @@ const imageUrl = new URL(image, site.url).toString();
           { capture: true },
         );
 
+        // Returning from a closed project modal restores the home page's scroll from when it opened.
+        var returnY = null;
+        try {
+          returnY = sessionStorage.getItem("rr-return-scroll");
+          sessionStorage.removeItem("rr-return-scroll");
+        } catch (_) {}
+        if (returnY != null && location.pathname === "/" && !location.hash) {
+          var y = parseInt(returnY, 10) || 0;
+          var restore = function () {
+            window.scrollTo({ top: y, behavior: "instant" });
+          };
+          // A second pass at load corrects late layout shifts unless the visitor has scrolled since.
+          var moved = false;
+          var onMove = function () { moved = true; };
+          ["wheel", "touchstart", "keydown"].forEach(function (t) {
+            window.addEventListener(t, onMove, { once: true, passive: true });
+          });
+          document.addEventListener("DOMContentLoaded", restore, { once: true });
+          window.addEventListener("load", function () {
+            if (!moved && Math.abs(window.scrollY - y) > 1) restore();
+          }, { once: true });
+        }
+
         // On a project route, Escape always returns to /#projects.
         var isProject = function () {
           return /^\/projects\/[^/]/.test(location.pathname);
         };
         var escInDialog = false;
+        var leaving = false;
         var onKey = function (e) {
           if (e.key !== "Escape" && e.keyCode !== 27) return;
           if (document.querySelector("dialog[open]")) { escInDialog = true; return; }
           if (escInDialog) { if (e.type === "keyup") escInDialog = false; return; }
-          if (!isProject()) return;
-          window.location.href = "/#projects";
+          if (!isProject() || leaving) return;
+          leaving = true;
+          // The modal's close link carries the return-to-source behavior; fall back to the anchor.
+          var close = document.querySelector('.project-modal a[aria-label="Close"]');
+          if (close) close.click();
+          else window.location.href = "/#projects";
         };
         window.addEventListener("keydown", onKey, true);
         document.addEventListener("keydown", onKey, true);
