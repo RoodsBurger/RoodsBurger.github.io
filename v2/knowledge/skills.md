@@ -5,11 +5,11 @@ url: /#about
 
 ## Programming languages
 
-Rodolfo Raimundo writes most of his machine learning, robotics, and Raspberry Pi code in Python. He uses C++ and C for embedded firmware on ESP32 microcontrollers, Swift with SwiftUI for native macOS apps, Dart with Flutter for cross-platform mobile and desktop apps, and TypeScript and JavaScript for web work, including this portfolio site. He has also used Java in coursework and at Morgan Stanley, SQL and PL/pgSQL for Postgres databases, Kotlin for an Android app, Fortran and MATLAB in early research, and LaTeX for documents. Rodolfo speaks English and Portuguese.
+Rodolfo Raimundo writes most of his machine learning, robotics, and Raspberry Pi code in Python. He uses C++ and C for embedded firmware on ESP32 microcontrollers, Swift with SwiftUI for native macOS apps, Dart with Flutter for cross-platform mobile and desktop apps, and TypeScript and JavaScript for web work, including this portfolio site. He has also used Java in coursework and at Morgan Stanley, SQL and PL/pgSQL for Postgres databases, Kotlin for an Android app, Fortran and MATLAB in early research, and LaTeX for documents. Rodolfo speaks Portuguese and English natively, and has elementary Spanish and French.
 
 ## Machine learning and deep learning
 
-Rodolfo's machine learning work covers PyTorch, TensorFlow and Keras, and scikit-learn. He has built diffusion models from scratch, including a conditional U-Net DDPM with classifier-free guidance, and used Hugging Face diffusers. His audio work at Pindrop used transfer learning from pretrained networks and multi-task contrastive learning for authentication. He has trained YOLO detectors (v8 and v11, including oriented bounding boxes) and used Faster R-CNN to bootstrap labels. Rodolfo has also studied network pruning, and on the infrastructure side he has built training pipelines on AWS SageMaker.
+Rodolfo's machine learning work covers PyTorch, TensorFlow and Keras, scikit-learn, and MLflow for experiment tracking. He has built diffusion models from scratch, including a conditional U-Net DDPM with classifier-free guidance, and used Hugging Face diffusers. His audio work at Pindrop used transfer learning from pretrained networks and multi-task contrastive learning for authentication. He has trained YOLO detectors (v8 and v11, including oriented bounding boxes) and used Faster R-CNN to bootstrap labels. Rodolfo has also studied network pruning, and on the infrastructure side he has built training pipelines on AWS SageMaker.
 
 ## Robotics and reinforcement learning
 

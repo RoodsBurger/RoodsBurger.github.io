@@ -5,7 +5,7 @@ url: /#about
 
 ## Who Rodolfo is
 
-Rodolfo Raimundo is a machine learning researcher and engineer based in the San Francisco Bay Area. He builds at the intersection of deep learning, reinforcement learning and robotics, and the goal is usually to get algorithms to do something useful in the physical world. Rodolfo grew up in São Paulo, Brazil, and speaks Portuguese as his native language, along with English. He holds an M.S. in Computer Science (2025) and a B.A. in Computer Science with a concentration in Mathematics (2021), both from Columbia University, and a high school technical degree in electronics from IFSP in Brazil.
+Rodolfo Raimundo is a machine learning researcher and engineer based in the San Francisco Bay Area. He builds at the intersection of deep learning, reinforcement learning and robotics, and the goal is usually to get algorithms to do something useful in the physical world. Rodolfo grew up in São Paulo, Brazil, and speaks Portuguese and English natively, plus some Spanish and French. He holds an M.S. in Computer Science (2025) and a B.A. in Computer Science with a concentration in Mathematics (2021), both from Columbia University, took graduate AI courses at Stanford through its Non-Degree Option, and has a high school technical degree in electronics from IFSP in Brazil.
 
 ## Current role at Pindrop
 
