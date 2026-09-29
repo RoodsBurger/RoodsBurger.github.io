@@ -114,13 +114,13 @@ const imageUrl = new URL(image, site.url).toString();
           return /^\/projects\/[^/]/.test(location.pathname);
         };
         var escInDialog = false;
-        var leaving = false;
         var onKey = function (e) {
           if (e.key !== "Escape" && e.keyCode !== 27) return;
           if (document.querySelector("dialog[open]")) { escInDialog = true; return; }
           if (escInDialog) { if (e.type === "keyup") escInDialog = false; return; }
-          if (!isProject() || leaving) return;
-          leaving = true;
+          if (!isProject()) return;
+          // Keydown is claimed so the browser's Escape-to-stop-loading cannot cancel the close; keyup navigates.
+          if (e.type !== "keyup") { e.preventDefault(); return; }
           // The modal's close link carries the return-to-source behavior; fall back to the anchor.
           var close = document.querySelector('.project-modal a[aria-label="Close"]');
           if (close) close.click();
@@ -129,8 +129,6 @@ const imageUrl = new URL(image, site.url).toString();
         window.addEventListener("keydown", onKey, true);
         document.addEventListener("keydown", onKey, true);
         window.addEventListener("keyup", onKey, true);
-        // A page restored from the back/forward cache can close again.
-        window.addEventListener("pageshow", function () { leaving = false; });
       })();
     </script>
   </head>
