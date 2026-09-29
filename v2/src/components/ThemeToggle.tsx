@@ -19,15 +19,24 @@ export default function ThemeToggle() {
   const toggle = () => {
     const next: Theme = theme === "dark" ? "light" : "dark";
 
-    // Trigger a brief CSS transition on every themed property across the page.
     const html = document.documentElement;
-    html.classList.add("theme-changing");
-    html.dataset.theme = next;
     setTheme(next);
     try {
       localStorage.setItem("theme", next);
     } catch {}
 
+    // One crossfade of the whole page where view transitions exist; otherwise every themed property transitions.
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if ("startViewTransition" in document && !reduce) {
+      html.classList.add("theme-vt");
+      const vt = document.startViewTransition(() => {
+        html.dataset.theme = next;
+      });
+      vt.finished.finally(() => html.classList.remove("theme-vt"));
+      return;
+    }
+    html.classList.add("theme-changing");
+    html.dataset.theme = next;
     window.setTimeout(() => html.classList.remove("theme-changing"), 380);
   };
 

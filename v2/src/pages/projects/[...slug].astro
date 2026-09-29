@@ -26,7 +26,7 @@ const { title, summary, cover } = project.data;
   ogType="article"
 >
   {/* The real home page renders behind so the modal's blur is genuine; inert + aria-hidden keep it out of the focus order and accessibility tree. */}
-  <div inert aria-hidden="true">
+  <div inert aria-hidden="true" data-modal-bg>
     <Hero />
     <ProjectShowcase />
     <LifeOutside />

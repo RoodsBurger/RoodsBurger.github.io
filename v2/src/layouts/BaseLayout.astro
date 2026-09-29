@@ -67,48 +67,6 @@ const imageUrl = new URL(image, site.url).toString();
         try { stored = localStorage.getItem("theme"); } catch (e) {}
         document.documentElement.dataset.theme = stored === "light" ? "light" : "dark";
 
-        // Save the source page's scroll position when a project link is clicked.
-        document.addEventListener(
-          "click",
-          function (e) {
-            var t = e.target;
-            var a = t && t.closest && t.closest('a[href^="/projects/"]');
-            if (!a) return;
-            var href = a.getAttribute("href") || "";
-            if (href === "/projects" || href === "/projects/") return;
-            try {
-              sessionStorage.setItem(
-                "rr-bg-scroll",
-                String(window.scrollY || 0),
-              );
-            } catch (_) {}
-          },
-          { capture: true },
-        );
-
-        // Returning from a closed project modal restores the home page's scroll from when it opened.
-        var returnY = null;
-        try {
-          returnY = sessionStorage.getItem("rr-return-scroll");
-          sessionStorage.removeItem("rr-return-scroll");
-        } catch (_) {}
-        if (returnY != null && location.pathname === "/" && !location.hash) {
-          var y = parseInt(returnY, 10) || 0;
-          var restore = function () {
-            window.scrollTo({ top: y, behavior: "instant" });
-          };
-          // A second pass at load corrects late layout shifts unless the visitor has scrolled since.
-          var moved = false;
-          var onMove = function () { moved = true; };
-          ["wheel", "touchstart", "keydown"].forEach(function (t) {
-            window.addEventListener(t, onMove, { once: true, passive: true });
-          });
-          document.addEventListener("DOMContentLoaded", restore, { once: true });
-          window.addEventListener("load", function () {
-            if (!moved && Math.abs(window.scrollY - y) > 1) restore();
-          }, { once: true });
-        }
-
         // On a project route, Escape always returns to /#projects.
         var isProject = function () {
           return /^\/projects\/[^/]/.test(location.pathname);
@@ -121,7 +79,7 @@ const imageUrl = new URL(image, site.url).toString();
           if (!isProject()) return;
           // Keydown is claimed so the browser's Escape-to-stop-loading cannot cancel the close; keyup navigates.
           if (e.type !== "keyup") { e.preventDefault(); return; }
-          // The modal's close link carries the return-to-source behavior; fall back to the anchor.
+          // The modal's close link carries the in-place close; fall back to the anchor.
           var close = document.querySelector('.project-modal a[aria-label="Close"]');
           if (close) close.click();
           else window.location.href = "/#projects";
@@ -149,6 +107,10 @@ const imageUrl = new URL(image, site.url).toString();
     {showFooter && <Footer />}
 
     {showChat && <ChatWidget mode="floating" client:idle />}
+
+    <script>
+      import "@/lib/project-modal";
+    </script>
 
     <script>
       // Behind a project modal the home page shows as-is, so reveals only run on normal pages.
@@ -189,31 +151,32 @@ const imageUrl = new URL(image, site.url).toString();
       if (!behindModal) observe();
 
       // Force autoplay reliably across browsers; pause when offscreen to save CPU.
-      let videoIO: IntersectionObserver | null = null;
-      const playVideos = () => {
-        if (videoIO) videoIO.disconnect();
-        videoIO = new IntersectionObserver(
-          (entries) => {
-            for (const e of entries) {
-              const v = e.target as HTMLVideoElement;
-              if (e.isIntersecting) v.play?.().catch(() => {});
-              else v.pause?.();
-            }
-          },
-          { threshold: 0.1 },
-        );
-        document
+      const videoIO = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            const v = e.target as HTMLVideoElement;
+            // Videos under an open modal stay paused until it closes.
+            if (e.isIntersecting && !v.closest("[inert]")) v.play?.().catch(() => {});
+            else v.pause?.();
+          }
+        },
+        { threshold: 0.1 },
+      );
+      const playVideos = (root: ParentNode = document) => {
+        root
           .querySelectorAll<HTMLVideoElement>("video[autoplay]")
           .forEach((v) => {
             // The mobile media sequence manages its own playback.
             if (v.closest("[data-mediaseq]")) return;
             v.muted = true;
             v.playsInline = true;
-            v.play?.().catch(() => {});
-            videoIO!.observe(v);
+            if (!v.closest("[inert]")) v.play?.().catch(() => {});
+            videoIO.observe(v);
           });
       };
       playVideos();
+      // Modal content injected after load gets the same treatment.
+      document.addEventListener("rr:content", (e) => playVideos((e as CustomEvent<HTMLElement>).detail));
     </script>
   </body>
 </html>
