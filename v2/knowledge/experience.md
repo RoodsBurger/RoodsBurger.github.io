@@ -5,7 +5,7 @@ url: /#about
 
 ## Pindrop, Research Scientist (June 2025 to present)
 
-Rodolfo Raimundo has been a Research Scientist on Pindrop's Authentication & ID Research team since June 2025. Pindrop sells voice authentication and fraud detection models to banks. Rodolfo works on those voice authentication models, and with large US bank customers on implementation and on their model-risk validation of Pindrop's models, alongside Pindrop's sales engineers. Much of his recent work puts LLM agents inside research workflows. He built an agentic tool that writes model development documentation, the reports that model risk management review requires. It runs on Amazon Bedrock AgentCore and uses Claude, with modes for generating a new document, updating performance sections, refactoring text and converting to PDF.
+Rodolfo Raimundo has been a Research Scientist on Pindrop's Authentication & ID Research team since June 2025, where he also leads the model risk management (MRM) work. Pindrop sells voice authentication and fraud detection models to banks. Rodolfo works on those voice authentication models, and with large US bank customers on implementation and on their model-risk validation of Pindrop's models, alongside Pindrop's sales engineers. Much of his recent work puts LLM agents inside research workflows. He built an agentic tool that writes model development documentation, the reports that model risk management review requires. It runs on Amazon Bedrock AgentCore and uses Claude, with modes for generating a new document, updating performance sections, refactoring text and converting to PDF.
 
 ## Pindrop articles: documentation agent and voice migration
 
@@ -17,11 +17,11 @@ From October 2022 to May 2024, Rodolfo was a Senior Data Scientist on Pindrop's 
 
 ## Columbia Creative Machines Lab, Graduate Research Assistant (2024 to 2025)
 
-During his M.S. at Columbia, from about October 2024 to May 2025, Rodolfo was a Graduate Research Assistant in the Creative Machines Lab. He worked on the lab's knolling research line, which studies how robots can learn to arrange cluttered objects neatly. Rodolfo built the perception and manipulation side: object detection with trained YOLOv11 oriented-bounding-box models, robot control code, and a robotic arm calibration procedure, which he contributed to the lab's Knolling repository in April 2025. He then built TidyNET, his own end-to-end system that combines a diffusion model with detection and a robotic arm. The research counted as two terms of supervised research.
+During his M.S. at Columbia, from October 2024 to June 2025, Rodolfo was a Graduate Research Assistant in the Creative Machines Lab, advised by Professor Hod Lipson and Dr. Yuhang Hu. He worked on the lab's knolling research line, which studies how robots can learn to arrange cluttered objects neatly. Rodolfo built the perception and manipulation side: object detection with trained YOLOv11 oriented-bounding-box models, robot control code, and a robotic arm calibration procedure, which he contributed to the lab's Knolling repository in April 2025. He then built TidyNET, his own end-to-end system that combines a diffusion model with detection and a robotic arm. The research counted as two terms of supervised research.
 
 ## Next Caller, Data Analyst (July 2021 to September 2022)
 
-From July 2021 to September 2022, Rodolfo was a Data Analyst at Next Caller in New York. Next Caller is a Y Combinator-backed caller verification company that Pindrop acquired in 2021, so his move to Pindrop in October 2022 was an internal transition. At Next Caller, Rodolfo trained models that identify spoofed phone calls from telephony metadata. He built an AWS SageMaker training pipeline that cut training time by 40% and made monthly retraining practical. He also built dashboards in Tableau and Redash and presented the findings in business meetings.
+From July 2021 to October 2022, Rodolfo was a Data Analyst at Next Caller in New York. Next Caller is a Y Combinator-backed caller verification company that Pindrop acquired in 2021, so his move to Pindrop in October 2022 was an internal transition. At Next Caller, Rodolfo trained models that identify spoofed phone calls from telephony metadata. He built an AWS SageMaker training pipeline that cut training time by 40% and made monthly retraining practical. He also built dashboards in Tableau and Redash and presented the findings in business meetings.
 
 ## groupwork Brasil, Summer Technology Intern (June to August 2020)
 
@@ -29,7 +29,7 @@ In the summer of 2020, Rodolfo was a Summer Technology Intern on the SMART Autom
 
 ## Morgan Stanley, Summer Business Analyst (June to August 2019)
 
-In the summer of 2019, Rodolfo was a Summer Business Analyst at Morgan Stanley in New York. He built a full-stack tool, with a Java and SQL back end and a TypeScript and Angular front end, that outperformed the legacy Enhanced Due Diligence system by 9 times. Rodolfo also implemented a PyTorch model to improve contract analysis for the Wealth Management team, his earliest documented machine learning work in industry.
+In the summer of 2019, Rodolfo was a Summer Analyst at Morgan Stanley in New York, as a Morgan Stanley Richard B. Fisher Scholar. He built a full-stack tool, with a Java and SQL back end and a TypeScript and Angular front end, that outperformed the legacy Enhanced Due Diligence system by 9 times. Rodolfo also implemented a PyTorch model to improve contract analysis for the Wealth Management team, his earliest documented machine learning work in industry.
 
 ## nok9, Summer Business Analyst (June to August 2016)
 
@@ -37,4 +37,8 @@ Rodolfo's first industry role was as a Summer Business Analyst at nok9 in Malmö
 
 ## Earlier research and student work
 
-Before and during his undergraduate years, Rodolfo took on several research and team roles. From April to November 2018 he was a Research Assistant in a Columbia database lab affiliated with the Data Science Institute, where he ran a survey on what Twitch streamers consider important for their popularity and analyzed streamers' tweets with sentiment analysis. From February 2019 to January 2020 he was Technology Lead of the Columbia Space Initiative team whose scientific payload flew on Blue Origin's New Shepard NS-12 mission. From 2019 to 2020 he co-founded and helped run the Columbia Quant Group, which hosted panels and workshops with quantitative finance professionals.
+Before and during his undergraduate years, Rodolfo took on several research and team roles. From April to December 2018 he was a Research Assistant at Columbia's Data Science Institute, in Professor Eugene Wu's lab (WuLab), as a 2018 Data Science Scholar, where he ran a survey on what Twitch streamers consider important for their popularity and analyzed streamers' tweets with sentiment analysis. From February 2019 to June 2020 he was Zero-G Tech Lead at the Columbia Space Initiative, on the team whose scientific payload flew on Blue Origin's New Shepard NS-12 mission. From 2019 to 2020 he co-founded and helped run the Columbia Quant Group, which hosted panels and workshops with quantitative finance professionals.
+
+## manroland web systems, Summer Technology Analyst (June to July 2014)
+
+Rodolfo's earliest industry experience was a summer internship in 2014 at manroland web systems, a printing press manufacturer in Augsburg, Germany, where he was a Summer Technology Analyst from June to July 2014. He was still in high school in Brazil at the time.

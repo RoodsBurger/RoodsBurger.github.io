@@ -9,7 +9,15 @@ Rodolfo Raimundo earned an M.S. in Computer Science from Columbia University's S
 
 ## B.A. in Computer Science, Columbia University (2021)
 
-Rodolfo received a B.A. in Computer Science with a concentration in Mathematics from Columbia College, Columbia University, attending from 2017 and graduating in May 2021. The mathematics side included calculus, linear algebra, analysis and optimization, a full year of modern algebra, and real analysis. His computer science courses included machine learning, analysis of algorithms, advanced algorithms, cryptography, computational complexity, computer systems, and Programming and Problem Solving, a course built around team strategy tournaments in Java. As an undergraduate Rodolfo also took Computation and the Brain, a graduate seminar, which produced his Artificial Synaptic Pruning project in Fall 2020.
+Rodolfo received a B.A. in Computer Science with a concentration in Mathematics from Columbia College, Columbia University, attending from 2017 and graduating in May 2021. The mathematics side included calculus, linear algebra, analysis and optimization, a full year of modern algebra, and real analysis. His computer science courses included machine learning, analysis of algorithms, advanced algorithms, cryptography, computational complexity, computer systems, and Programming and Problem Solving, a course built around team strategy tournaments in Java. As an undergraduate Rodolfo also took Computation and the Brain, a graduate seminar, which produced his Artificial Synaptic Pruning project in Fall 2020. Outside computer science, he took Introduction to East Asian Civilization: Korea in Spring 2021 and wrote two essays on Korean history for it. In Fall 2019 he took Introduction to Cryptography.
+
+## Stanford University, Non-Degree Option in Artificial Intelligence (2022)
+
+Rodolfo Raimundo also studied at Stanford University. While working full time, he took graduate courses in artificial intelligence through Stanford's Non-Degree Option (NDO), which lets professionals enroll in regular Stanford graduate courses for credit without joining a degree program. He started in Winter 2022 with CS224N, Natural Language Processing with Deep Learning, and his Stanford coursework covered deep learning and robotics. Pindrop's education stipend paid for the courses. The Stanford classes renewed his interest in research and led to his decision to go back to school for the M.S. at Columbia in 2024.
+
+## University of São Paulo (USP), before Columbia
+
+Before moving to the United States, Rodolfo started university in Brazil at the Universidade de São Paulo (USP). He was enrolled in Computer Engineering at USP's Escola Politécnica and in Computer Science at its Institute of Mathematics and Statistics (IME-USP), and took Linear Algebra, Calculus, Programming in C, Physics, advanced Java programming, Materials Science and Chemistry there. He left USP without finishing a degree when he was admitted to Columbia, where he started his B.A. in 2017.
 
 ## Technical degree in Electronics, IFSP (2016)
 
