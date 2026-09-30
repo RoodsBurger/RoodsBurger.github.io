@@ -5,9 +5,17 @@ import { CohereClientV2 } from "cohere-ai";
 import { clientKey } from "../../src/lib/chat/client-key.ts";
 import { CHAT_MODEL, EMBED_DIM, EMBED_MODEL, NAMESPACE, RERANK_MODEL } from "../../src/lib/chat/models.ts";
 import { isAllowedOrigin } from "../../src/lib/chat/origin.ts";
-import { buildMessages, FAST_PATH_PROMPT, isFastPath, type ChatCompletionMessage } from "../../src/lib/chat/prompts.ts";
+import {
+  buildMessages,
+  FAST_PATH_PROMPT,
+  isFastPath,
+  isPromptExtraction,
+  leaksPrompt,
+  PROMPT_REFUSAL,
+  type ChatCompletionMessage,
+} from "../../src/lib/chat/prompts.ts";
 import { checkLimit, memoryStore, type CounterStore, type CounterValue } from "../../src/lib/chat/rate-limit.ts";
-import { selectDocuments, type RetrievedMatch, type SelectedDocument } from "../../src/lib/chat/retrieval.ts";
+import { retrievalQuery, selectDocuments, type RetrievedMatch, type SelectedDocument } from "../../src/lib/chat/retrieval.ts";
 import { RequestSchema, trimHistory, type ChatRequest } from "../../src/lib/chat/schema.ts";
 
 const IP_LIMIT = 20;
@@ -22,6 +30,9 @@ const FIRST_BYTE_TIMEOUT_MS = 10000;
 const IDLE_TIMEOUT_MS = 10000;
 
 const CUT_OFF_SUFFIX = "\n\n(Sorry, the reply was cut off.)";
+// Characters held back at the start of a reply so a leaked system prompt is caught before any of it is sent.
+const LEAK_HOLD_CHARS = 160;
+const EMPTY_REPLY = "Sorry, I couldn't put an answer together. Could you rephrase the question?";
 
 const ERRORS = {
   method: "Method not allowed.",
@@ -213,6 +224,20 @@ async function streamReply(
   const encoder = new TextEncoder();
   // Set when the client disconnects, so the resulting abort is not treated as an upstream failure.
   let cancelled = false;
+  // Set once any text has been sent, so an upstream that ends silently still gets a visible reply.
+  let sent = false;
+  // The whole reply so far, checked for system prompt text; nothing is sent until LEAK_HOLD_CHARS have arrived or the reply ends.
+  let full = "";
+  let held = "";
+  // Stops the upstream and ends the reply with the refusal when the model starts reciting its instructions.
+  const stopLeak = async (out: ReadableStreamDefaultController<Uint8Array>) => {
+    clearTimeout(timer);
+    console.error("Chat reply leaked the system prompt; replaced with a refusal.");
+    out.enqueue(encoder.encode(sent ? `\n\n${PROMPT_REFUSAL}` : PROMPT_REFUSAL));
+    out.close();
+    controller.abort();
+    await events.return?.().catch(() => undefined);
+  };
   return new ReadableStream<Uint8Array>({
     async pull(out) {
       try {
@@ -220,6 +245,15 @@ async function streamReply(
           const next = await events.next();
           if (next.done) {
             clearTimeout(timer);
+            if (held) {
+              out.enqueue(encoder.encode(held));
+              held = "";
+              sent = true;
+            }
+            if (!sent) {
+              console.error("Chat stream ended with no text.");
+              out.enqueue(encoder.encode(EMPTY_REPLY));
+            }
             out.close();
             return;
           }
@@ -228,8 +262,15 @@ async function streamReply(
           if (event.type === "content-delta") {
             const text = event.delta?.message?.content?.text;
             if (text) {
-              out.enqueue(encoder.encode(text));
-              return;
+              full += text;
+              if (leaksPrompt(full)) return await stopLeak(out);
+              held += text;
+              if (sent || full.length >= LEAK_HOLD_CHARS) {
+                out.enqueue(encoder.encode(held));
+                held = "";
+                sent = true;
+                return;
+              }
             }
           }
         }
@@ -237,7 +278,7 @@ async function streamReply(
         clearTimeout(timer);
         if (cancelled) return;
         console.error("Chat stream failed:", (e as Error).name, (e as Error).message);
-        out.enqueue(encoder.encode(CUT_OFF_SUFFIX));
+        out.enqueue(encoder.encode(sent ? CUT_OFF_SUFFIX : EMPTY_REPLY));
         out.close();
       }
     },
@@ -247,6 +288,19 @@ async function streamReply(
       controller.abort();
       // The upstream may already be closed by the abort, so a failed return is ignored.
       await events.return?.().catch(() => undefined);
+    },
+  });
+}
+
+// Sends a fixed reply in the same plain-text format as a streamed one.
+function textReply(text: string, origin: string | null): Response {
+  return new Response(text, {
+    status: 200,
+    headers: {
+      ...corsHeaders(origin),
+      "Content-Type": "text/plain; charset=utf-8",
+      "Cache-Control": "no-store",
+      "X-Content-Type-Options": "nosniff",
     },
   });
 }
@@ -270,6 +324,7 @@ async function handlePost(req: Request, context: FunctionContext | undefined, or
   if (limited) return json(429, { error: limited.message }, origin, { "Retry-After": String(limited.retryAfter) });
 
   const { message, pageTopic, pageSlug } = parsed;
+  if (isPromptExtraction(message)) return textReply(PROMPT_REFUSAL, origin);
   const history = trimHistory(parsed.conversationHistory);
   const cohere = new CohereClientV2({ token: process.env.COHERE_API_KEY });
 
@@ -280,8 +335,7 @@ async function handlePost(req: Request, context: FunctionContext | undefined, or
     messages = [{ role: "system", content: FAST_PATH_PROMPT }, ...history, { role: "user", content: message }];
     temperature = 0.5;
   } else {
-    // Folds the current page topic into the retrieval query so the current page's chunks rank higher.
-    const query = pageTopic ? `${message}\n\n(In the context of: ${pageTopic})` : message;
+    const query = retrievalQuery(message, history, pageTopic);
     try {
       documents = await retrieve(cohere, query, pageSlug);
     } catch (e) {

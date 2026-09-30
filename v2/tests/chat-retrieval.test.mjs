@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { selectDocuments } from "../src/lib/chat/retrieval.ts";
+import { retrievalQuery, selectDocuments } from "../src/lib/chat/retrieval.ts";
 
 const matches = [
   { id: "a#0", metadata: { slug: "tobias", title: "Tobias", url: "/projects/tobias", text: "Tobias text" } },
@@ -79,4 +79,23 @@ test("a match with no metadata text is skipped even with a high score", () => {
   const noText = [{ id: "f#0", metadata: { slug: "chat-project", title: "Chat", url: "/projects/chat-project" } }];
   const rerank = [{ index: 0, relevanceScore: 0.99 }];
   assert.deepEqual(selectDocuments(noText, rerank), []);
+});
+
+test("retrievalQuery is the bare message with no history or page topic", () => {
+  assert.equal(retrievalQuery("What is Tobias?", []), "What is Tobias?");
+});
+
+test("retrievalQuery folds in the previous user turn so follow-ups keep their topic", () => {
+  const history = [
+    { role: "user", content: "Should I hire him?" },
+    { role: "assistant", content: "He ships research into production." },
+  ];
+  assert.equal(
+    retrievalQuery("That's not an answer to my question", history),
+    "Earlier question: Should I hire him?\nEarlier answer: He ships research into production.\n\nCurrent question: That's not an answer to my question",
+  );
+});
+
+test("retrievalQuery appends the page topic", () => {
+  assert.equal(retrievalQuery("Tell me more", [], "Tobias"), "Tell me more\n\n(In the context of: Tobias)");
 });
