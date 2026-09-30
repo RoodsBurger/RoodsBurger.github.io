@@ -51,3 +51,18 @@ export function selectDocuments(
     text: match.metadata?.text ?? "",
   }));
 }
+
+// Builds the retrieval query from the current message, the previous exchange (so follow-ups like "tell me more" or "that's not what I asked" find the earlier topic) and the page topic.
+export function retrievalQuery(
+  message: string,
+  history: ReadonlyArray<{ role: "user" | "assistant"; content: string }>,
+  pageTopic?: string,
+): string {
+  const lastOf = (role: "user" | "assistant") => [...history].reverse().find((turn) => turn.role === role)?.content.slice(0, 400);
+  const question = lastOf("user");
+  const answer = lastOf("assistant");
+  const earlier = [question && `Earlier question: ${question}`, answer && `Earlier answer: ${answer}`].filter(Boolean).join("\n");
+  const parts = [earlier ? `${earlier}\n\nCurrent question: ${message}` : message];
+  if (pageTopic) parts.push(`(In the context of: ${pageTopic})`);
+  return parts.join("\n\n");
+}

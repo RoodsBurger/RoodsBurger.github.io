@@ -7,6 +7,10 @@ url: /#about
 
 Rodolfo Raimundo is a machine learning researcher and engineer based in the San Francisco Bay Area. He builds at the intersection of deep learning, reinforcement learning and robotics, and the goal is usually to get algorithms to do something useful in the physical world. Rodolfo grew up in São Paulo, Brazil, and speaks Portuguese and English natively, plus some Spanish and French. He holds an M.S. in Computer Science (2025) and a B.A. in Computer Science with a concentration in Mathematics (2021), both from Columbia University, took graduate AI courses at Stanford through its Non-Degree Option, and has a high school technical degree in electronics from IFSP in Brazil.
 
+## Where Rodolfo has lived
+
+Rodolfo grew up in São Paulo, Brazil. He moved to New York in 2017 for Columbia, lived in San Francisco while working at Pindrop from 2022 to 2024, went back to New York for his M.S., and now lives in the San Francisco Bay Area. He has also lived in Europe for summer internships: in Augsburg, Germany in 2014 and in Malmö, Sweden in 2016, and he spent summer 2020 working in São Paulo.
+
 ## Current role at Pindrop
 
 Rodolfo is a Research Scientist on the Authentication & ID Research team at Pindrop, a company that sells voice authentication and fraud detection models to banks. He has been in the role since June 2025. He works on the voice authentication models themselves, and with the bank teams that implement them and validate them for model risk, alongside Pindrop's sales engineers. It is his second time on the team: he was a Senior Data Scientist there from October 2022 to May 2024, left to finish his master's at Columbia, and was hired back into a research role. He also leads Pindrop's model risk management team and is a co-author of an ACL 2026 main-conference paper on bias in AI text detectors. During the master's he was a graduate research assistant in Columbia's Creative Machines Lab.

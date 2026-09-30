@@ -5,7 +5,7 @@
 import handler from "../netlify/functions/chat.mts";
 
 const ORIGIN = "http://localhost:4321";
-// Spaces requests out so trial-key per-minute limits (rerank especially) are not hit.
+// Spaces requests out so trial-key per-minute limits (rerank especially) are not hit; each question uses its own IP so the per-IP limit is not hit either.
 const DELAY_MS = 7000;
 
 const QUESTIONS = [
@@ -67,7 +67,7 @@ for (const [i, body] of QUESTIONS.entries()) {
       headers: { "Content-Type": "application/json", Origin: ORIGIN },
       body: JSON.stringify(body),
     }),
-    { ip: "127.0.0.1" },
+    { ip: `127.0.0.${i + 1}` },
   );
   let text = "";
   let firstByteMs = null;
