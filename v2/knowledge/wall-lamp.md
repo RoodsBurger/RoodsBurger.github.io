@@ -21,4 +21,4 @@ Holding the arm with the driver asleep only works if the reduction gives the mot
 
 ## Electronics and firmware
 
-The kinetic wall lamp reuses the ESP32-S3 control board from Rodolfo's rising-core desk lamp unchanged. Its firmware is a fork of the desk lamp's, with its SimpleFOC motor control, Matter color temperature endpoint and signed over-the-air updates. On top of that it adds knock detection, arm positioning, and a serial console over USB that drives, calibrates and tunes the arm live.
+The kinetic wall lamp reuses the ESP32-S3 control board from Rodolfo's kinetic desk lamp unchanged. Its firmware is a fork of the desk lamp's, with its SimpleFOC motor control, Matter color temperature endpoint and signed over-the-air updates. On top of that it adds knock detection, arm positioning, and a serial console over USB that drives, calibrates and tunes the arm live.

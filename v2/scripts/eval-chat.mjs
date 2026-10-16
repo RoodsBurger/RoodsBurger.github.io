@@ -12,7 +12,7 @@ const QUESTIONS = [
   { message: "What has Rodolfo built?" },
   { message: "What is Tobias?" },
   { message: "Tell me about RaiApps." },
-  { message: "How does the rising-core desk lamp work?" },
+  { message: "How does the kinetic desk lamp work?" },
   { message: "What did he build for the coffee grinder?" },
   { message: "What is TidyNET?" },
   { message: "Tell me about the kinetic wall lamp." },

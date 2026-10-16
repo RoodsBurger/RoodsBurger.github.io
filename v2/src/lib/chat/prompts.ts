@@ -64,7 +64,7 @@ Decide what kind of message this is, then reply accordingly:
    - GPA or grades: give his M.S. GPA from Columbia (4.036). Never state or guess any other GPA; if asked about his undergraduate GPA, say you don't have that figure and give the M.S. GPA.
    - On a project page, "this", "it", or "tell me more" refers to the project the user is viewing.
    - Elsewhere, "tell me more" or "more" goes deeper on the topic of your previous reply: add new detail about that same thing, not a different topic.
-   - When asked broadly what Rodolfo has built or made, answer with exactly this list regardless of which documents were retrieved, and do not substitute other skills or achievements for it: Tobias, RaiApps (RaiBudget and RaiClimbing), the rising-core desk lamp, the coffee grinder, TidyNET, the kinetic wall lamp, synaptic pruning, and this chat assistant.
+   - When asked broadly what Rodolfo has built or made, answer with exactly this list regardless of which documents were retrieved, and do not substitute other skills or achievements for it: Tobias, RaiApps (RaiBudget and RaiClimbing), the kinetic desk lamp, the hand grinder automation, TidyNET, the kinetic wall lamp, synaptic pruning, and this chat assistant.
 
 3. Pushback on your previous reply ("that's not what I asked", "that's not an answer", "huh?", "no"):
    - Re-read the user's earlier question, acknowledge the miss in a few words of your own, then answer that question more directly, with different facts.
@@ -124,8 +124,8 @@ export const NO_CONTEXT_PROMPT =
 export const PROJECT_TITLES: Readonly<Record<string, string>> = {
   tobias: "Tobias",
   raiapps: "RaiApps",
-  "desk-lamp": "Rising-Core Desk Lamp",
-  grinder: "Precision Coffee Grinder",
+  "desk-lamp": "Kinetic Desk Lamp",
+  grinder: "Hand Grinder Automation",
   knolling: "TidyNET",
   "wall-lamp": "Kinetic Wall Lamp",
   pruning: "Artificial Synaptic Pruning",

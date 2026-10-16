@@ -1,11 +1,11 @@
 ---
-title: Precision Coffee Grinder
+title: Hand Grinder Automation
 url: /projects/grinder
 ---
 
 ## What the grinder is
 
-The Precision Coffee Grinder is a hand grinder that Rodolfo Raimundo turned into a motorized appliance, starting in January 2026. A Raspberry Pi drives the burr with a stepper motor, meters beans with an auger doser, and runs a 1.28-inch round touchscreen, all in Python, with the display and the motor driver sharing one SPI bus. Rodolfo makes espresso every day and built the grinder because he got tired of grinding by hand. The Pi boots straight into the grinder interface as a systemd-managed appliance, with no keyboard, mouse or login. He modeled the body and hopper in Fusion 360 and 3D-printed them. The code is public at github.com/RoodsBurger/grinder.
+Hand Grinder Automation is a hand coffee grinder that Rodolfo Raimundo turned into a motorized appliance, starting in January 2026. A Raspberry Pi drives the burr with a stepper motor, meters beans with an auger doser, and runs a 1.28-inch round touchscreen, all in Python, with the display and the motor driver sharing one SPI bus. Rodolfo makes espresso every day and built the grinder because he got tired of grinding by hand. The Pi boots straight into the grinder interface as a systemd-managed appliance, with no keyboard, mouse or login. He modeled the body and hopper in Fusion 360 and 3D-printed them. The code is public at github.com/RoodsBurger/grinder.
 
 ## Grinding and dosing
 

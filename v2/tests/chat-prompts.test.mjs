@@ -14,7 +14,7 @@ test("fast path does not match a real question", () => {
 test("SYSTEM_PROMPT lists the main projects in the site's order", () => {
   assert.match(
     SYSTEM_PROMPT,
-    /Tobias, RaiApps \(RaiBudget and RaiClimbing\), the rising-core desk lamp, the coffee grinder, TidyNET, the kinetic wall lamp, synaptic pruning, and this chat assistant/,
+    /Tobias, RaiApps \(RaiBudget and RaiClimbing\), the kinetic desk lamp, the hand grinder automation, TidyNET, the kinetic wall lamp, synaptic pruning, and this chat assistant/,
   );
 });
 

@@ -1,11 +1,11 @@
 ---
-title: Rising-Core Desk Lamp
+title: Kinetic Desk Lamp
 url: /projects/desk-lamp
 ---
 
-## What the rising-core desk lamp is
+## What the kinetic desk lamp is
 
-The rising-core desk lamp is a smart lamp that Rodolfo Raimundo designed and built in 2026, where brightness is a position. A brushless gimbal motor turns a lead screw, and a lit core carrying a warm and cool LED strip rides up and down the body. Every brightness change is a mechanical move, so the motor, the light and the smart-home state all have to agree on where the core is. One knob controls it locally, and Matter over WiFi connects it to Apple Home, Google Home and SmartThings. Rodolfo uses the lamp every day, and he sometimes catches himself distracted, just watching the core go up and down.
+The kinetic desk lamp is a smart lamp that Rodolfo Raimundo designed and built in 2026, where brightness is a position. A brushless gimbal motor turns a lead screw, and a lit core carrying a warm and cool LED strip rides up and down the body. Every brightness change is a mechanical move, so the motor, the light and the smart-home state all have to agree on where the core is. One knob controls it locally, and Matter over WiFi connects it to Apple Home, Google Home and SmartThings. Rodolfo uses the lamp every day, and he sometimes catches himself distracted, just watching the core go up and down.
 
 ## How the lamp moves and lights
 
