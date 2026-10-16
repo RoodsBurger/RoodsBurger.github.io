@@ -3,6 +3,8 @@
 
 const PROJECT_PATH = /^\/projects\/([a-z0-9-]+)\/?$/;
 const CLOSE_SELECTOR = 'a[href="/#projects"]';
+// Wraps the chat launcher and panel, so the chat stays usable whether it is open or closed.
+const CHAT_SELECTOR = "[data-chat-widget]";
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
@@ -96,7 +98,7 @@ function runScripts(root: HTMLElement) {
 
 // Everything but the modal and the chat widget leaves the focus order and the accessibility tree.
 function inertBackground(overlay: HTMLElement): HTMLElement[] {
-  const chat = document.querySelector('[aria-label="AI assistant"]');
+  const chat = document.querySelector(CHAT_SELECTOR);
   const inerted: HTMLElement[] = [];
   Array.from(document.body.children).forEach((el) => {
     if (!(el instanceof HTMLElement) || el.contains(overlay) || (chat && el.contains(chat))) return;
@@ -153,7 +155,7 @@ function trapFocus(overlay: HTMLElement) {
       (el) => !el.hasAttribute("data-focus-sentinel") && (el.offsetParent !== null || el === document.activeElement),
     );
   const inChat = (el: EventTarget | null) => {
-    const chat = document.querySelector('[aria-label="AI assistant"]');
+    const chat = document.querySelector(CHAT_SELECTOR);
     return !!(chat && el instanceof Node && chat.contains(el));
   };
   const redirect = (pick: (items: HTMLElement[], e: FocusEvent) => HTMLElement) => (e: FocusEvent) => {
