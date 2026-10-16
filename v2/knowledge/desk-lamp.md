@@ -5,7 +5,7 @@ url: /projects/desk-lamp
 
 ## What the kinetic desk lamp is
 
-The kinetic desk lamp is a smart lamp that Rodolfo Raimundo designed and built in 2026, where brightness is a position. Closed, it is a plain Ø150 mm aluminum cylinder with the light hidden inside. As it turns up, a lantern of two frosted glass tubes around a lit core rises out of the top of the tube, up to about 115 mm. Every brightness change is a mechanical move, so the motor, the light and the smart-home state all have to agree on where the lantern is. Matter over WiFi connects it to Apple Home, Google Home and SmartThings, and a knob under the base gives local control. This is the current version of the lamp; an earlier version raised a lit core out of its body.
+The kinetic desk lamp is a smart lamp that Rodolfo Raimundo designed and built in 2026, where brightness is a position. Closed, it is a plain Ø150 mm aluminum cylinder with the light hidden inside. As it turns up, a lantern of two frosted glass tubes around a lit core rises out of the top of the tube, up to about 115 mm. Every brightness change is a mechanical move, so the motor, the light and the smart-home state all have to agree on where the lantern is. Matter over WiFi connects it to Apple Home, Google Home and SmartThings, and a knob under the base gives local control. Rodolfo uses the lamp every day, and he sometimes catches himself distracted, just watching the lantern go up and down. This is the current version of the lamp; an earlier version raised a lit core out of its body.
 
 ## How the lamp moves and lights
 

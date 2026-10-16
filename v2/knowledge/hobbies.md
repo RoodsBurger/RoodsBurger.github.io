@@ -21,4 +21,4 @@ Hiking and camping are how Rodolfo gets outdoors and away from screens and the w
 
 ## Coffee and everyday objects
 
-Rodolfo makes espresso every day. He got tired of grinding by hand, so he motorized a hand grinder with a Raspberry Pi, a stepper motor on a driver board he designed, an auger bean doser and a round touchscreen. He likes designing objects he uses at home, including a kinetic desk lamp whose glass lantern rises out of an aluminum tube as it brightens, and a kinetic wall lamp that moves when it's knocked.
+Rodolfo makes espresso every day. He got tired of grinding by hand, so he motorized a hand grinder with a Raspberry Pi, a stepper motor on a driver board he designed, an auger bean doser and a round touchscreen. He likes designing objects he uses at home, including a kinetic desk lamp that he also uses every day, whose glass lantern rises out of an aluminum tube as it brightens, and a kinetic wall lamp that moves when it's knocked.
