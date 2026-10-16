@@ -286,6 +286,7 @@ export default function ChatWidget({ mode = "floating" }: Props) {
       )}
       role="dialog"
       aria-label="AI assistant"
+      data-chat-widget
     >
       <header className="flex items-center justify-between px-4 py-3 border-b border-(--color-border)/60">
         <div className="flex items-center gap-2">
@@ -412,7 +413,7 @@ export default function ChatWidget({ mode = "floating" }: Props) {
   if (mode === "embedded") return panel;
 
   return (
-    <>
+    <div data-chat-widget>
       {!isOpen && (
         <button
           type="button"
@@ -424,6 +425,6 @@ export default function ChatWidget({ mode = "floating" }: Props) {
         </button>
       )}
       {isOpen && panel}
-    </>
+    </div>
   );
 }
