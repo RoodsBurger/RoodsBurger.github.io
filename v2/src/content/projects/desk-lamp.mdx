@@ -1,13 +1,13 @@
 ---
 title: "Kinetic Desk Lamp"
-summary: "A desk lamp that sets brightness by raising a lit core on a lead screw, driven by a brushless motor."
+summary: "A desk lamp that sets brightness by raising a glass lantern out of an aluminum tube, driven by a brushless motor on a lead screw."
 tags: ["ESP32-S3", "BLDC", "SimpleFOC", "Matter"]
 category: ["code", "cad"]
 order: 3
 cover: "/artifacts/desk-lamp/cover.webp"
 coverDark: "/artifacts/desk-lamp/cover-dark.webp"
 coverTall: "/artifacts/desk-lamp/hero.webp"
-coverAlt: "The kinetic desk lamp on a dark studio floor"
+coverAlt: "The kinetic desk lamp with its glass lantern raised, on a dark studio floor"
 ---
 
 import Figure from "@/components/project/Figure.astro";
@@ -15,7 +15,7 @@ import Model3DPair from "@/components/Model3DPair.astro";
 
 <Figure
   src="/artifacts/desk-lamp/lift.webm"
-  alt="The lamp's core rising as it lights"
+  alt="The lamp's glass lantern rising out of its tube as it lights, then sinking back as it dims"
   ratio="16/10"
   video
   poster="/artifacts/desk-lamp/lift-poster.webp"
@@ -23,17 +23,19 @@ import Model3DPair from "@/components/Model3DPair.astro";
 
 ## How it works
 
-The desk lamp sets brightness by position: a brushless gimbal motor turns a lead screw, and a lit core with warm and cool LEDs rides up and down the body. Every brightness change is a mechanical move, so the motor, the light and the smart-home state all have to agree on where the core is.
+The desk lamp sets brightness by position. Closed, it's a plain aluminum cylinder with the light hidden inside. Turn it up and a lantern of two frosted glass tubes around a lit core rises out of the top, up to about 115 mm. Every brightness change is a mechanical move, so the motor, the light and the smart-home state all have to agree on where the lantern is.
 
-The light fades in at the start of a rise and out at the end of a descent, so motion speed is also fade speed. At rest the motor driver sleeps, so there's no hum. I use it every day and sometimes get distracted just watching the core rise and fall.
-
-## Controls
-
-One knob runs the lamp. Turning it moves the core, a click toggles the light, and a double click switches the knob between motor, brightness and color temperature. Over Matter the lamp is a color temperature light, and its brightness slider drives the same motor position as the knob.
+The light fades in at the start of a rise and out at the end of a descent, so motion speed is also fade speed. The core carries a warm and cool LED strip wound around it as a helix, with a row of addressable LEDs at the top.
 
 ## Mechanism
 
-A magnetic encoder closes the loop, so the firmware knows where the core is instead of counting steps and hoping they all landed. If someone stops the core by hand, the motor gives up after about half a second, takes that spot as the new target and reports the matching level over Matter.
+A brushless gimbal motor turns a lead screw directly, and quiet came first in every choice. The lantern rides a floating anti-backlash nut and two steel rods with polymer bushings, so a slightly off-center screw can't bind it. The screw is self-locking, so at rest the motor driver sleeps and there's no hum.
+
+The tube is the only metal part of the body. Everything else is printed in ABS, and the outside shows just three thin lines of plastic: a lip under the tube, a collar on top and the rim of the lid. No moving printed part touches a fixed one; where parts meet, the contact is steel, POM or felt, and every screw into plastic goes into a heat-set insert. I checked clearances over the whole travel with a scripted sweep of the Fusion assembly.
+
+## Control and firmware
+
+A magnetic encoder on the motor closes the loop, so the firmware knows where the lantern is instead of counting steps. If someone stops it by hand, the motor gives up after about half a second, takes that spot as the new target and reports the matching level over Matter. Over Matter the lamp is a color temperature light, and its brightness slider drives the motor position. A knob under the base covers local control.
 
 The firmware is ESP-IDF with SimpleFOC, on an ESP32-S3 control board I designed. The field-oriented control loop gets one of the chip's two cores to itself, so radio traffic doesn't stall the motor.
 
@@ -42,11 +44,11 @@ The firmware is ESP-IDF with SimpleFOC, on an ESP32-S3 control board I designed.
   items={[
     {
       src: "/artifacts/desk-lamp/lamp-closed.glb",
-      alt: "3D model of the desk lamp with the core lowered",
+      alt: "3D model of the desk lamp closed, with the lantern inside the tube",
     },
     {
       src: "/artifacts/desk-lamp/lamp-open.glb",
-      alt: "3D model of the desk lamp with the core raised",
+      alt: "3D model of the desk lamp open, with the lantern raised",
     },
   ]}
 />
