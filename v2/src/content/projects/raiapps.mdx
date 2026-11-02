@@ -1,62 +1,63 @@
 ---
 title: "RaiApps"
-summary: "A budgeting app and a climbing training tracker, both Flutter on Supabase, with LLM reports that never compute numbers or act alone."
-tags: ["Flutter", "Supabase", "Plaid", "LLM"]
+summary: "A household budgeting and investing app and a climbing training tracker, both Flutter, with LLM reports that never compute numbers or act alone."
+tags: ["Flutter", "AWS", "Plaid", "LLM"]
 category: ["code"]
 order: 2
 cover: "/artifacts/raiapps/cover.webp"
-coverAlt: "Three phone screens on a dark background: a budgeting dashboard, a climbing training day, and a spending analysis report"
+coverDark: "/artifacts/raiapps/cover-dark.webp"
+coverAlt: "Three phone screens: the Toucan dashboard, a climbing training day, and Toucan's money flow analysis"
 ---
 
 import DeviceFrame from "@/components/project/DeviceFrame.astro";
 import PhoneRow from "@/components/project/PhoneRow.astro";
+import PhoneVideo from "@/components/project/PhoneVideo.astro";
 import Diagram from "@/components/project/Diagram.astro";
-import RaiBudgetArchitecture from "@/components/diagrams/RaiBudgetArchitecture.astro";
+import ToucanArchitecture from "@/components/diagrams/ToucanArchitecture.astro";
 
-RaiBudget is a budgeting app fed by bank and card transactions through Plaid, and RaiClimbing is a training tracker for climbing. Both hand part of the work to an LLM, which is risky around money and training loads. So code computes the figures, the model judges what they mean, a server-side validator decides what reaches the screen, and anything binding waits for my approval. I built both in 2026 for my own use.
+Toucan is a household budgeting and investing app fed by bank, card and brokerage data through Plaid, and RaiClimbing is a training tracker for climbing. Both hand part of the work to an LLM, which is risky around money and training loads. So code computes the figures, the model only writes about them, a server-side validator decides what reaches the screen, and anything binding waits for a person. I built both in 2026 for my own use.
 
-## RaiBudget
+## Toucan
 
-RaiBudget runs on macOS, iOS and Android from one Flutter codebase and syncs in real time. Each category gets a monthly limit, and recategorizing a transaction once can save a rule for the next one.
+Toucan started in July as RaiBudget, a budgeting app for me, and grew into one my household shares. It runs on macOS, iOS and Android from one Flutter codebase. Members share budgets, goals, an activity feed, a spending report and an Invest tab, and each can keep accounts private, with their own budgets and reports that nobody else sees.
 
 <PhoneRow>
   <div>
-    <DeviceFrame src="/artifacts/raiapps/budget-dashboard.webp" alt="RaiBudget dashboard with monthly spending, income, and a spending trend chart" caption="Dashboard" />
+    <PhoneVideo src="/artifacts/raiapps/toucan-dashboard.webm" alt="Toucan dashboard: a finger scrubs the month's spending chart in the dark band, then scrolls to upcoming charges and a spending calendar" caption="Dashboard" />
   </div>
   <div>
-    <DeviceFrame src="/artifacts/raiapps/budget-budgets.webp" alt="RaiBudget category budgets with progress bars for the current month" caption="Budgets" />
+    <PhoneVideo src="/artifacts/raiapps/toucan-activity.webm" alt="Toucan activity feed filtered by household member, with a transaction sheet that sets a rule for the merchant" caption="Activity" />
   </div>
   <div>
-    <DeviceFrame src="/artifacts/raiapps/budget-analysis.webp" alt="RaiBudget analysis report with spending observations and trends" caption="Analysis" />
+    <PhoneVideo src="/artifacts/raiapps/toucan-budgets.webm" alt="Toucan budgets: category budgets rise as a range of hills in the band, then a budget opens with each member's share" caption="Budgets" />
   </div>
 </PhoneRow>
 
+Every screen follows a design system I wrote for it. A dark band holds the page's one figure and one small chart, and a light sheet under it holds the rows. The band's curve runs as one line from page to page, so a swipe between tabs slides along it, and every band chart reads by touch. Budgets stand as a range of hills, one per category. The clips follow this site's light or dark theme, as the app does.
 
-The back end is Postgres with row-level security on every table. The Plaid integration runs in edge functions, and its secrets sit in a table the app can't read. The first version took about three days and 184 commits.
+The back end moved from Supabase to AWS in October. Postgres runs on RDS with row-level security on every table, behind PostgREST on Lambda, and the app talks only to that API. It checks for changes every 30 seconds, so another member's edit or a bank sync shows within half a minute. Plaid's access tokens are sealed with a key only the Plaid functions can use, and reading household data or secrets from the AWS console takes a deliberate change that emails an alert. It runs for about $17 a month.
 
-The Analysis tab is written by a scheduled Claude Code cloud routine, not by the app. It pulls transactions and budgets through an edge function and writes back a report on anomalies, forecasts, recurring charges and trends. The server computes every figure the report cites, and the routine's search queries never include an amount or an account.
-
-{/* video slot */}
-
-<Diagram caption="The app talks only to Postgres. Plaid and the analysis routine go through edge functions.">
-  <RaiBudgetArchitecture />
+<Diagram caption="The app talks only to the REST API. Plaid and the analysis worker go through the functions.">
+  <ToucanArchitecture />
 </Diagram>
+
+The Analysis tab is a spending report written by a worker that runs every 15 minutes on Fargate. Code builds every fact first: budget pace, recurring charges, savings rate, net worth and where the month's income went. One OpenAI call then writes only words: a one-line summary, a short note per chart and a few recommendations. Every amount and percentage in the reply has to trace back to a figure it was given, or the reply is retried once and then dropped. Member names and people paid directly are swapped for aliases before the call.
+
+<PhoneRow>
+  <div>
+    <PhoneVideo src="/artifacts/raiapps/toucan-analysis.webm" alt="Toucan analysis: the month's income flows into spending, savings and investing, then the spending pace and net worth charts" caption="Analysis" />
+  </div>
+  <div>
+    <PhoneVideo src="/artifacts/raiapps/toucan-invest.webm" alt="Toucan Invest: portfolio value, top actions, a holdings map, and a ticker page with price history and signals" caption="Invest" />
+  </div>
+  <div>
+    <PhoneVideo src="/artifacts/raiapps/toucan-sandbox.webm" alt="Toucan Sandbox: a backtest replays past recommendations on the portfolio after taxes and trading costs" caption="Sandbox" />
+  </div>
+</PhoneRow>
 
 ### Investments
 
-A portfolio view gets its own read-only report with no buy or sell advice, so nothing happens to an account unless I do it.
-
-<PhoneRow>
-  <div>
-    <DeviceFrame src="/artifacts/raiapps/budget-investments.webp" alt="RaiBudget portfolio screen with holdings and allocation" caption="Portfolio" />
-  </div>
-  <div>
-    <DeviceFrame src="/artifacts/raiapps/budget-investments-analysis.webp" alt="RaiBudget investments analysis report" caption="Analysis" />
-  </div>
-  <div>
-    <DeviceFrame src="/artifacts/raiapps/budget-investments-charts.webp" alt="RaiBudget investment allocation and performance charts" caption="Charts" />
-  </div>
-</PhoneRow>
+The Invest tab runs on a quant engine I wrote in Python. Each weekday it forecasts risk, sets an outlook from today's yields and valuations, measures factor exposures and stress tests, then issues recommendations with a stated confidence. Each one is scored once it matures, and a confidence level is demoted when its hit rate falls short. The Sandbox replays past recommendations on the actual portfolio, after taxes and trading costs, to show what following them would have done. Written notes sit on top under the same rule as the spending report, and nothing trades by itself.
 
 ## RaiClimbing
 

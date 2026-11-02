@@ -25,7 +25,7 @@ Rodolfo's current work at Pindrop puts LLM agents into research workflows: he bu
 
 ## Web, cloud, and apps
 
-For web and cloud work, Rodolfo uses Astro, React, Tailwind CSS, and Netlify Functions, as on this site, and Node.js with Express. He builds app back ends on Supabase with Postgres, row-level security, realtime sync, edge functions, and scheduled jobs, and has integrated Plaid for bank data. On AWS he has used SageMaker, ECR, Docker, Batch, Bedrock AgentCore, and AWS CDK for infrastructure as code. Rodolfo builds native macOS menu bar apps with SwiftUI, OAuth, the Keychain, and FSEvents, and cross-platform apps with Flutter. For data and business intelligence he has used Tableau, Redash, and AWS QuickSight.
+For web and cloud work, Rodolfo uses Astro, React, Tailwind CSS, and Netlify Functions, as on this site, and Node.js with Express. He builds app back ends on Supabase with Postgres, row-level security, realtime sync, edge functions, and scheduled jobs, and has integrated Plaid for bank, card and brokerage data. On AWS he has used SageMaker, ECR, Docker, Batch, Bedrock AgentCore, and AWS CDK for infrastructure as code, and runs his Toucan app's back end on RDS Postgres, Lambda, Cognito and Fargate, set up with Terraform. Rodolfo builds native macOS menu bar apps with SwiftUI, OAuth, the Keychain, and FSEvents, and cross-platform apps with Flutter. For data and business intelligence he has used Tableau, Redash, and AWS QuickSight.
 
 ## Design and fabrication
 
