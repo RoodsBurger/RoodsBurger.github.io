@@ -8,7 +8,7 @@ url: /#projects
 Rodolfo Raimundo's site features eight projects, in the site's order:
 
 - Tobias: a 3D-printed quadruped robot that walks on a policy trained with reinforcement learning (Soft Actor-Critic) in simulation, running on a Raspberry Pi 4 that drives eight bus servos.
-- RaiApps: two Flutter apps on Supabase that Rodolfo built for his own use, RaiBudget (budgeting that syncs across devices, with Plaid) and RaiClimbing (a climbing training tracker), with LLM reports that never compute a number or change anything on their own.
+- RaiApps: two Flutter apps that Rodolfo built for his own use, Toucan (a household budgeting and investing app on AWS with Plaid, formerly called RaiBudget) and RaiClimbing (a climbing training tracker on Supabase), with LLM reports that never compute a number or change anything on their own.
 - Kinetic Desk Lamp: a desk lamp that sets brightness by raising a glass lantern out of an aluminum tube on a lead screw, with a brushless motor, a knob under the base and Matter over WiFi. Rodolfo uses it every day.
 - Hand Grinder Automation: a hand grinder turned into a motorized appliance, with a Raspberry Pi, a stepper-driven burr, an auger doser and a round touchscreen. Rodolfo built it because he makes espresso every day.
 - TidyNET: a robotic tidying system built in Columbia's Creative Machines Lab, where a diffusion model generates a tidy layout from a photo and a WidowX 200 robot arm rearranges the real objects to match.

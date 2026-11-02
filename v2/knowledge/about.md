@@ -25,7 +25,7 @@ Rodolfo's main professional achievements are at Pindrop: he co-authored an ACL 2
 
 ## What Rodolfo works on
 
-Rodolfo's work spans three areas. In machine learning, he has built speaker and audio authentication models, diffusion models for visual planning, and reinforcement learning policies for legged robots. In robotics, he trained a quadruped to walk in simulation and moved the policy to real hardware, and built a perception and manipulation pipeline that tidies a workspace with a robotic arm. In hardware, he designs and builds his own devices end to end: CAD, 3D-printed parts, custom ESP32-S3 control boards, motor control firmware and smart-home integration over Matter. He also builds software for his own use, including two Flutter apps, RaiBudget and RaiClimbing.
+Rodolfo's work spans three areas. In machine learning, he has built speaker and audio authentication models, diffusion models for visual planning, and reinforcement learning policies for legged robots. In robotics, he trained a quadruped to walk in simulation and moved the policy to real hardware, and built a perception and manipulation pipeline that tidies a workspace with a robotic arm. In hardware, he designs and builds his own devices end to end: CAD, 3D-printed parts, custom ESP32-S3 control boards, motor control firmware and smart-home integration over Matter. He also builds software for his own use, including two Flutter apps, Toucan (formerly RaiBudget) and RaiClimbing.
 
 ## Rodolfo's interests and approach
 

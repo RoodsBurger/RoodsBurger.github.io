@@ -1,27 +1,35 @@
 ---
-title: RaiApps, RaiBudget and RaiClimbing
+title: RaiApps, Toucan and RaiClimbing
 url: /projects/raiapps
 ---
 
 ## What RaiApps are
 
-RaiApps are two apps Rodolfo Raimundo built in 2026 for his own use: RaiBudget, a budgeting app that syncs across devices and pulls bank and card transactions through Plaid, and RaiClimbing, a training tracker for climbing and general workouts. Both are Flutter apps on Supabase with the same pastel design language. Both hand part of the work to an LLM, which is risky around money and training loads unless the model never produces a number and never changes anything by itself.
+RaiApps are two apps Rodolfo Raimundo built in 2026 for his own use: Toucan, a household budgeting and investing app that pulls bank, card and brokerage data through Plaid, and RaiClimbing, a training tracker for climbing and general workouts. Toucan was called RaiBudget until October 2026, when it was renamed. Both are Flutter apps. Both hand part of the work to an LLM, which is risky around money and training loads unless the model never produces a number and never changes anything by itself.
 
 ## The shared agent pattern
 
-RaiBudget and RaiClimbing handle the LLM the same way. Code computes the figures first, so the model only interprets numbers it didn't generate. The model judges what the numbers mean and drafts a report or recommendation. A server-side validator, with its own tests, decides what reaches the screen and rejects output that fails its checks. Anything binding waits for a person to approve it by hand: RaiBudget's reports are read-only, so nothing happens to an account unless Rodolfo does it himself, and a tap in RaiClimbing only applies changes already written out in the recommendation's text.
+Toucan and RaiClimbing handle the LLM the same way. Code computes the figures first, so the model only writes about numbers it didn't generate. A server-side validator, with its own tests, decides what reaches the screen and rejects output that fails its checks. Anything binding waits for a person: Toucan only reads accounts, so nothing happens to an account unless someone in the household does it, and a tap in RaiClimbing only applies changes already written out in the recommendation's text.
 
-## RaiBudget: budgets and dashboard
+## Toucan: what it does
 
-RaiBudget runs on macOS, iOS and Android from one Flutter codebase. Each spending category gets a monthly limit, and the dashboard shows it filling up, with over and under states and month-over-month trend charts. Every signed-in device sees the same data in real time. Recategorizing a transaction once can save a rule, so the next matching transaction is filed automatically. A PIN or biometric lock guards the app on every device, and public sign-ups are off.
+Toucan started in July 2026 as RaiBudget, Rodolfo's personal budgeting app, and grew into an app his household shares. It runs on macOS, iOS and Android from one Flutter codebase. Members share monthly category budgets, goals, a dashboard, an activity feed, a spending report and an Invest tab. Each member can also keep accounts private: only they see them, in a Personal view with its own budgets, goals and reports. Recategorizing a transaction once can save a rule for the next one, refunds reduce their category's spending, and transactions export as CSV. A PIN or biometric lock guards the app, and it opens offline from an encrypted copy of its last data. An interactive tour introduces each page on first launch.
 
-## RaiBudget: back end
+## Toucan: design
 
-RaiBudget's back end is Supabase: Postgres with row-level security on every table, realtime sync, edge functions and scheduled pg_cron jobs. The whole Plaid integration lives in edge functions, which create link tokens, exchange tokens, verify webhooks server-side and sync transactions incrementally, with a nightly job as the fallback. Plaid's secrets and access tokens sit in a table the app can't read. The app talks only to Postgres, and Plaid and the analysis routine reach the database only through edge functions. Rodolfo's first version took about three days, 184 commits and 24 database migrations, followed by several rounds of review.
+Rodolfo wrote a design system for Toucan called Plumage. Every screen has a dark band holding the page's title, one figure and one small chart, over a light sheet of plain rows. The band's curved edge runs as one continuous line from page to page, so swiping between tabs slides along it. Every band chart reads by touch: the Dashboard's spending line, the Budgets tab's range of hills (one per category budget), the Analysis tab's ridges and the Invest tab's portfolio value by quarter. The band folds away as the page scrolls. The app has light and dark themes. The demo videos on the project page show the real app running on a made-up household. A Flutter test drives the app and records each frame, and the phone around the screen is a still image rendered once in Blender.
 
-## RaiBudget: analysis and investments
+## Toucan: back end
 
-RaiBudget's Analysis tab is written by a scheduled Claude Code cloud routine, not by the app. Every few hours it checks whether a report is due. On a full run it pulls recent transactions and budgets through an edge function and writes back a structured report covering anomalies, budget-breach forecasts, recurring charges and subscriptions, savings suggestions and trends, laid out as tabs with charts and tables. The server computes every figure the report cites, and the routine's search queries never include an amount or an account. An admin can change how often it runs or force a refresh. A separate investments view shows portfolio value, holdings with their share of the portfolio, allocation and performance charts, and a second report covers the portfolio and gives no buy or sell advice.
+Toucan moved from Supabase to AWS on October 21, 2026. Postgres 17 runs on RDS with row-level security on every table, behind PostgREST on Lambda; sign-in is Cognito, with Google or email; the server functions run on Lambda; and the whole setup is Terraform. The app talks only to the API. It checks for changes every 30 seconds while open, so another member's edit or a bank sync shows within half a minute. Plaid access tokens are sealed with a KMS key that only the Plaid functions can use. Reading household data or server secrets from the AWS console takes a deliberate change, and every such change emails an alert. The AWS bill is about $16 to $17 a month. The repository passed 360 pull requests and about 690 commits between July and November 2026.
+
+## Toucan: spending analysis
+
+Toucan's Analysis tab is a spending report written by a worker container on AWS Fargate that runs every 15 minutes and reaches the database only through the API. Code builds every fact first: budget pace and projections, recurring charges and subscriptions, savings rate, net worth history, goals and a money flow from income to spending, saving and investing. One OpenAI call then writes only words: a one-line summary, a short analyst note per chart, and two to four recommendations. Every dollar amount and percentage in the reply must trace back to a figure the writer was given, or the reply is retried once and then the job fails. Member names and person-to-person payees are replaced with aliases before the call. Each household and each private view has its own monthly LLM budget, and all LLM calls stop at $19 a month.
+
+## Toucan: investing
+
+Toucan's Invest tab runs on a quant engine Rodolfo wrote in Python. Each weekday it forecasts volatility with the best of EWMA, GJR-GARCH and HAR-RV models, sets a return outlook from current yields and valuations, measures factor exposures and stress tests, and scores signals such as momentum, quality and value. It then issues recommendations, like trimming a position or harvesting a tax loss, each with a stated confidence. Every recommendation is scored once it matures, and a confidence level is demoted when its hit rate falls short. The Sandbox replays past recommendations on the household's own portfolio on historical prices, after taxes and trading costs, to show what following them would have done. Written notes come from OpenAI under the same rule as the spending report, and a weekly research pass adds news on public tickers only. Nothing trades by itself.
 
 ## RaiClimbing: plans and logging
 
