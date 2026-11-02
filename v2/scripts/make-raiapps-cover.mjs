@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Composes the RaiApps cover: three phone mockups side by side on a transparent background, so the card behind shows through in either theme.
+// Composes the RaiApps light and dark covers: three phone mockups side by side on a transparent background, the Toucan screens in the matching theme.
 import { writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -7,7 +7,6 @@ import sharp from "sharp";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const artDir = join(root, "public/artifacts/raiapps");
-const outPath = join(artDir, "cover.webp");
 
 const CANVAS_W = 2560;
 const CANVAS_H = 1600;
@@ -16,7 +15,7 @@ const BEZEL = "#0c0c0e";
 // A mid-grey rim keeps the black bezel visible on dark cards.
 const BORDER = "#5b5b63";
 
-// Screenshot source geometry: full, uncropped 1080x2400 phone screenshots.
+// Screenshot source geometry: 1080x2400 phone screenshots; the 1080x2316 Toucan stills lose a sliver at each side to fit.
 const SOURCE_W = 1080;
 const SOURCE_H = 2400;
 
@@ -64,18 +63,19 @@ async function buildPhone(screenshotPath) {
     .toBuffer();
 }
 
-const phones = await Promise.all(
-  ["budget-dashboard.webp", "climbing-today.webp", "budget-analysis.webp"].map((f) => buildPhone(join(artDir, f))),
-);
-
 const totalW = PHONE_W * 3 + GAP * 2;
 const startX = Math.round((CANVAS_W - totalW) / 2);
 const positions = [0, 1, 2].map((i) => startX + i * (PHONE_W + GAP));
 
-const cover = await sharp({ create: { width: CANVAS_W, height: CANVAS_H, channels: 4, background: BG } })
-  .composite(phones.map((input, i) => ({ input, left: positions[i], top: TOP_Y })))
-  .webp({ quality: 90, alphaQuality: 100 })
-  .toBuffer();
-
-writeFileSync(outPath, cover);
-console.log(`wrote ${outPath} (${cover.length} bytes)`);
+for (const suffix of ["", "-dark"]) {
+  const phones = await Promise.all(
+    [`toucan-dashboard-still${suffix}.webp`, "climbing-today.webp", `toucan-analysis-still${suffix}.webp`].map((f) => buildPhone(join(artDir, f))),
+  );
+  const cover = await sharp({ create: { width: CANVAS_W, height: CANVAS_H, channels: 4, background: BG } })
+    .composite(phones.map((input, i) => ({ input, left: positions[i], top: TOP_Y })))
+    .webp({ quality: 90, alphaQuality: 100 })
+    .toBuffer();
+  const outPath = join(artDir, `cover${suffix}.webp`);
+  writeFileSync(outPath, cover);
+  console.log(`wrote ${outPath} (${cover.length} bytes)`);
+}

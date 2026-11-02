@@ -1,0 +1,68 @@
+---
+// A phone-frame screen recording with light and dark takes; only the take for the current theme shows and plays.
+interface Props {
+  // The light take's .webm; the .mp4 and .webp poster sit beside it, and the dark take adds "-dark" to each name.
+  src: string;
+  alt: string;
+  caption?: string;
+}
+
+const { src, alt, caption } = Astro.props;
+const base = src.replace(/\.(webm|mp4)$/, "");
+const takes = [
+  { base, cls: "cover-when-light" },
+  { base: `${base}-dark`, cls: "cover-when-dark" },
+];
+---
+
+<figure class="not-prose my-8 mx-auto w-full max-w-xs">
+  <div class="rounded-[2.25rem] bg-(--color-foreground)/90 p-[4px] md:p-[6px]">
+    <div class="rounded-[2rem] md:rounded-[1.875rem] overflow-hidden isolate bg-(--color-muted)">
+      {takes.map((t) => (
+        <video
+          width="720"
+          height="1544"
+          muted
+          loop
+          playsinline
+          preload="none"
+          poster={`${t.base}.webp`}
+          class={`w-full h-auto block ${t.cls}`}
+          aria-label={alt}
+          data-phone-video
+        >
+          <source src={`${t.base}.webm`} type="video/webm" />
+          <source src={`${t.base}.mp4`} type="video/mp4" />
+        </video>
+      ))}
+    </div>
+  </div>
+  {caption && (
+    <figcaption class="mt-3 text-center font-mono text-xs text-(--color-muted-foreground)">
+      {caption}
+    </figcaption>
+  )}
+</figure>
+
+<script>
+  // The hidden theme's take never intersects, so it stays paused and unloaded; reduced motion gets controls instead.
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        const v = e.target as HTMLVideoElement;
+        if (e.isIntersecting && !v.closest("[inert]")) v.play?.().catch(() => {});
+        else v.pause?.();
+      }
+    },
+    { threshold: 0.2 },
+  );
+  document.querySelectorAll<HTMLVideoElement>("video[data-phone-video]:not([data-bound])").forEach((v) => {
+    v.dataset.bound = "";
+    if (reduce) {
+      v.controls = true;
+      v.loop = false;
+      v.preload = "metadata";
+    } else io.observe(v);
+  });
+</script>

@@ -1,0 +1,75 @@
+---
+// Toucan architecture on AWS: the app talks only to the REST API, Plaid reaches Postgres through the functions, and the worker reads and writes through them too, sending OpenAI only computed facts.
+import OrthoDiagram from "./OrthoDiagram.astro";
+import type { DiagramSpec } from "./ortho";
+
+const nodes = {
+  app: { title: "Flutter app", sub: "iOS · Android · macOS", tone: "accent" as const },
+  api: { title: "REST API", sub: "PostgREST on Lambda" },
+  postgres: { title: "Postgres", sub: "RLS on every table" },
+  functions: { title: "functions", sub: "Lambda · Plaid sync" },
+  worker: { title: "worker", sub: "Fargate · 15 min" },
+  plaid: { title: "Plaid", sub: "banks + brokerages", tone: "muted" as const },
+  openai: { title: "OpenAI", sub: "writes words only", tone: "muted" as const },
+};
+
+const aws = { id: "aws", title: "AWS", nodes: ["api", "postgres", "functions", "worker"] };
+
+// AWS is a 2x2 block on the right; the app and OpenAI sit on its left and Plaid under the functions.
+const desktop: DiagramSpec = {
+  cols: 3,
+  rows: 3,
+  cell: { h: 56, gapX: [100, 112], gapY: [56, 64] },
+  nodes: [
+    { id: "app", col: 0, row: 0, ...nodes.app },
+    { id: "api", col: 1, row: 0, ...nodes.api },
+    { id: "postgres", col: 2, row: 0, ...nodes.postgres },
+    { id: "openai", col: 0, row: 1, ...nodes.openai },
+    { id: "worker", col: 1, row: 1, ...nodes.worker },
+    { id: "functions", col: 2, row: 1, ...nodes.functions },
+    { id: "plaid", col: 2, row: 2, ...nodes.plaid },
+  ],
+  groups: [aws],
+  edges: [
+    { from: "app", to: "api", bidir: true, label: ["reads", "writes"] },
+    { from: "api", to: "postgres", bidir: true },
+    { from: "functions", to: "postgres", label: "writes", labelSide: "right" },
+    { from: "worker", to: "functions", bidir: true, label: ["data in", "reports out"] },
+    { from: "worker", to: "openai", tone: "secondary", bidir: true, label: ["facts in", "words out"] },
+    { from: "plaid", to: "functions", label: "transactions", labelSide: "right" },
+  ],
+};
+
+// One column; Plaid and OpenAI reach the functions and the worker through lanes on either side.
+const mobile: DiagramSpec = {
+  cols: 1,
+  rows: 7,
+  pad: { l: 36, r: 36 },
+  cell: { h: 50, gapX: 0, gapY: [60, 36, 36, 36, 48, 52] },
+  nodes: [
+    { id: "app", col: 0, row: 0, ...nodes.app },
+    { id: "api", col: 0, row: 1, ...nodes.api },
+    { id: "postgres", col: 0, row: 2, ...nodes.postgres },
+    { id: "functions", col: 0, row: 3, ...nodes.functions },
+    { id: "worker", col: 0, row: 4, ...nodes.worker },
+    { id: "plaid", col: 0, row: 5, ...nodes.plaid },
+    { id: "openai", col: 0, row: 6, ...nodes.openai },
+  ],
+  groups: [{ ...aws, pad: { t: 30, r: 12, b: 12, l: 12 } }],
+  edges: [
+    { from: "app", to: "api", bidir: true, label: "reads + writes", labelAt: 1, labelDy: -15 },
+    { from: "api", to: "postgres", bidir: true },
+    { from: "functions", to: "postgres", label: "writes" },
+    { from: "worker", to: "functions", bidir: true },
+    { from: "plaid", to: "functions", fromSide: "r", toSide: "r", via: [{ x: 1, dx: 6 }], label: "transactions", labelSide: "left", labelAt: 5 },
+    { from: "openai", to: "worker", fromSide: "l", toSide: "l", tone: "secondary", via: [{ x: 0, dx: -6 }], bidir: true, label: ["facts in", "words out"], labelAt: 6 },
+  ],
+};
+---
+
+<OrthoDiagram
+  name="toucan"
+  label="The Flutter app on iOS, Android and macOS talks only to a REST API, PostgREST on Lambda, in front of Postgres with row-level security on every table. Plaid transactions arrive through Lambda functions that write them to Postgres. A worker on Fargate runs every 15 minutes, reads data and writes reports through those functions, and sends OpenAI only computed facts, getting back words."
+  desktop={desktop}
+  mobile={mobile}
+/>
